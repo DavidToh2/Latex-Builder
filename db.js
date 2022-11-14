@@ -12,7 +12,10 @@ const options = {
     authSource: 'admin'
 };
 
-mongoose.connect(mongoURI, options);
+mongoose.connect(mongoURI, options)
+.then(() => console.log("Connection success!"))
+.catch((error) => console.log(error));
+
 var db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
