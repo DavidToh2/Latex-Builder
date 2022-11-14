@@ -2,11 +2,28 @@ version: '3.4'
 
 services:
   latexquestionbank:
+    container_name: latexquestionbank
     image: latexquestionbank
     build:
       context: .
       dockerfile: ./Dockerfile
-    environment:
-      NODE_ENV: production
+    env_file:
+      - .env      
     ports:
       - 3000:3000
+      - 9229:9229
+    links:
+      - questiondb
+
+  questiondb:
+    container_name: questiondb
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - db-data:/data/db
+    env_file:
+      - .env
+
+volumes:
+  db-data:

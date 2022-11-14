@@ -67,7 +67,60 @@
 
 [Docker tutorial](https://docs.docker.com/language/nodejs/build-images/)
 
-## Part 3: MongoDB/Mongoose
+## Part 3: Setting Up MongoDB/Mongoose and Docker Compose
 
 **MongoDB** is a NoSQL database framework. **Mongoose** is the NodeJS version of this framework.
 
+**Docker Compose** is a tool that allows us to define and configure multi-container Docker applications. We do so by editing the `docker-compose.yml` file.
+
+1. Install the Mongoose NodeJS extension
+    - Execute `npm install mongoose`
+
+2. Download the official Mongo Docker image
+    - Execute `docker pull mongo:latest`
+    - We do not need to install MongoDB natively on our own machine. Anyway, the MongoDB Community Edition Server doesn't support Ubuntu 22.04, and MongoDB Atlas is paid
+
+3. Create an environment variable file `.env`. 
+   - Include the following two variables
+     - `MONGO_INITDB_ROOT_USERNAME`
+     - `MONGO_INITDB_ROOT_PASSWORD`
+     - `MONGODB_APPLICATION_DATABASE`
+   - Set-up the `MONGO_URI`
+     - The format is `mongodb://<username>:<password>@<container>/<database>`
+     - Reference in Javascript with `process.env.MONGO_URI`
+
+4. Update `docker-compose.yml` with our second service
+    - Include the names of the container and image used
+    - Port: `27017:27017`, the MongoDB default
+    - Create a mounted volume `<host-dir>:/data/db`. This allows the database data, normally stored under `/data/db`, to be persistent across container start/stops.
+    - Add a reference to the `env_file`
+    - Add a link from our app service to the database service
+    - Copy the `MONGO_URI` over to the app service's environment variable file
+
+5. Set-up Mongoose authentication
+    - In `db.js`: connect to the MongoDB using the following code
+```
+const mongoURI = "mongodb://<container>/<database>"
+const options = {
+    const options = { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true,
+    user: <MONGO_INITDB_ROOT_USERNAME>,
+    pass: <MONGO_INITDB_ROOT_PASSWORD>,
+    authSource: 'admin'         // Important
+}
+mongoose.connect(mongoURI, options)
+```
+
+## Part 4: Building and Development
+
+1. Build both containers at once
+    - Execute `docker-compose up`
+    - Execute `docker-compose up --build` to rebuild images
+
+2. Stop all containers
+    - Execute `docker-compose down`
+
+[Docker compose example](https://hub.docker.com/r/excellalabs/mongo)
+
+[Docker with authentication](https://hub.docker.com/r/duluca/minimal-mongo)
