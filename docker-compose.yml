@@ -24,6 +24,8 @@ services:
       - db-data:/data/db
     env_file:
       - .env
+    environment:
+      - MONGO_INITDB...:
 
 volumes:
   db-data:

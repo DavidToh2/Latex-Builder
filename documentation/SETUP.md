@@ -1,3 +1,7 @@
+## Introduction
+
+This document is intended as a guide for people wishing to start their own containerised NodeJS / MongoDB cdatabase-backed application.
+
 ## Part 1. NodeJS
 
 **NodeJS** is a cross-platform runtime environment that can be used to create both server-side tools and applications in Javascript.
@@ -81,7 +85,7 @@
     - We do not need to install MongoDB natively on our own machine. Anyway, the MongoDB Community Edition Server doesn't support Ubuntu 22.04, and MongoDB Atlas is paid
 
 3. Create an environment variable file `.env`. 
-   - Include the following two variables
+   - Include the following three variables
      - `MONGO_INITDB_ROOT_USERNAME`
      - `MONGO_INITDB_ROOT_PASSWORD`
      - `MONGODB_APPLICATION_DATABASE`
@@ -102,7 +106,6 @@
 ```
 const mongoURI = "mongodb://<container>/<database>"
 const options = {
-    const options = { 
     useNewUrlParser: true, 
     useUnifiedTopology: true,
     user: <MONGO_INITDB_ROOT_USERNAME>,
