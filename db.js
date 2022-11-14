@@ -3,7 +3,7 @@
 var mongoose = require('mongoose')
 var async = require('async')
 
-const mongoURI = "mongodb://questiondb/database"
+const mongoURI = "mongodb://questiondb/questions"
 const options = { 
     useNewUrlParser: true, 
     useUnifiedTopology: true,
