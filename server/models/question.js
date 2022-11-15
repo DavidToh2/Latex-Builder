@@ -31,13 +31,6 @@ const topicData = new Schema( {
 })
 
 const questionSchema = new Schema( {
-    hash: {
-        type: Number,
-        unique: true,
-        min: 0,
-        max: 99999999,
-        required: [true, 'Missing hash!']
-    },
     question: {
         type: String,
         required: [true, 'Missing question!']

@@ -30,7 +30,7 @@ const Source = mongoose.model("sources", sourceData);
 const Question = mongoose.model("questions", questionSchema);
 
 function newQuestion(
-    nhash, nquestion, ntopicData, ndifficulty, nimages, nsolution, nsolutionImages, nsourceData
+    nquestion, ntopicData, ndifficulty, nimages, nsolution, nsolutionImages, nsourceData
 ) {
 
     const ntopic = new Topic(
@@ -48,7 +48,6 @@ function newQuestion(
     )
     const quEx = new Question(
         {
-            hash: nhash,
             question: nquestion,
             topicData: ntopic,
             difficulty: ndifficulty,
@@ -69,9 +68,9 @@ function newQuestion(
     })
 }
 
-function findQuestion(dataDict, outputArr) {   
+function findQuestions(dataDict, outputArr) {   
     var outputFields = outputArr.join(" ");
-    question.find(dataDict, outputFields, (err, questions) => {
+    Question.find(dataDict, outputFields, (err, questions) => {
         if (err) {
             console.log("Failed to find questions!"); 
             console.log(err);
@@ -81,6 +80,40 @@ function findQuestion(dataDict, outputArr) {
     })
 }
 
+function findQuestionByID(qnID, outputArr) {   
+    var outputFields = outputArr.join(" ");
+    Question.findById(qnID, outputFields, (err, question) => {
+        if (err) {
+            console.log(`Failed to delete question with ID ${qnID}!`);
+            console.log(err);
+            return false;
+        }
+        return question;
+    })
+}
+
+function deleteQuestions(dataDict) {
+    Question.deleteMany(dataDict, (err) => {
+        if (err) {
+            console.log("Failed to delete questions!");
+            console.log(err);
+            return false;
+        }
+        return true;
+    })
+}
+
+function deleteQuestionByID(qnID) {
+    Question.findByIdAndDelete(qnID, (err) => {
+        if (err) {
+            console.log(`Failed to delete question with ID ${qnID}!`);
+            console.log(err);
+            return false;
+        }
+        return true;
+    })
+}
+
 module.exports = {
-    newQuestion, findQuestion
+    newQuestion, findQuestions, findQuestionByID, deleteQuestions, deleteQuestionByID
 };
