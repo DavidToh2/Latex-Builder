@@ -1,16 +1,20 @@
-## Installing Docker
-- Install docker by following docker-desktop by following [this](https://docs.docker.com/desktop/install/linux-install/)
+## Introduction
+
+This file documents the steps needed to run and test the server in development.
 
 ## Environmental Variables
 Write the following in `.env` in the application's root directory.
-`
+```
 MONGO_INITDB_ROOT_USERNAME=admin_user
 MONGO_INITDB_ROOT_PASSWORD=admin_password
-`
+```
 
-## Running the Application
+## Running the Server
 - Run using `docker compose up`
+- Rebuild images using `docker compose build`
+- Stop containers using `docker compose down`
 
 ## Exploring the Database
-- We can use [MongoDB Compass](https://www.mongodb.com/products/compass)
+- Download and install [MongoDB Compass](https://www.mongodb.com/products/compass)
+- Start MongoDB Compass using `mongodb-compass`
 - Connect using the string `mongodb://admin_user:admin_password@localhost:27017`

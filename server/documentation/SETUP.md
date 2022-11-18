@@ -45,7 +45,8 @@ This document is intended as a guide for people wishing to start their own conta
 
 **Docker** is a containerisation service. The container itself is controlled by the `Dockerfile`.
 
-1. Install Docker and the VSCode Docker Extension
+1. Install Docker and the VSCode Docker Extension via [this link](https://docs.docker.com/desktop/install/linux-install/).
+   - Execute `systemctl --user enable docker-desktop` to allow Docker Desktop to start automatically upon system boot.
 
 2. Open the Command Palette and select *Add Docker Files to Workspace*
 
@@ -60,7 +61,7 @@ This document is intended as a guide for people wishing to start their own conta
     - This runs the image in the container, detaches the container from the terminal, and exposes the given internal container port to the given external host port
     - Execute `curl` with `--url http://localhost:[host port]/` to send a request to the web server container. The full command is
 ```
- curl --request GET --url http://localhost:3000/users \
+ curl --request GET --url http://localhost:3000/ \
   --header 'content-type: application/json' --data '{"msg": "testing"}'
 ```
 
@@ -115,15 +116,10 @@ const options = {
 mongoose.connect(mongoURI, options)
 ```
 
-## Part 4: Building and Development
-
-1. Build both containers at once
-    - Execute `docker-compose up`
-    - Execute `docker-compose up --build` to rebuild images
-
-2. Stop all containers
-    - Execute `docker-compose down`
+## Some links:
 
 [Docker compose example](https://hub.docker.com/r/excellalabs/mongo)
 
 [Docker with authentication](https://hub.docker.com/r/duluca/minimal-mongo)
+
+## For development-related instructions, refer to [DEVELOPMENT.md](./DEVELOPMENT.md)
