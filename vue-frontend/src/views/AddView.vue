@@ -1,7 +1,31 @@
+<script setup lang="ts">
+
+import { defineComponent } from 'vue'
+/* export default defineComponent({
+	question: string
+
+	topic: string
+	subtopic: string
+	subsubtopic: string
+
+	difficulty: string
+	image: string[]
+
+	solution: string
+	solimage: string[]
+
+	sourcename: string
+	sourceyear: number
+}) */
+
+</script>
+
 <template>
-	<div class="about">
-		<h1>Add a Problem</h1>
-		<h2>This part will eventually become a(nother) form?</h2>
+	<div class="section">
+		<h2>Add a problem</h2>
+		<form class="addProblem">
+			<input>
+		</form>
 	</div>
 </template>
   

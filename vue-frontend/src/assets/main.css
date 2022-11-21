@@ -32,4 +32,8 @@ a,
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   } */
+
+  .container {
+    padding: 0px 20px;
+  }
 }
