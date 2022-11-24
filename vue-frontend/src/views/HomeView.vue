@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import Title from '@/components/PageTitle.vue'
 </script>
 
 <template>
+    <Title title="Home" />
 	<main>
 		<h1>-- About Latex Problem Sheet Builder -- </h1>
 		<p>
@@ -10,3 +12,8 @@
 		</p>
 	</main>
 </template>
+
+<style scoped>
+
+</style>
+

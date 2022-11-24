@@ -3,33 +3,34 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <template>
-    <nav class="navbar">
-        <ul class="navbar-list">
-            <li class="navbar-item"><RouterLink to="/">Home</RouterLink></li>
-            <li class="navbar-item"><RouterLink to="/build">Build</RouterLink></li>
-            <li class="navbar-item"><RouterLink to="/add">Contribute</RouterLink></li>
-        </ul>
-    </nav>
+    <ul class="navbar-list">
+        <li class="navbar-item"><RouterLink to="/">Home</RouterLink></li>
+        <li class="navbar-item"><RouterLink to="/build">Build</RouterLink></li>
+        <li class="navbar-item"><RouterLink to="/add">Contribute</RouterLink></li>
+        <li class="navbar-item"><RouterLink to="/add">Login</RouterLink></li>
+    </ul>
 </template>
 
 <style scoped>
+
 .navbar-list {
     list-style: none;
     display: flex;
     align-items: flex-start;
 }
 
-.navbar-item {
+.navbar-item > a {
     width: max-content;
-    padding: 0px 20px;
     text-decoration: none;
     color: #ffffff;
-    font-size: 1.6rem;
+    font-size: 26px;
+    font-weight: 600;
+    padding: 0px 24px;
 }
 
 .navbar-item:hover {
-    background-color: #550055;
-    font-weight: 500;
+    background-color: #002504;
+    font-weight: 800;
     cursor: pointer;
 }
 
