@@ -1,0 +1,24 @@
+{
+    "Mathematics": {
+        "Topics": {
+            "Algebra": [
+                "Polynomials", "Inequalities"
+            ],
+            "Combinatorics": [
+                "Counting", "Invariants"
+            ],
+            "Geometry": [
+                "Cyclic Quadrilaterals", "Power of a Point", "Linear Geometry"
+            ],
+            "Number Theory": [
+                "Divisibility", "Modular Arithmetic"
+            ]
+        },
+        "Difficulty": [
+            "Primary", "Junior (C)", "Junior (B)", "Junior (A)", "Senior", "Open", "IMO (D)", "IMO (C)", "IMO (B)", "IMO (A)"
+        ],
+        "Source": [
+            "SMO Junior", "SMO Senior", "SMO Open", "IMO"
+        ]
+    }
+}

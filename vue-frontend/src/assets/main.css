@@ -19,14 +19,16 @@
     width: 100%;
     height: 100vh;
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template:
+      "a a" 64px
+      "b c" / 50% 50%;
     grid-row-gap: 0;
   }
 
   .textbox {
     display: flex;
     align-items: center;
-    justify-items: left;
+    justify-content: left;
   }
 }
   
