@@ -12,7 +12,7 @@ const router = createRouter({
       name: 'home',
       components: {
         left: HomeView,
-        right: DatabaseView
+        right: HomeView
       }
     },
     {

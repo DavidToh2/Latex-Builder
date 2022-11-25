@@ -6,8 +6,8 @@ import { RouterLink } from 'vue-router'
     <ul class="navbar-list">
         <li class="navbar-item"><RouterLink to="/">Home</RouterLink></li>
         <li class="navbar-item"><RouterLink to="/build">Build</RouterLink></li>
-        <li class="navbar-item"><RouterLink to="/add">Contribute</RouterLink></li>
-        <li class="navbar-item"><RouterLink to="/add">Login</RouterLink></li>
+        <li class="navbar-item"><RouterLink to="/contribute">Contribute</RouterLink></li>
+        <li class="navbar-item"><RouterLink to="/login">Login</RouterLink></li>
     </ul>
 </template>
 

@@ -1,41 +1,39 @@
 <script setup lang="ts">
-
 import { defineComponent } from 'vue'
-/* export default defineComponent({
-	question: string
+import Title from '@/components/PageTitle.vue'
+import QuestionFilters from '@/components/QuestionFilters.vue'
 
-	topic: string
-	subtopic: string
-	subsubtopic: string
+</script>
 
-	difficulty: string
-	image: string[]
-
-	solution: string
-	solimage: string[]
-
-	sourcename: string
-	sourceyear: number
-}) */
+<script lang="ts">
 
 </script>
 
 <template>
-	<div class="section">
-		<h2>Add a problem</h2>
-		<form class="addProblem">
-			<input>
-		</form>
-	</div>
+    <Title title="Contribute" />
+    <form id="question-build-container" method="POST" action="http://localhost:3000/database/set/new/">
+        <QuestionFilters />
+        <textarea id="question-text" name="question" placeholder="Type LaTeX here:"></textarea>
+        <input type="submit">
+    </form>
 </template>
-  
-<!--   <style>
-  @media (min-width: 1024px) {
-    .about {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-    }
-  }
-  </style> -->
+
+<style scoped>
+
+#question-build-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0px;
+    align-items: center;
+}
+
+#question-text {
+	width: 100%;
+	height: 300px;
+	max-height: none;
+}
+
+</style>
   

@@ -2,42 +2,22 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const sourceData = new Schema( {
-    sourceName: {
-        type: String,
-        uppercase: true
-    },
-    sourceYear: {
-        type: Number,
-        min: 1800
-    }
-
-})
-
-const topicData = new Schema( {
-    topic: {
-        type: [String],
-        enum: ['Algebra', 'Combinatorics', 'Geometry', 'Number Theory', 'Others'],
-        required: [true, 'Missing topic!']
-    },
-    subTopic: {
-        type: String,
-        lowercase: true
-    },
-    subSubTopic: {
-        type: String,
-        lowercase: true
-    },
-})
-
 const questionSchema = new Schema( {
     question: {
         type: String,
         required: [true, 'Missing question!']
     },
-    topicData: {
-        type: topicData,
+    category: {
+        type: String,
+        required: [true, 'Missing category!'],
+        enum: ['Mathematics', 'Computer Science']
+    },
+    topic: {
+        type: [String],
         required: [true, 'Missing topic data!']
+    },
+    subtopic: {
+        type: [String]
     },
 
     difficulty: {
@@ -51,14 +31,36 @@ const questionSchema = new Schema( {
         type: String
     },
     solutionImages: [String],
-    sourceData: {
-        type: sourceData
+    
+    sourceName: {
+        type: String,
+        uppercase: true
+    },
+    sourceYear: {
+        type: Number,
+        min: 1800
+    },
+
+    tags: {
+        type: [String]
     }
-})
+}, 
+/* {
+    virtuals: {
+        qnID: {
+            get() {
+                if (this.category == 'Mathematics') {
+                    return 'M' + this.id
+                } else if (this.category == 'Computer Science') {
+                    return 'CS' + this.id
+                }
+            }
+        }
+    }
+} */
+)
 
 module.exports = {
-    topicData: topicData,
-    sourceData: sourceData,
     questionSchema: questionSchema
 }
 

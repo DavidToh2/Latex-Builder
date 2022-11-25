@@ -1,5 +1,5 @@
 var express = require('express')
-var {newQuestion, findQuestion} = require('../db.js')
+var {newQuestion, findQuestions} = require('../db.js')
 var router = express.Router()
 
 /* GET users listing. */

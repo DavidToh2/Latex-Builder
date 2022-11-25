@@ -2,6 +2,7 @@
 
 export interface Props {
   description: string
+  internalName: string
   fontSize?: string
 }
 
@@ -9,7 +10,7 @@ const props = withDefaults(defineProps<Props>(), {
   fontSize: "20"
 })
 
-const dropdownSize = (props.fontSize == "20") ? "row" : "column"
+const dropdownDir = (props.fontSize == "20") ? "row" : "column"
 
 </script>
 
@@ -19,7 +20,7 @@ const dropdownSize = (props.fontSize == "20") ? "row" : "column"
             {{ description }}
         </div>
         <div class="dropdown-search-container">
-            <input type="text" class="dropdown-searchbar" :class="{description}" :style="{'font-size' : fontSize + 'px'}">
+            <input type="text" class="dropdown-searchbar" :name="internalName" :style="{'font-size' : fontSize + 'px'}">
             <ul class="dropdown-list">
                 <li>"Hi"</li>
             </ul>
@@ -31,7 +32,7 @@ const dropdownSize = (props.fontSize == "20") ? "row" : "column"
 
 .dropdown-container {
     display: flex;
-    flex-direction: v-bind('dropdownSize');
+    flex-direction: v-bind('dropdownDir');
     justify-content: center;
     gap: 7px;
     padding: 0px 7px;

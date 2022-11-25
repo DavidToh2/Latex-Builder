@@ -122,4 +122,4 @@ mongoose.connect(mongoURI, options)
 
 [Docker with authentication](https://hub.docker.com/r/duluca/minimal-mongo)
 
-## For development-related instructions, refer to [DEVELOPMENT.md](./DEVELOPMENT.md)
+## For execution-related instructions, refer to [RUNNING.md](./RUNNING.md)

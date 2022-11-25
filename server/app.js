@@ -10,8 +10,9 @@ var logger = require('morgan');
 
 		// Import routing modules
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+// var indexRouter = require('./routes/index');
+// var usersRouter = require('./routes/users');
+var router = require('./router')
 
 var app = express();                              	// Initialise the app
 
@@ -26,8 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));	// allows us to serve s
 		// The following two lines map our application URLs to the routing modules.
 		// Overall URL: [the stuff below]/[the stuff in the router module]
 
-app.use('/', indexRouter);			
-app.use('/users', usersRouter);
+app.use('/database', router)
 
 
 		// Error handlers
@@ -39,13 +39,9 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-	// set locals, only providing error in development
-	res.locals.message = err.message;
-	res.locals.error = req.app.get('env') === 'development' ? err : {};
-
 	// render the error page
 	res.status(err.status || 500);
-	res.render('error');
+	res.send(err.message);
 });
 
 module.exports = app;
