@@ -1,5 +1,9 @@
 <script setup lang="ts">
 
+import { ref } from 'vue'
+
+    // Props
+
 export interface Props {
   description: string
   internalName: string
@@ -12,6 +16,37 @@ const props = withDefaults(defineProps<Props>(), {
 
 const dropdownDir = (props.fontSize == "20") ? "row" : "column"
 
+    // Emits
+
+const emits = defineEmits<{
+    (e: 'update', values: [string]): void
+}>()
+
+    // Dynamic variables
+
+const searchText = ref('')
+
+</script>
+
+<script lang="ts"> 
+
+const searchDir : string = "@/assets/dropdown.json"
+
+function dropdownFilter(e : HTMLInputElement, directory : string) {
+    var searchTarget = e.value
+    var eName = e.name
+    fetch(searchDir)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Could not fetch dropdown tags! HTTP Error " + response.status)
+        }
+        return response.json()
+    })
+    .then(tags => {
+
+    })
+}
+
 </script>
 
 <template>
@@ -20,7 +55,7 @@ const dropdownDir = (props.fontSize == "20") ? "row" : "column"
             {{ description }}
         </div>
         <div class="dropdown-search-container">
-            <input type="text" class="dropdown-searchbar" :name="internalName" :style="{'font-size' : fontSize + 'px'}">
+            <input type="text" class="dropdown-searchbar" :name="internalName" :style="{'font-size' : fontSize + 'px'}" :bind="searchText">
             <ul class="dropdown-list">
                 <li>"Hi"</li>
             </ul>
