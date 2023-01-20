@@ -12,7 +12,7 @@ import QuestionFilters from '@/components/QuestionFilters.vue'
 <template>
     <Title title="Contribute" />
     <form id="question-build-container" method="POST" action="http://localhost:3000/database/set/new/">
-        <QuestionFilters />
+        <QuestionFilters func="contribute" />
         <input type="text" id="question-build-shortcut" name="question-tags" placeholder="Quickfill: Category - Topic - Subtopic - Difficulty - Source - Year - Tags">
         <textarea id="question-text" name="question" placeholder="Type LaTeX here:"></textarea>
         <input type="submit">

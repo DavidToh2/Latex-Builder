@@ -1,29 +1,52 @@
 <script setup lang="ts">
 
-import DropdownSearch from '@/components/DropdownSearch.vue'
-import {searchParametersStore} from '@/stores/SearchParameters'
+    import DropdownSearch from '@/components/DropdownSearch.vue'
 
-const parametersStore = searchParametersStore()
-const params = parametersStore.paramList
+    export interface Props {
+        func: string
+    }
+
+    const props = withDefaults(defineProps<Props>(), {
+        
+    })
+
+</script>
+
+<script lang="ts">
+    let category: string
+    let topic: [string]
+    let subtopic: [string]
+    let difficulty: [string]
+    let sourceName: [string]
+    let sourceYear: [string]
+    let tags: [string]
+
+    function update(n : Number) {
+        switch(n) {
+
+        }
+    }
 
 </script>
 
 <template>
-    <div id="question-filters-row">
-        <div class="question-filters">
-            <DropdownSearch description="Category" internalName="category" fontSize="24" />
+    <form :id="func" action="">
+        <div id="question-filters-row">
+            <div class="question-filters">
+                <DropdownSearch description="Category" internalName="category" fontSize="24" @update="update(1)"/>
+            </div>
+            <div class="question-filters">
+                <DropdownSearch description="Topic" internalName="topic" />
+                <DropdownSearch description="Subtopic" internalName="subtopic" />
+                <DropdownSearch description="Difficulty" internalName="difficulty" />
+            </div>
+            <div class="question-filters">
+                <DropdownSearch description="Source" internalName="sourceName" />
+                <DropdownSearch description="Year" internalName="sourceYear" />
+                <DropdownSearch description="Tags" internalName="tags" />
+            </div>
         </div>
-        <div class="question-filters">
-            <DropdownSearch description="Topic" internalName="topic" />
-            <DropdownSearch description="Subtopic" internalName="subtopic" />
-            <DropdownSearch description="Difficulty" internalName="difficulty" />
-        </div>
-        <div class="question-filters">
-            <DropdownSearch description="Source" internalName="sourceName" />
-            <DropdownSearch description="Year" internalName="sourceYear" />
-            <DropdownSearch description="Tags" internalName="tags" />
-        </div>
-    </div>
+    </form>
 </template>
 
 <style scoped>

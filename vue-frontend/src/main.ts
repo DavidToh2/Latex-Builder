@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createPinia } from 'pinia'     // Allows creation and use of Stores, which are global variables. Currently unused.
 import App from './App.vue'
 import router from './router'
 

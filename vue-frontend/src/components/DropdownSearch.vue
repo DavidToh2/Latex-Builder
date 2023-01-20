@@ -1,51 +1,60 @@
 <script setup lang="ts">
 
-import { ref } from 'vue'
+    import { ref } from 'vue'
 
-    // Props
+        // Props receive data from the parent components of this component.
+        // When the child component is refreshed, the list of available selections is received from the parent.
 
-export interface Props {
-  description: string
-  internalName: string
-  fontSize?: string
-}
+    export interface Props {
+        description: string
+        internalName: string
+        selection?: [string]
+        fontSize?: string
+    }
 
-const props = withDefaults(defineProps<Props>(), {
-  fontSize: "20"
-})
+        // Define the default value of props
 
-const dropdownDir = (props.fontSize == "20") ? "row" : "column"
+    const props = withDefaults(defineProps<Props>(), {
+        fontSize: "20",
+    })
 
-    // Emits
+    const dropdownDir = (props.fontSize == "20") ? "row" : "column"
 
-const emits = defineEmits<{
-    (e: 'update', values: [string]): void
-}>()
+        // Emits send data to the parent components of this component.
+        // The update emit sends the list of selected items to the parent.
 
-    // Dynamic variables
+    const emits = defineEmits<{
+        (e: 'update', values: [string]): void
+    }>()
 
-const searchText = ref('')
+        // Dynamic variables
+
+    const searchText = ref('')
 
 </script>
 
 <script lang="ts"> 
 
-const searchDir : string = "@/assets/dropdown.json"
+    const searchDir : string = "@/assets/dropdown.json"
 
-function dropdownFilter(e : HTMLInputElement, directory : string) {
-    var searchTarget = e.value
-    var eName = e.name
-    fetch(searchDir)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Could not fetch dropdown tags! HTTP Error " + response.status)
-        }
-        return response.json()
-    })
-    .then(tags => {
+    function dropdownFilter(e : HTMLInputElement, directory : string) {
+        var searchTarget = e.value
+        var eName = e.name
+        fetch(searchDir)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Could not fetch dropdown tags! HTTP Error " + response.status)
+            }
+            return response.json()
+        })
+        .then(tags => {
 
-    })
-}
+        })
+    }
+
+    function getSelections() {
+        let selectElement = document.querySelector()
+    }
 
 </script>
 
@@ -56,9 +65,13 @@ function dropdownFilter(e : HTMLInputElement, directory : string) {
         </div>
         <div class="dropdown-search-container">
             <input type="text" class="dropdown-searchbar" :name="internalName" :style="{'font-size' : fontSize + 'px'}" :bind="searchText">
-            <ul class="dropdown-list">
-                <li>"Hi"</li>
-            </ul>
+
+            <!-- Emits an event to update the parent component whenever the selection is changed. 
+            This is to allow other DropdownSearches to access this DropdownSearch's selections. -->
+
+            <select class="dropdown-list" :id="{'dropdown-list-' + internalName}" @onchange="$emit('update', getSelections())">
+                <option v-for="item in selection">{{ item }}</option>
+            </select>
         </div>
     </div>
 </template>
