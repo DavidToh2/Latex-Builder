@@ -1,6 +1,6 @@
 {
     "Mathematics": {
-        "Topics": {
+        "topic": {
             "Algebra": [
                 "Polynomials", "Inequalities"
             ],
@@ -14,11 +14,27 @@
                 "Divisibility", "Modular Arithmetic"
             ]
         },
-        "Difficulty": [
+        "difficulty": [
             "Primary", "Junior (C)", "Junior (B)", "Junior (A)", "Senior", "Open", "IMO (D)", "IMO (C)", "IMO (B)", "IMO (A)"
         ],
-        "Source": [
+        "source": [
             "SMO Junior", "SMO Senior", "SMO Open", "IMO"
+        ]
+    },
+    "Computer Science": {
+        "topic": {
+            "Graph Theory": [
+                "Graph Traversal", "Minimum Spanning Tree"
+            ],
+            "Second Topic": [
+                "Placeholder"
+            ]
+        },
+        "difficulty": [
+            "NOI", "University"
+        ],
+        "source": [
+            "NOI", "IOI", "ICPC"
         ]
     }
 }

@@ -19,7 +19,7 @@ function submitSearchQuery() {
 <template>
     <Title title="Database" />
     <form id="question-search-container" method="POST" onsubmit="submitSearchQuery()">
-        <QuestionFilters />
+        <QuestionFilters func="database" />
         <input type="text" id="question-search" name="question" placeholder="Search question text">
         <input type="submit">
     </form>

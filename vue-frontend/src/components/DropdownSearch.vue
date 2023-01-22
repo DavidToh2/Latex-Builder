@@ -1,14 +1,14 @@
 <script setup lang="ts">
 
-    import { ref } from 'vue'
+    import { ref, reactive, computed } from 'vue'
 
-        // Props receive data from the parent components of this component.
+    // PROPS receive data from the parent components of this component.
         // When the child component is refreshed, the list of available selections is received from the parent.
 
     export interface Props {
         description: string
         internalName: string
-        selection?: [string]
+        availableSelections?: string[]
         fontSize?: string
     }
 
@@ -18,42 +18,62 @@
         fontSize: "20",
     })
 
-    const dropdownDir = (props.fontSize == "20") ? "row" : "column"
+    // REACTIVE VARIABLES
+        // These Javascript variables are bound using :value, and are automatically updated along with their bound HTML counterparts.
+        // Since this is TypeScript, we have to explicitly type the empty array.    
 
-        // Emits send data to the parent components of this component.
+    const search = reactive({
+        searchText: '',
+        activeSelections: <string[]>[],
+        active: false
+    })
+
+    const dropdownDir = (props.fontSize == "20") ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
+
+    // EMITS send data to the parent components of this component.
         // The update emit sends the list of selected items to the parent.
 
     const emits = defineEmits<{
-        (e: 'update', values: [string]): void
+        (e: 'update', intName: string, values: string[]): void
     }>()
 
-        // Dynamic variables
+        // Whenever the input text is updated, get the list of matching available selections.
 
-    const searchText = ref('')
+    let searchAvailableSelections = (e : Event) => {
 
-</script>
+        // Sadly, TypeScript doesn't really support the use of 'this' in onclick="function(this)"
+        // One workaround is to use "function($event)", which directly accesses the DOM event (in this case, onclick),
+        // then use event.target to access the DOM element.
 
-<script lang="ts"> 
+        let t1 = e.target as HTMLInputElement
+        let t = t1.nextElementSibling as HTMLSelectElement
 
-    const searchDir : string = "@/assets/dropdown.json"
+        for (var child of t.children as HTMLCollection) {
 
-    function dropdownFilter(e : HTMLInputElement, directory : string) {
-        var searchTarget = e.value
-        var eName = e.name
-        fetch(searchDir)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Could not fetch dropdown tags! HTTP Error " + response.status)
+            child.classList.remove('dropdown-option-inactive')
+
+            let s : string = search.searchText
+            let s1 : string = child.innerHTML
+            let i : number = s.length
+            let j : number = s1.length
+            let r : boolean = false
+
+            for (let x=0; x<j-i; x++) {
+                if (s.substring(x, x+i).toLowerCase() == s1.substring(x, x+i).toLowerCase()) {
+                    r = true
+                }
             }
-            return response.json()
-        })
-        .then(tags => {
 
-        })
+            if (!r) {
+                child.classList.add('dropdown-option-inactive')
+            }
+        }
     }
 
-    function getSelections() {
-        let selectElement = document.querySelector()
+        // Whenever the list of active selections is updated, send this information back to the parent using an emit.
+
+    let setActiveSelections = () => {
+        emits('update', props.internalName, search.activeSelections)
     }
 
 </script>
@@ -63,15 +83,17 @@
         <div class="dropdown-description textbox" :style="{'font-size' : fontSize + 'px'}">
             {{ description }}
         </div>
-        <div class="dropdown-search-container">
-            <input type="text" class="dropdown-searchbar" :name="internalName" :style="{'font-size' : fontSize + 'px'}" :bind="searchText">
+        <div class="dropdown-search-container-outer">
+            <div class="dropdown-search-container" @mouseover="search.active = true" @mouseout="search.active = false">
+                <input type="text" class="dropdown-searchbar" autocomplete="off" :name="internalName" :style="{'font-size' : fontSize + 'px'}" v-model="search.searchText" @input="searchAvailableSelections($event)">
 
-            <!-- Emits an event to update the parent component whenever the selection is changed. 
-            This is to allow other DropdownSearches to access this DropdownSearch's selections. -->
-
-            <select class="dropdown-list" :id="{'dropdown-list-' + internalName}" @onchange="$emit('update', getSelections())">
-                <option v-for="item in selection">{{ item }}</option>
-            </select>
+                <!-- Emits an event to update the parent component whenever the selection is changed. 
+                This is to allow other DropdownSearches to access this DropdownSearch's selections. -->
+                
+                <select multiple class="dropdown-list" :value="search.activeSelections" @change="setActiveSelections()" :class="{'dropdown-list-active': search.active}">
+                    <option class="dropdown-option" v-for="item in availableSelections">{{ item }}</option>
+                </select>
+            </div>
         </div>
     </div>
 </template>
@@ -91,8 +113,14 @@
     font-size: 16px;
 }
 
+.dropdown-search-container-outer {
+    flex-grow: 1;
+    height: 25px;
+}
+
 .dropdown-search-container {
-    flex: 1;
+    width: 100%;
+    position: absolute;
 }
 
 .dropdown-searchbar {
@@ -101,7 +129,21 @@
 
 .dropdown-list {
     display: none;
-    position: absolute;
     list-style: none;
+}
+
+.dropdown-list-active {
+    display: block;
+    z-index: 1;
+    max-height: 200px;
+    width: 100%;
+}
+
+.dropdown-option {
+    font-size: 16px;
+}
+
+.dropdown-option-inactive {
+    display: none;
 }
 </style>
