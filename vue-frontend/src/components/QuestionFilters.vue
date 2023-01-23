@@ -21,88 +21,93 @@
         tags: <string[]> [],
     }
 
-    const selections = reactive({ ...defaultSelections })
+    const ss = reactive({ ...defaultSelections })        // Actively selected items
+    const as = reactive({ ...defaultSelections })       // Available selections
 
     function clearAvailableSelections() {
-        Object.assign(selections, defaultSelections)
-    }       // https://stackoverflow.com/questions/61184749/how-to-properly-reset-vue-composition-apis-reactive-values
+        Object.assign(ss, defaultSelections)
+    }       // https://stackoverflow.com/questions/61184749/how-to-properly-populate-vue-composition-apis-reactive-values
 
     function initialiseAvailableSelections() {
-        reset('category')
-        reset('topic')
-        reset('subtopic')
-        reset('difficulty')
-        reset('source')
+        populate('category')
+        populate('topic')
+        populate('subtopic')
+        populate('difficulty')
+        populate('source')
     }
 
-        // The following function populates a selection with all its permissible values, or clears it (year, tags)
+        // The following populates this selection's available options based on its parent selection's active options.
 
-    function reset(intName: string) {
+    function populate(intName: string) {
 
         let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'source', 'tags']
         if (!permittedIntNames.includes(intName)) {
             console.log("Error: Active Selection internal name " + intName + " not permitted!\n")
         }
 
-        selections[intName as keyof typeof selections] = []
+        as[intName as keyof typeof as] = []
 
         switch(intName) {
-            case "category":
-                selections.category = Object.keys(paramdir)
+            case "category":        // All categories are always displayed.
+                as.category = Object.keys(paramdir)
             break
             case "topic":           // Populates all available topics based on the selected categories
-                console.log(selections.category)
-                for (var cat of selections.category) {
+                for (var cat of ss.category) {
                     let a = paramdir[cat as keyof typeof paramdir]
                     let b = a['topic']
-                    let t = selections['topic']
-                    selections['topic'] = t.concat(Object.keys(b))
+                    let t = as['topic']
+                    as['topic'] = t.concat(Object.keys(b))
                 }
             break
             case "subtopic":        // Populates all available subtopics based on the selected categories and topics
-                let s = selections.topic
-                for (var cat of selections.category) {
+                let at = ss.topic
+                for (var cat of ss.category) {
                     let a = paramdir[cat as keyof typeof paramdir]['topic']
                     let t = Object.keys(a)
                     for (var tt of t) {
-                        if (s.includes(tt)) {
+                        if (at.includes(tt)) {
                             let st = a[tt as keyof typeof a]
-                            selections.subtopic = selections.subtopic.concat(st)
+                            as.subtopic = as.subtopic.concat(st)
                         }
                     }
                 }
             break
             case "difficulty":
             case "source":          // Populates all available difficulties and sources based on the selected categories
-                for (var cat of selections.category) {
+                for (var cat of ss.category) {
                     let a = paramdir[cat as keyof typeof paramdir] 
                     let b = a[intName as keyof typeof a] as string[]
-                    let c = selections[intName as keyof typeof selections]
-                    selections[intName as keyof typeof selections] = c.concat(b)
+                    let c = as[intName as keyof typeof as]
+                    as[intName as keyof typeof as] = c.concat(b)
                 }
             break
         }
 
-        console.log(selections[intName as keyof typeof selections])
+        // console.log(selections[intName as keyof typeof selections])
     }
 
-        // The following function is called whenever a selection is updated.
+        // The following function updates the active selections,
+        // then updates the available child options.
 
     function update(intName : string, updatedSelections : string[]) {
+
+        console.log(intName)
+        console.log(updatedSelections)
 
         let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'source', 'tags']
         if (!permittedIntNames.includes(intName)) {
             console.log("Error: Active Selection internal name " + intName + " not permitted!\n")
         }
         
-        // Update the field itself
-        selections[intName as keyof typeof selections] = updatedSelections
+        // Update the active selections of the field
+        ss[intName as keyof typeof ss] = updatedSelections
 
-        // In general, if a field is cleared by the user, reset it --- treat it as "everything is possible" now.
+        // In general, if a field is cleared by the user, treat it as "everything is possible" now --- reset the available options
+        // Note that for category, everything is always displayed anyway
         if (updatedSelections.length == 0) {
-            reset(intName)
+            populate(intName)
 
-        // Otherwise, reset the child fields.
+        // Otherwise, populate the child fields.
         } else {
 
             switch(intName) {
@@ -110,14 +115,14 @@
                 case "category":     // The category has changed
 
                     // Update available topics, difficulty and sources
-                    reset("topic")
-                    reset("difficulty")
-                    reset("source")
+                    populate("topic")
+                    populate("difficulty")
+                    populate("source")
                 
                 case "topic":     // The topic was changed
 
                     // Update available subtopics
-                    reset("subtopic")
+                    populate("subtopic")
 
                 break;
             }
@@ -136,15 +141,15 @@
     <form :id="func" style="width: 100%" autocomplete="false">
         <div id="question-filters-row">
             <div class="question-filters">
-                <DropdownSearch description="Category" internalName="category" fontSize="24" :availableSelections="selections.category" @update="update"/>
+                <DropdownSearch description="Category" internalName="category" fontSize="20px" :availableSelections="as.category" @update="update"/>
             </div>
             <div class="question-filters">
-                <DropdownSearch description="Topic" internalName="topic" :availableSelections="selections.topic" @update="update"/>
-                <DropdownSearch description="Subtopic" internalName="subtopic" :availableSelections="selections.subtopic" @update="update"/>
-                <DropdownSearch description="Difficulty" internalName="difficulty" :availableSelections="selections.difficulty" @update="update"/>
+                <DropdownSearch description="Topic" internalName="topic" :availableSelections="as.topic" @update="update"/>
+                <DropdownSearch description="Subtopic" internalName="subtopic" :availableSelections="as.subtopic" @update="update"/>
+                <DropdownSearch description="Difficulty" internalName="difficulty" :availableSelections="as.difficulty" @update="update"/>
             </div>
             <div class="question-filters">
-                <DropdownSearch description="Source" internalName="sourceName" :availableSelections="selections.source" @update="update"/>
+                <DropdownSearch description="Source" internalName="sourceName" :availableSelections="as.source" @update="update"/>
                 <DropdownSearch description="Year" internalName="sourceYear" @update="updateYear"/>
                 <DropdownSearch description="Tags" internalName="tags" @update="update"/>
             </div>
