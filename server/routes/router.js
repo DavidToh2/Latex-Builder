@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { newQuestion, getAllQuestions, findQuestions, findQuestionByID, deleteQuestions, deleteQuestionByID, saveQuestion } = require('./db')
+var { newQuestion, getAllQuestions, findQuestions, findQuestionByID, deleteQuestions, deleteQuestionByID, saveQuestion } = require('../db')
 
 
 router.post('/', function(req, res, next) {
@@ -39,4 +39,4 @@ nsourceName,
 nsourceYear, 
 nTags */
 
-module.exports = router;
+module.exports = router

@@ -53,6 +53,7 @@ This document is intended as a guide for people wishing to start their own conta
     - Execute `docker build --tag <image-name> .` (note the dot at the end) This also sets the image's name
     - Execute `docker images` to view the list of local images
     - Execute `docker image rm <image-name>` to delete an image
+    - Execute `docker image prune` to delete all _dangling images_. (Dangling images are images which are not referenced by any container, i.e. old builds.)
 
 4. Run the Docker image in a container
     - Execute `docker ps -a` to view the list of all containers, running or not

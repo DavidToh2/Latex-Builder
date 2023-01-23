@@ -10,9 +10,8 @@ var logger = require('morgan');
 
 		// Import routing modules
 
-// var indexRouter = require('./routes/index');
-// var usersRouter = require('./routes/users');
-var router = require('./router')
+var router = require('./routes/router')
+var debugrouter = require('./routes/debugrouter')
 
 var app = express();                              	// Initialise the app
 
@@ -28,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));	// allows us to serve s
 		// Overall URL: [the stuff below]/[the stuff in the router module]
 
 app.use('/database', router)
+app.use('/debug', debugrouter)
 
 
 		// Error handlers

@@ -8,7 +8,7 @@ const questionSchema = new Schema( {
         required: [true, 'Missing question!']
     },
     category: {
-        type: String,
+        type: [String],
         required: [true, 'Missing category!'],
         enum: ['Mathematics', 'Computer Science']
     },
@@ -22,7 +22,6 @@ const questionSchema = new Schema( {
 
     difficulty: {
         type: String,
-        enum: ['Primary', 'Junior (A)', 'Junior (B)', 'Junior (C)', 'Senior', 'Open', 'National', 'Unknown'],
         required: [true, 'Missing difficulty!']
     },
     images: [String],
@@ -33,7 +32,7 @@ const questionSchema = new Schema( {
     solutionImages: [String],
     
     sourceName: {
-        type: String,
+        type: [String],
         uppercase: true
     },
     sourceYear: {

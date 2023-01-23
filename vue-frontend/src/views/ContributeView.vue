@@ -7,12 +7,15 @@ import QuestionFilters from '@/components/QuestionFilters.vue'
 
 <template>
     <Title title="Contribute" />
-    <form id="question-build-container" method="POST" action="http://localhost:3000/database/set/new/">
+    <form id="question-build-container" autocomplete="false" method="POST" action="http://localhost:3000/debug">
         <QuestionFilters func="contribute" />
-        <input type="text" id="question-build-shortcut" name="question-tags" placeholder="Quickfill: Category - Topic - Subtopic - Difficulty - Source - Year - Tags">
-        <textarea id="question-text" name="question" placeholder="Type LaTeX here:"></textarea>
-        <textarea id="question-text" name="question" placeholder="Type LaTeX here:"></textarea>
-        <textarea id="question-text" name="question" placeholder="Type LaTeX here:"></textarea>
+        <!-- <input type="text" id="question-build-shortcut" name="question-tags" placeholder="Quickfill: Category - Topic - Subtopic - Difficulty - Source - Year - Tags"> -->
+        <div class="latex-container">
+            <textarea id="question-text" name="question" placeholder="Type LaTeX here:"></textarea>
+        </div>
+        <div class="display-container">
+
+        </div>
         <input type="submit">
     </form>
 </template>
@@ -36,13 +39,32 @@ import QuestionFilters from '@/components/QuestionFilters.vue'
     font-size: 18px;
 }
 
-#question-text {
+.latex-container {
 	width: 95%;
-	height: 300px;
+	height: 250px;
+	max-height: none;
+}
+
+#question-text {
+	width: 100%;
+    height: 100%;
     border-radius: 8px;
     border: 1px solid #000000;
-    padding: 5px;
+    padding: 10px;
+
+    font-size: 14px;
+    font-family: 'Gothic AI', sans-serif;
+
+    overflow-y: scroll;
+}
+
+.display-container {
+	width: 95%;
+	height: 250px;
 	max-height: none;
+    border: 1px solid #000000;
+
+    overflow-y: scroll;
 }
 
 </style>

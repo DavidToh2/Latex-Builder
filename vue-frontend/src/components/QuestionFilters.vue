@@ -47,12 +47,17 @@
 
         as[intName as keyof typeof as] = []
 
+        let sc = ss.category        // Selected categories.
+        if (sc.length == 0) {
+            sc = as.category        // If none selected, choose from all categories.
+        }
+
         switch(intName) {
             case "category":        // All categories are always displayed.
                 as.category = Object.keys(paramdir)
             break
             case "topic":           // Populates all available topics based on the selected categories
-                for (var cat of ss.category) {
+                for (var cat of sc) {
                     let a = paramdir[cat as keyof typeof paramdir]
                     let b = a['topic']
                     let t = as['topic']
@@ -60,21 +65,29 @@
                 }
             break
             case "subtopic":        // Populates all available subtopics based on the selected categories and topics
-                let at = ss.topic
-                for (var cat of ss.category) {
+                let st = ss.topic
+                
+                for (var cat of sc) {
                     let a = paramdir[cat as keyof typeof paramdir]['topic']
-                    let t = Object.keys(a)
-                    for (var tt of t) {
-                        if (at.includes(tt)) {
-                            let st = a[tt as keyof typeof a]
-                            as.subtopic = as.subtopic.concat(st)
+                    let t = Object.keys(a)              // List of all available topics.
+                    if (st.length == 0) {               // If no selected topics, display all available subtopics.
+                        for (var tt of t) {
+                            let arr = a[tt as keyof typeof a]        // Array of subtopics.
+                            as.subtopic = as.subtopic.concat(arr)
+                        }
+                    } else {                            // Otherwise, for each selected topic, display available subtopics.
+                        for (var tt of t) {
+                            if (st.includes(tt)) {
+                                let arr = a[tt as keyof typeof a]
+                                as.subtopic = as.subtopic.concat(arr)
+                            }
                         }
                     }
                 }
             break
             case "difficulty":
             case "source":          // Populates all available difficulties and sources based on the selected categories
-                for (var cat of ss.category) {
+                for (var cat of sc) {
                     let a = paramdir[cat as keyof typeof paramdir] 
                     let b = a[intName as keyof typeof a] as string[]
                     let c = as[intName as keyof typeof as]
@@ -138,28 +151,26 @@
 </script>
 
 <template>
-    <form :id="func" style="width: 100%" autocomplete="false">
-        <div id="question-filters-row">
-            <div class="question-filters">
-                <DropdownSearch description="Category" internalName="category" fontSize="20px" :availableSelections="as.category" @update="update"/>
-            </div>
-            <div class="question-filters">
-                <DropdownSearch description="Topic" internalName="topic" :availableSelections="as.topic" @update="update"/>
-                <DropdownSearch description="Subtopic" internalName="subtopic" :availableSelections="as.subtopic" @update="update"/>
-                <DropdownSearch description="Difficulty" internalName="difficulty" :availableSelections="as.difficulty" @update="update"/>
-            </div>
-            <div class="question-filters">
-                <DropdownSearch description="Source" internalName="sourceName" :availableSelections="as.source" @update="update"/>
-                <DropdownSearch description="Year" internalName="sourceYear" @update="updateYear"/>
-                <DropdownSearch description="Tags" internalName="tags" @update="update"/>
-            </div>
+    <div class="question-filters-row" :id="func">
+        <div class="question-filters">
+            <DropdownSearch description="Category" internalName="category" fontSize="20px" :availableSelections="as.category" @update="update"/>
         </div>
-    </form>
+        <div class="question-filters">
+            <DropdownSearch description="Topic" internalName="topic" :availableSelections="as.topic" @update="update"/>
+            <DropdownSearch description="Subtopic" internalName="subtopic" :availableSelections="as.subtopic" @update="update"/>
+            <DropdownSearch description="Difficulty" internalName="difficulty" :availableSelections="as.difficulty" @update="update"/>
+        </div>
+        <div class="question-filters">
+            <DropdownSearch description="Source" internalName="sourceName" :availableSelections="as.source" @update="update"/>
+            <DropdownSearch description="Year" internalName="sourceYear" @update="updateYear"/>
+            <DropdownSearch description="Tags" internalName="tags" @update="update"/>
+        </div>
+    </div>
 </template>
 
 <style scoped>
 
-#question-filters-row {
+.question-filters-row {
     display: flex;
     align-items: center;
     padding: 10px;

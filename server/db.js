@@ -20,7 +20,7 @@ var db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"))
 
-const {topicData, sourceData, questionSchema} = require("./models/question.js")
+const {questionSchema} = require("./models/question.js")
 
 // https://forum.freecodecamp.org/t/cant-export-require-a-module-mongoose-model-typeerror-user-is-not-a-constructor/452317/6
 // Exporting the schemas rather than the models works better for some reason.
