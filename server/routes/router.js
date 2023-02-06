@@ -3,10 +3,16 @@ var router = express.Router();
 var { newQuestion, getAllQuestions, findQuestions, findQuestionByID, deleteQuestions, deleteQuestionByID, saveQuestion } = require('../db')
 
 
-router.post('/', function(req, res, next) {
+var stringToArrayFields = ['category', 'topic', 'subtopic', 'tags']
+var stringToNumberFields = ['sourceYear']
 
-    console.log("Request received!")
-    res.json(getAllQuestions())
+router.post('/get', function(req, res, next) {                  // FIND / GET QUESTIONS BASED ON DATADICT
+
+    // console.log("Request received!")
+
+    var dataDict = parseWebToServer(req.body)
+
+    res.json(findQuestions(dataDict))
 
     /* res.json does the following:
         res.header("Content-Type", "application/json")
@@ -14,29 +20,27 @@ router.post('/', function(req, res, next) {
     */
 })
 
-router.post('/set/new', function(req, res, next) {
+router.post('/set/new', function(req, res, next) {              // SET NEW QUESTION
 
     console.log("Setting new question")
     res.send(newQuestion(req.body))
 })
 
-router.post('/set/update', function(req, res, next) {
+router.post('/set/update', function(req, res, next) {           // UPDATE EXISTING QUESTION
 
     console.log("Updating existing question")
     const reqData = req.body
     res.send(saveQuestion(reqData.id, reqData.dataDict))
 })
 
-/* ncategory, 
-nquestion, 
-ntopicData, 
-nsubtopicData, 
-ndifficulty, 
-nimages, 
-nsolution, 
-nsolutionImages, 
-nsourceName, 
-nsourceYear, 
-nTags */
+function parseWebToServer(dataDict) {
+    for (const f of stringToArrayFields) {
+        dataDict[f] = dataDict[f].split(', ')
+    }
+    for (const f of stringToNumberFields) {
+        dataDict[f] = Number(dataDict[f])
+    }
+    return dataDict
+}
 
 module.exports = router

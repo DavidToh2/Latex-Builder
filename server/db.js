@@ -49,15 +49,17 @@ function getAllQuestions() {
     })
 }
 
+// Question.find({}) also returns all questions.
+
 function findQuestions(dataDict) {   
-    Question.find(dataDict, (err, questions) => {
+    return Question.find(dataDict, (err, questions) => {
         if (err) {
             console.log("Failed to find questions!"); 
             console.log(err);
             return err;
         }
         return questions;
-    })
+    }).lean()
 }
 
 // Exact ID and not questionID for now

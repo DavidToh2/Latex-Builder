@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-    import { ref, reactive, computed } from 'vue'
+    import { reactive, computed } from 'vue'
 
     // PROPS receive data from the parent components of this component.
         // When the child component is refreshed, the list of available selections is received from the parent.
@@ -25,11 +25,21 @@
     const search = reactive({
         searchText: '',
         activeSelections: <string[]>[],
-        active: false
+        active: false,
     })
 
     const dropdownDir = (props.fontSize == "16px") ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
-    const dropdownRows = (props.fontSize == "16px") ? 2 : 1
+
+    const searchbarRows = computed<number>(() => {
+        if (search.searchText.length >= 25) {
+            return 2
+        } else {
+            return 1
+        }
+    })
+    const dropdownSearchContainerOuterHeight = computed(() => {
+        return (1 + searchbarRows.value) * 16 - 2
+    })
 
     // EMITS send data to the parent components of this component.
         // The update emit sends the list of selected items to the parent.
@@ -110,7 +120,7 @@
         </div>
         <div class="dropdown-search-container-outer">
             <div class="dropdown-search-container" @mouseenter="search.active = true" @mouseleave="search.active = false">
-                <textarea :rows="dropdownRows" class="dropdown-searchbar" autocomplete="off" :name="internalName" style="resize: none;" :value="search.searchText" @focus="initialiseSearch($event)" @input="searchAvailableSelections($event)" @blur="displayActiveSelections()"></textarea>
+                <textarea :rows="searchbarRows" class="dropdown-searchbar" autocomplete="off" :name="internalName" style="resize: none;" :value="search.searchText" @focus="initialiseSearch($event)" @input="searchAvailableSelections($event)" @blur="displayActiveSelections()"></textarea>
 
                 <!-- Emits an event to update the parent component whenever the selection is changed. 
                 This is to allow other DropdownSearches to access this DropdownSearch's selections. -->
@@ -140,7 +150,7 @@
 
 .dropdown-search-container-outer {
     flex-grow: 1;
-    height: calc(3 * v-bind('fontSize'));
+    height: calc(dropdownSearchContainerOuterHeight)
 }
 
 .dropdown-search-container {
@@ -151,7 +161,8 @@
 .dropdown-searchbar {
     width: 100%;
     font-family: 'Gothic A1', sans-serif;
-    font-size: calc(v-bind(fontSize) - 2px);
+    font-size: calc(v-bind(fontSize) - 4px);
+    resize: none;
 }
 
 .dropdown-list {

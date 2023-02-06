@@ -1,28 +1,54 @@
 <script setup lang="ts">
 import Title from '@/components/PageTitle.vue'
-import QuestionFilters from '@/components/QuestionFilters.vue'
-import { onMounted } from 'vue';
+import QuestionFilters from '@/components/QuestionFilters/QuestionFilters.vue'
+import SearchTable from '@/components/SearchTable/SearchTable.vue'
 
-onMounted(() => {
+import type { qn } from '@/types/Types'
+import { useQuestionStore } from '@/stores/stores'
 
-})
+const mainStore = useQuestionStore()
 
-</script>
+var results : qn[] = []
 
-<script lang="ts">
+async function submitSearchQuery(e : Event) {
+    let f = e.target as HTMLFormElement
+    let form = f.elements as HTMLFormControlsCollection
+    let reqBody = {} as { [key : string] : string | number | null }
 
-function submitSearchQuery() {
+    for (const element of form) {
+        const eName = element.getAttribute('name')
+        if (eName) {
+            const eValue = element.getAttribute('value')
+            reqBody[eName] = eValue
+        }
+    }
+
+    const response = await fetch("http://localhost:3000/get", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application-json'
+        },
+        body: JSON.stringify(reqBody)
+    })
+    const responsejson = response.json() as unknown as qn[]
+    mainStore.populateDatabase(responsejson)
+    getResultsFromStore()
+}
+
+const getResultsFromStore = () => {
+    results = mainStore.getDatabase()
 }
 
 </script>
 
 <template>
     <Title title="Database" />
-    <form id="question-search-container" method="POST" onsubmit="submitSearchQuery()">
+    <form id="question-search-container" autocomplete="false" @onsubmit="submitSearchQuery($event)">
         <QuestionFilters func="database" />
-        <input type="text" id="question-search" name="question" placeholder="Search question text">
-        <input type="submit">
+        <textarea rows="1" id="question-search" name="question" placeholder="Search question text"></textarea>
+        <input type="submit" hidden>
     </form>
+    <SearchTable :qns="results" />
 </template>
 
 <style scoped>
@@ -38,12 +64,11 @@ function submitSearchQuery() {
 }
 
 #question-search {
-    width: 36%;
-    height: 36px;
+    width: 80%;
     border: 1px solid #000000;
     padding: 4px;
     border-radius: 8px;
-    font-size: 24px;
+    font-size: 16px;
 }
 
 #question-search::placeholder {

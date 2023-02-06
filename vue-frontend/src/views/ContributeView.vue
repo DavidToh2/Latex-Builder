@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineComponent } from 'vue'
 import Title from '@/components/PageTitle.vue'
-import QuestionFilters from '@/components/QuestionFilters.vue'
+import QuestionFilters from '@/components/QuestionFilters/QuestionFilters.vue'
 
 </script>
 

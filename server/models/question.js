@@ -32,12 +32,15 @@ const questionSchema = new Schema( {
     solutionImages: [String],
     
     sourceName: {
-        type: [String],
+        type: String,
         uppercase: true
     },
     sourceYear: {
         type: Number,
         min: 1800
+    },
+    lastModified: {
+        type: Date
     },
 
     tags: {

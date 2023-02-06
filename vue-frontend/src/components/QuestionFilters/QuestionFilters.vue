@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
     import { reactive, ref, computed } from 'vue'
-    import DropdownSearch from '@/components/DropdownSearch.vue'
+    import DropdownSearch from '@/components/QuestionFilters/DropdownSearch.vue'
+    import Input from '@/components/QuestionFilters/Input.vue'
     import paramdir from '@/assets/dropdown.json'
 
     export interface Props {
@@ -17,8 +18,7 @@
         topic: <string[]> [],
         subtopic: <string[]> [],
         difficulty: <string[]> [],
-        source: <string[]> [],
-        tags: <string[]> [],
+        source: <string[]> []
     }
 
     const ss = reactive({ ...defaultSelections })        // Actively selected items
@@ -40,7 +40,7 @@
 
     function populate(intName: string) {
 
-        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'source', 'tags']
+        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'source']
         if (!permittedIntNames.includes(intName)) {
             console.log("Error: Active Selection internal name " + intName + " not permitted!\n")
         }
@@ -107,7 +107,7 @@
         console.log(intName)
         console.log(updatedSelections)
 
-        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'source', 'tags']
+        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'source', 'year', 'tags']
         if (!permittedIntNames.includes(intName)) {
             console.log("Error: Active Selection internal name " + intName + " not permitted!\n")
         }
@@ -117,38 +117,42 @@
 
         // In general, if a field is cleared by the user, treat it as "everything is possible" now --- reset the available options
         // Note that for category, everything is always displayed anyway
-        if (updatedSelections.length == 0) {
-            populate(intName)
+        if (intName == 'year' || intName == 'tags') {
 
-        // Otherwise, populate the child fields.
         } else {
+            if (updatedSelections.length == 0) {
+                populate(intName)
 
-            switch(intName) {
+            // Otherwise, populate the child fields.
+            } else {
 
-                case "category":     // The category has changed
+                switch(intName) {
 
-                    // Update available topics, difficulty and sources
-                    populate("topic")
-                    populate("difficulty")
-                    populate("source")
-                
-                case "topic":     // The topic was changed
+                    case "category":     // The category has changed
 
-                    // Update available subtopics
-                    populate("subtopic")
+                        // Update available topics, difficulty and sources
+                        populate("topic")
+                        populate("difficulty")
+                        populate("source")
+                    
+                    case "topic":     // The topic was changed
 
-                break;
+                        // Update available subtopics
+                        populate("subtopic")
+
+                    break;
+                }
             }
         }
-    }
-    
-    function updateYear() {
-
     }
 
     initialiseAvailableSelections()
 
 </script>
+
+<!--
+    Each of the following <DropdownSearch />'es contains one <textarea name=_> that will be captured by the form.
+-->
 
 <template>
     <div class="question-filters-row" :id="func">
@@ -162,8 +166,8 @@
         </div>
         <div class="question-filters">
             <DropdownSearch description="Source" internalName="sourceName" :availableSelections="as.source" @update="update"/>
-            <DropdownSearch description="Year" internalName="sourceYear" @update="updateYear"/>
-            <DropdownSearch description="Tags" internalName="tags" @update="update"/>
+            <Input description="Year" internalName="sourceYear" @update="update"/>
+            <Input description="Tags" internalName="tags" @update="update"/>
         </div>
     </div>
 </template>
