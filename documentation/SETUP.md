@@ -70,6 +70,11 @@ This document is intended as a guide for people wishing to start their own conta
     - Execute `docker restart <container-name>` to restart the container
     - Execute `docker rm <container-name>` to remove the container from the list of containers on the machine
 
+6. Delete the Docker volume to reset the database
+    - Execute `docker volume ls` to list all volumes
+    - Execute `docker volume prune` to delete all dangling volumes
+    - Execute `docker volume rm <volume-name>` to remove a volume
+
 [Docker tutorial](https://docs.docker.com/language/nodejs/build-images/)
 
 ## Part 3: Setting Up MongoDB/Mongoose and Docker Compose

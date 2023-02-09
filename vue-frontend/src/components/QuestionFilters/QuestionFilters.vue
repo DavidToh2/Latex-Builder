@@ -104,10 +104,7 @@
 
     function update(intName : string, updatedSelections : string[]) {
 
-        console.log(intName)
-        console.log(updatedSelections)
-
-        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'source', 'year', 'tags']
+        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName']
         if (!permittedIntNames.includes(intName)) {
             console.log("Error: Active Selection internal name " + intName + " not permitted!\n")
         }
@@ -166,8 +163,8 @@
         </div>
         <div class="question-filters">
             <DropdownSearch description="Source" internalName="sourceName" :availableSelections="as.source" @update="update"/>
-            <Input description="Year" internalName="sourceYear" @update="update"/>
-            <Input description="Tags" internalName="tags" @update="update"/>
+            <Input description="Year" internalName="sourceYear"/>
+            <Input description="Tags" internalName="tags"/>
         </div>
     </div>
 </template>

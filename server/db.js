@@ -28,28 +28,20 @@ const {questionSchema} = require("./models/question.js")
 const Question = mongoose.model("questions", questionSchema);
 
 function newQuestion(nQ) {
+
+    console.log("Setting new question...")
     Question.insertMany([nQ], function(err) {
         if (err) {
             console.log("Failed to save!")
             console.log(err)
             return err.message
         }
+        console.log("Done!")
         return "Saved!"
     })
 }
 
-function getAllQuestions() {
-    Question.find().lean().exec(function(err, result) {
-        if (err) {
-            console.log("Failed to get all questions!")
-            console.log(err)
-            return err
-        }
-        return result
-    })
-}
-
-// Question.find({}) also returns all questions.
+// Question.find({}) returns all questions.
 
 function findQuestions(dataDict) {   
     return Question.find(dataDict, (err, questions) => {
@@ -72,17 +64,6 @@ function findQuestionByID(id) {
             return err;
         }
         return question;
-    })
-}
-
-function deleteQuestions(dataDict) {
-    Question.deleteMany(dataDict, (err) => {
-        if (err) {
-            console.log("Failed to delete questions!");
-            console.log(err);
-            return false;
-        }
-        return true;
     })
 }
 
@@ -117,5 +98,5 @@ function saveQuestion(
 }
 
 module.exports = {
-    newQuestion, getAllQuestions, findQuestions, findQuestionByID, deleteQuestions, deleteQuestionByID, saveQuestion
+    newQuestion, findQuestions, findQuestionByID, deleteQuestionByID, saveQuestion
 };
