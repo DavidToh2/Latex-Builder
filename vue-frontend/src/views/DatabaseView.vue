@@ -5,42 +5,56 @@ import SearchTable from '@/components/SearchTable/SearchTable.vue'
 
 import type { qn } from '@/types/Types'
 import { useQuestionStore } from '@/stores/stores'
-import { post } from '@/post'
+import { postForm } from '@/post'
 
-const mainStore = useQuestionStore()
+import { reactive, nextTick, onMounted } from 'vue'
 
-var results : qn[] = []
-
-async function submitSearchQuery(e : Event) {
-
-    const response = await post(e, 'http://localhost:3000/database/get') as Response
-    
-    const responsejson = response.json() as unknown as qn[]
-    mainStore.populateDatabase(responsejson)
-    getResultsFromStore()
+interface searchResults {
+    resultArray : qn[]
 }
 
-const getResultsFromStore = () => {
-    results = mainStore.getDatabase()
+const mainStore = useQuestionStore()
+var results : searchResults = reactive({
+    resultArray: []
+})
+
+onMounted(async () => {
+    const f = document.querySelector('form#question-search-container') as HTMLFormElement
+    await submitSearchQuery(f)
+})
+async function submitSearchEvent(e : Event) {
+    const f = document.querySelector('form#question-search-container') as HTMLFormElement
+    await submitSearchQuery(f)
+}
+async function submitSearchQuery(f : HTMLFormElement) {
+    const response = await postForm(f, 'http://localhost:3000/database/get') as Response
+    
+    const responsejson = await response.json() as qn[]
+    mainStore.populateDatabase(responsejson)
+    displayDatabase()
+}
+function displayDatabase() {
+    results.resultArray = mainStore.getDatabase()
+    console.log(results.resultArray)
 }
 
 </script>
 
 <template>
     <Title title="Database" />
-    <form id="question-search-container" autocomplete="false" @submit.prevent="submitSearchQuery($event)">
+    <form id="question-search-container" autocomplete="false" @submit.prevent="submitSearchEvent($event)">
         <QuestionFilters func="database" />
         <textarea rows="1" id="question-search" name="question" placeholder="Search question text"></textarea>
-        <input type="submit" hidden>
+        <input type="submit">
     </form>
-    <SearchTable :qns="results" />
+    <div id="no-of-results">Number of results: {{ results.resultArray.length }}</div>
+    <SearchTable :qns="results.resultArray" />
 </template>
 
 <style scoped>
 
 #question-search-container {
     width: 100%;
-    height: 180px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -58,6 +72,10 @@ const getResultsFromStore = () => {
 
 #question-search::placeholder {
     text-align: center;
+}
+
+#no-of-results {
+    margin-left: 20px;
 }
 
 </style>

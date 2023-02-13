@@ -7,7 +7,7 @@ import { RouterLink } from 'vue-router'
         <li class="navbar-item"><RouterLink to="/">Home</RouterLink></li>
         <li class="navbar-item"><RouterLink to="/build">Build</RouterLink></li>
         <li class="navbar-item"><RouterLink to="/contribute">Contribute</RouterLink></li>
-        <li class="navbar-item"><RouterLink to="/login">Login</RouterLink></li>
+        <li class="navbar-item"><RouterLink to="/">Login</RouterLink></li>
     </ul>
 </template>
 

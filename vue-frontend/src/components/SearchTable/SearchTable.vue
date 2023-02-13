@@ -4,7 +4,7 @@
     import type { qn } from '@/types/Types'
 
     export interface Props {
-        qns: qn[]
+        qns?: qn[]
     }
 
     const props = defineProps<Props> ()
@@ -13,7 +13,9 @@
 <template>
     <div class="search-table">
         <SearchTableHeader />
-        <SearchTableResult v-for="item in qns" :q="item"/>
+        <div class="search-table-results" v-for="item in qns">
+            <SearchTableResult :q="item"></SearchTableResult>
+        </div>
     </div>
 </template>
 

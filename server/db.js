@@ -43,15 +43,15 @@ function newQuestion(nQ) {
 
 // Question.find({}) returns all questions.
 
-function findQuestions(dataDict) {   
-    return Question.find(dataDict, (err, questions) => {
-        if (err) {
-            console.log("Failed to find questions!"); 
-            console.log(err);
-            return err;
-        }
-        return questions;
-    }).lean()
+async function findQuestions(dataDict) {   
+    const fQ = await Question.find(dataDict).lean()
+    .catch((err) => {
+        console.log("Failed to find questions!")
+        console.log(err)
+        return err
+    })
+
+    return fQ
 }
 
 // Exact ID and not questionID for now

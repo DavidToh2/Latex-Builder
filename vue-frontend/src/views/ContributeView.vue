@@ -2,17 +2,14 @@
 import { defineComponent } from 'vue'
 import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/QuestionFilters/QuestionFilters.vue'
-import { post } from '@/post';
+import { postForm } from '@/post';
 
-function test(e : Event) {
-    e.preventDefault()
-    console.log("Test")
-    return false
+function modifyQuestionEvent(e : Event) {
+    const f = e.target as HTMLFormElement
+    modifyQuestion(f)
 }
-
-async function modifyQuestion(e : Event) {
-    
-    const response = await post(e, 'http://localhost:3000/database/set/new') as Response
+async function modifyQuestion(f : HTMLFormElement) {
+    const response = await postForm(f, 'http://localhost:3000/database/set/new') as Response
     console.log(response.json())
 }
 
@@ -20,7 +17,7 @@ async function modifyQuestion(e : Event) {
 
 <template>
     <Title title="Contribute" />
-    <form id="question-build-container" autocomplete="false" @submit.prevent="modifyQuestion($event)">
+    <form id="question-build-container" autocomplete="false" @submit.prevent="modifyQuestionEvent($event)">
         <QuestionFilters func="contribute" />
         <!-- <input type="text" id="question-build-shortcut" name="question-tags" placeholder="Quickfill: Category - Topic - Subtopic - Difficulty - Source - Year - Tags"> -->
         <div class="latex-container">

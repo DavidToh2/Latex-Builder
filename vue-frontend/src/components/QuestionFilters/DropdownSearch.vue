@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
     import { reactive, computed } from 'vue'
+    import { numberToPixels } from '@/aux'
 
     // PROPS receive data from the parent components of this component.
         // When the child component is refreshed, the list of available selections is received from the parent.
@@ -9,13 +10,13 @@
         description: string
         internalName: string
         availableSelections?: string[]
-        fontSize?: string
+        fontSize?: number
     }
 
         // Define the default value of props
 
     const props = withDefaults(defineProps<Props>(), {
-        fontSize: "16px",
+        fontSize: 16
     })
 
     // REACTIVE VARIABLES
@@ -28,7 +29,7 @@
         active: false,
     })
 
-    const dropdownDir = (props.fontSize == "16px") ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
+    const dropdownDir = (props.fontSize == 16) ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
 
     const searchbarRows = computed<number>(() => {
         if (search.searchText.length >= 25) {
@@ -37,8 +38,9 @@
             return 1
         }
     })
-    const dropdownSearchContainerOuterHeight = computed(() => {
-        return (1 + searchbarRows.value) * 16 - 2
+    const inputContainerHeight = computed<number>(() => {
+        const p : number = (1 + searchbarRows.value) * 16 - 7
+        return p
     })
 
     // EMITS send data to the parent components of this component.
@@ -137,6 +139,7 @@
 
 .dropdown-container {
     display: flex;
+    height: calc(v-bind(numberToPixels(inputContainerHeight)));
     flex-direction: v-bind('dropdownDir');
     justify-content: center;
     gap: 7px;
@@ -150,7 +153,6 @@
 
 .dropdown-search-container-outer {
     flex-grow: 1;
-    height: calc(dropdownSearchContainerOuterHeight)
 }
 
 .dropdown-search-container {
@@ -161,7 +163,7 @@
 .dropdown-searchbar {
     width: 100%;
     font-family: 'Gothic A1', sans-serif;
-    font-size: calc(v-bind(fontSize) - 4px);
+    font-size: calc(v-bind(numberToPixels(fontSize - 4)));
     resize: none;
 }
 

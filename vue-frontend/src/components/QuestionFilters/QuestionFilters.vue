@@ -154,7 +154,7 @@
 <template>
     <div class="question-filters-row" :id="func">
         <div class="question-filters">
-            <DropdownSearch description="Category" internalName="category" fontSize="20px" :availableSelections="as.category" @update="update"/>
+            <DropdownSearch description="Category" internalName="category" :fontSize="20" :availableSelections="as.category" @update="update"/>
         </div>
         <div class="question-filters">
             <DropdownSearch description="Topic" internalName="topic" :availableSelections="as.topic" @update="update"/>

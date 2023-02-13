@@ -1,23 +1,18 @@
-export async function post(e : Event, url : string) {
-    const f = e.target as HTMLFormElement
+export async function postForm(f : HTMLFormElement, url : string) {
     const formc = f.elements as HTMLFormControlsCollection
     const form = Array.from(formc) as HTMLTextAreaElement[]
     var reqBody = {} as { [key : string] : string | number | null }
 
-    console.log(form)
-
     for (const element of form) {
 
-        console.log(element)
         const eName = element.name
         if (eName) {
             const eValue = element.value
-            console.log(eValue)
-            reqBody[eName] = eValue
+            if (eValue) {
+                reqBody[eName] = eValue
+            }
         }
     }
-
-    console.log(reqBody)
 
     console.log("Sending...")
     const response = await fetch(url, {
