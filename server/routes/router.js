@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { newQuestion, findQuestions, findQuestionByID, deleteQuestionByID, saveQuestion } = require('../db')
+var { newQuestion, findQuestions, deleteQuestion, saveQuestion } = require('../db')
 
 
 var stringToArrayFields = ['category', 'topic', 'subtopic', 'tags']
@@ -15,12 +15,14 @@ router.use((req, res, next) => {                        // MIDDLEWARE FUNCTION G
 
 router.post('/get', async function(req, res) {                  // FIND / GET QUESTIONS BASED ON DATADICT
 
-    console.log("Getting questions with the following parameters:")
-    var dataDict = parseWebToServer(req.body)
+    console.log("Search parameters:")
+    const dataDict = parseWebToServer(req.body)
     console.log(req.body)
-    var fQ = await findQuestions(dataDict)
+
+    const fQ = await findQuestions(dataDict)
     console.log("Found the following questions:")
     console.log(fQ)
+
     res.json(fQ)
 
     /* res.json does the following:
@@ -29,31 +31,49 @@ router.post('/get', async function(req, res) {                  // FIND / GET QU
     */
 })
 
-router.post('/set/new', function(req, res) {              // SET NEW QUESTION
+router.post('/set/new', async function(req, res) {              // SET NEW QUESTION
 
-    console.log("Setting new question...")
-    var dataDict = parseWebToServer(req.body)
+    console.log("Input parameters:")
+    const dataDict = parseWebToServer(req.body)
     console.log(req.body)
-    var nQ = newQuestion(dataDict)
-    console.log(nQ)     
+
+    const nQ = await newQuestion(dataDict)      
+    console.log("The following question has been set:")
+    console.log(nQ)
+
     res.header("Content-Type", "text/plain")
-    res.send(nQ)
+    res.send(`The ID of the new question is ${nQ}`)
 })
 
-router.post('/set/update', function(req, res) {           // UPDATE EXISTING QUESTION
+router.post('/set/update/:displayID', async function(req, res) {           // UPDATE EXISTING QUESTION
 
-    console.log("Updating existing question")
+    console.log("Input parameters:")
     const reqData = req.body
+    console.log(reqData)
+    const displayID = req.params['displayID']
+
+    const r = await saveQuestion(displayID, reqData.dataDict)
+    console.log(r)
+
     res.header("Content-Type", "text/plain")
-    res.send(saveQuestion(reqData.id, reqData.dataDict))
+    res.send(r)
 })
 
-router.post('/delete/id', function(req, res) {
+router.post('/delete/:displayID', async function(req, res) {
 
-    console.log("Deleting question")
+    console.log("Input parameters:")
     const reqData = req.body
-    res.send(deleteQuestionByID(reqData.id))
+    console.log(reqData)
+    const displayID = req.params['displayID']
+
+    const d = await deleteQuestion(displayID)
+    console.log(d)
+
+    res.header("Content-Type", "text/plain")
+    res.send(d)
 })
+
+
 
 function parseWebToServer(dataDict) {
     for (const f of stringToArrayFields) {

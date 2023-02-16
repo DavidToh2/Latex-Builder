@@ -7,12 +7,25 @@
     }
     const props = defineProps<Props>()
 
+    const emits = defineEmits<{
+        (e: 'edit', displayID: string): void
+    }>()
+
+    function editQuestion(e : Event) {
+        const img = e.target as HTMLImageElement
+        const r = ((img.parentElement as HTMLElement).parentElement as HTMLElement).children[0] as HTMLDivElement
+
+        const dispID = r.innerText
+        console.log(dispID)
+        emits('edit', dispID)
+    }
+
 </script>
 
 <template>
     <div class="search-table-result-row">
-        <div class="search-id search-cell">
-            {{ q.id }}
+        <div class="search-id search-cell" style="padding: 8px 0px; text-align: center;">
+            {{ q.displayID }}
         </div>
         <div class="search-question search-cell">
             {{ q.question }}
@@ -29,20 +42,23 @@
             <p>{{ q.sourceYear }}</p>
         </div>
         <div class="search-options search-cell">
-            f
+            <img class="edit-button" src="@/assets/rightarrow.png" @click="editQuestion($event)">
         </div>
     </div>
 </template>
 
 <style scoped>
 
-.search-table-result-row {
-    display: flex;
-    flex-direction: row;
+.edit-button {
+    width: 30px;
+    height: 30px;
+    cursor: pointer
 }
 
-.search-cell {
-    padding: 8px 10px;
+.search-table-result-row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
 }
 
 </style>

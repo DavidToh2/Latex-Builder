@@ -1,40 +1,127 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { reactive } from 'vue'
 import type { qn } from '@/types/Types'
+
+interface qnStore {
+    displayIDArray: string[],          // Used to speed up searching through indexes
+    qnArray: qn[]
+}
+
+const initStore : qnStore = {
+    displayIDArray: [],
+    qnArray: []
+}
 
 export const useQuestionStore = defineStore('QuestionStore', () => {
 
     // STATES
-    const database = ref([] as qn[])
-    const contribute = ref([] as qn[])
-    const build = ref([] as qn[])
+    const database : qnStore = reactive(structuredClone(initStore))
+    const contribute : qnStore = reactive(structuredClone(initStore))
+    const build : qnStore = reactive(structuredClone(initStore))
+
+    function getIDList(targetArray : qn[]) {
+        var idArr : string[] = []
+        for (var i=0; i<targetArray.length; i++) {
+            idArr.push(targetArray[i].displayID)
+        }
+        return idArr
+    }
+
+    function getQnIndexUsingID(targetStore : qnStore, dispID : string) {
+        const match = (element : string) => element == dispID
+        const i = targetStore.displayIDArray.findIndex(match)
+        return i
+    }
+
+    function getQnUsingID(storeName : string, dispID : string) {
+        const allowedNames = ['database', 'build', 'contribute']
+        if (allowedNames.includes(storeName)) {
+            var qnArr : qn[]
+            var i : number
+            switch(storeName) {
+                case 'database':
+                    qnArr = database.qnArray
+                    i = getQnIndexUsingID(database, dispID)
+                    return qnArr[i]
+                break
+                case 'build':
+                    qnArr = database.qnArray
+                    i = getQnIndexUsingID(database, dispID)
+                    return qnArr[i]
+                break
+                case 'contribute':
+                    qnArr = contribute.qnArray
+                    i = getQnIndexUsingID(contribute, dispID)
+                    return qnArr[i]
+                break
+            }
+        }
+    }
 
     // GETTERS
     function getDatabase() {
-        return database.value
+        return database.qnArray
     }
     function getContribute() {
-        return contribute.value
+        return contribute.qnArray
     }
     function getBuild() {
-        return build.value
+        return build.qnArray
+    }
+    function getContributeIDList() {
+        return contribute.displayIDArray
+    }
+    function getBuildIDList() {
+        return build.displayIDArray
     }
 
     // RESET ACTIONS
     function resetDatabase() {
-        database.value = []
+        database.displayIDArray = []
+        database.qnArray = []
     }
     function resetContribute() {
-        contribute.value = []
+        contribute.displayIDArray = []
+        contribute.qnArray = []
     }
     function resetBuild() {
-        build.value = []
+        build.displayIDArray = []
+        build.qnArray = []
     }
 
     // POPULATE ACTIONS
     function populateDatabase(v : qn[]) {
-        database.value = v
+        database.qnArray = v
+        database.displayIDArray = getIDList(v)
+    }
+    function insertFromDatabaseToContribute(dispID : string) {
+        const q = getQnUsingID('database', dispID) as qn
+        contribute.displayIDArray.push(dispID)
+        contribute.qnArray.push(q)
+    }
+    function deleteFromContribute(dispID : string) {
+        const i = getQnIndexUsingID(contribute, dispID)
+        contribute.displayIDArray.splice(i, 1)
+        contribute.qnArray.splice(i, 1)
+    }
+    function insertFromDatabaseToBuild(dispID : string) {
+        const q = getQnUsingID('database', dispID) as qn
+        build.displayIDArray.push(dispID)
+        build.qnArray.push(q)
+    }
+    function deleteFromBuild(dispID : string) {
+        const i = getQnIndexUsingID(build, dispID)
+        build.displayIDArray.splice(i, 1)
+        build.qnArray.splice(i, 1)
     }
 
-    return{ getDatabase, getContribute, getBuild, resetDatabase, resetContribute, resetBuild, populateDatabase }
+    return{ 
+        getQnUsingID,
+        getDatabase, getContribute, getBuild, 
+        getContributeIDList, getBuildIDList, 
+        resetDatabase, resetContribute, resetBuild, 
+        populateDatabase,
+        insertFromDatabaseToBuild, deleteFromBuild,
+        insertFromDatabaseToContribute, deleteFromContribute
+    }
 })

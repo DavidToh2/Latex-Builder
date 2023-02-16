@@ -8,15 +8,11 @@
     export interface Props {
         description: string
         internalName: string
-        availableSelections?: string[]
-        fontSize?: string
     }
 
         // Define the default value of props
 
-    const props = withDefaults(defineProps<Props>(), {
-        fontSize: "16px",
-    })
+    const props = defineProps<Props>()
 
     // REACTIVE VARIABLES
         // These Javascript variables are bound using :value, and are automatically updated along with their bound HTML counterparts.
@@ -25,8 +21,6 @@
     const search = reactive({
         inputText: ''
     })
-
-    const dropdownDir = (props.fontSize == "16px") ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
 
     // EMITS send data to the parent components of this component.
         // The update emit sends the list of selected items to the parent.
@@ -60,7 +54,7 @@
 
 .dropdown-container {
     display: flex;
-    flex-direction: v-bind('dropdownDir');
+    flex-direction: row;
     justify-content: center;
     gap: 7px;
     padding: 0px 7px;
@@ -68,12 +62,12 @@
 }
 
 .dropdown-description {
-    font-size: v-bind('fontSize');
+    font-size: 16px;
 }
 
 .dropdown-search-container-outer {
     flex-grow: 1;
-    height: calc(2 * v-bind(fontSize) - 2);
+    height: 25px;
 }
 
 .dropdown-search-container {
@@ -84,7 +78,7 @@
 .dropdown-input {
     width: 100%;
     font-family: 'Gothic A1', sans-serif;
-    font-size: calc(v-bind(fontSize) - 4px);
+    font-size: 12px;
 }
 
 </style>

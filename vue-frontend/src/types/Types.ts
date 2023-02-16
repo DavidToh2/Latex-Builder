@@ -1,5 +1,5 @@
 export interface qn {
-    id: string
+    displayID: string
     question: string
 
     category: string[]
@@ -17,4 +17,8 @@ export interface qn {
     lastModified: string
 
     tags: string[]
+}
+
+export interface qns {
+    qns: qn[]
 }

@@ -1,5 +1,5 @@
 
-
+var { newID, deleteID, parseID } = require('./ids/id')
 var mongoose = require('mongoose')
 var async = require('async')
 
@@ -20,83 +20,116 @@ var db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"))
 
-const {questionSchema} = require("./models/question.js")
+const { questionSchema } = require("./models/question.js")
 
 // https://forum.freecodecamp.org/t/cant-export-require-a-module-mongoose-model-typeerror-user-is-not-a-constructor/452317/6
 // Exporting the schemas rather than the models works better for some reason.
 
 const Question = mongoose.model("questions", questionSchema);
 
-function newQuestion(nQ) {
-
-    console.log("Setting new question...")
-    Question.insertMany([nQ], function(err) {
-        if (err) {
-            console.log("Failed to save!")
-            console.log(err)
-            return err.message
+async function newQuestion(nQ) {
+    try {
+        console.log("Setting new question...")
+        const i = await newID()
+        if (!i) {
+            throw new Error('Unable to assign new ID!')
         }
-        console.log("Done!")
-        return "Saved!"
-    })
+
+        nQ['id'] = i
+        console.log(`The new id is ${i}`)
+
+        const qns = await Question.insertMany([nQ])         // Returns a copy of the saved documents
+        if (!qns) {
+            throw new Error('insertMany() method failed!')
+        }
+        return qns
+    }
+    catch(err) {
+        dbError(err, "db/newQuestion: Failed to save!")
+        return
+    }
 }
 
 // Question.find({}) returns all questions.
 
 async function findQuestions(dataDict) {   
-    const fQ = await Question.find(dataDict).lean()
-    .catch((err) => {
-        console.log("Failed to find questions!")
-        console.log(err)
-        return err
-    })
+    try {
+        console.log("Finding questions...")
+        const qns = await Question.find(dataDict).lean()
 
-    return fQ
+        // Parses IDs to displayIDs before passing to web
+        qns.forEach((qn) => {
+            qn = parseID(qn, 'server')
+        })
+
+        return qns
+    }
+    catch(err) {
+        dbError(err, "db/findQuestions: Failed to find question!")
+        return
+    }
 }
 
-// Exact ID and not questionID for now
-function findQuestionByID(id) {   
-    var outputFields = outputArr.join(" ");
-    Question.findById(id, outputFields, (err, question) => {
-        if (err) {
-            console.log(`Failed to find question with ID ${id}!`);
-            console.log(err);
-            return err;
+async function deleteQuestion(i) {
+
+    try {
+        console.log(`Deleting question with displayID ${i}`)
+        var dQ = [{'displayID': i}]
+        dQ = parseID(dQ, 'web')             // Parse displayID to ID before searching database
+
+        const d = await deleteID(dQ['id'])
+        if (!d) {
+            throw new Error('Unable to delete ID!')
         }
-        return question;
-    })
+
+        const res = await Question.deleteOne(dQ)        // Returns {deletedCount: 1}
+        if (!res) {
+            throw new Error('deleteOne() method failed!')
+        }
+
+        return res      
+    }
+    catch {
+        dbError(err, `db/deleteQuestion: Failed to delete question with ID ${i}!`)
+        return
+    }
 }
 
-function deleteQuestionByID(id) {
-    Question.findByIdAndDelete(id, (err) => {
-        if (err) {
-            console.log(`Failed to delete question with ID ${id}!`);
-            console.log(err);
-            return false;
+async function saveQuestion(i, dataDict) {
+
+    try {
+        console.log(`Saving question with displayID ${i}`)
+        const qID = [{'displayID': i}]
+        qID = parseID(qID, 'web')             // Parse displayID to ID before searching database
+
+        var q = await findQuestions(qID)
+        if (!qID) {
+            throw new Error('Question not found!')
         }
-        return true;
-    })
+
+        Object.keys(dataDict).forEach(function(key) {
+            q.key = dataDict[key]
+        })
+        
+        var qs = await q.save()         // Returns a copy of the saved question
+        if (!qs) {
+            throw new Error('save() method failed!')
+        }
+
+        console.log(`Saved question with ID ${i}`)
+        return qs       
+    }
+    catch(err) {
+        dbError(err, `db/saveQuestion: Failed to save question with ID ${i}`)
+        return
+    }
 }
 
-function saveQuestion(
-    id,
-    dataDict
-) {
-    let q = findQuestionByID(id)
-    Object.keys(dataDict).forEach(function(key) {
-        q.key = dataDict[key]
-    })
-
-    q.save((err) => {
-        if (err) {
-            console.log("Failed to save!")
-            console.log(err)
-            return err.message
-        }
-        return "Saved!"
-    })
+function dbError(err, errorMsg) {
+    console.log(err, errorMsg)
+    console.log(err)
 }
 
 module.exports = {
-    newQuestion, findQuestions, findQuestionByID, deleteQuestionByID, saveQuestion
-};
+    newQuestion, findQuestions, deleteQuestion, saveQuestion
+}

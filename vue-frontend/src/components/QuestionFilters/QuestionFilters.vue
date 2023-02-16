@@ -9,9 +9,7 @@
         func: string
     }
 
-    const props = withDefaults(defineProps<Props>(), {
-        
-    })
+    const props = defineProps<Props>()
 
     const defaultSelections = {
         category: <string[]> [],

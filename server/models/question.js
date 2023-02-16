@@ -3,14 +3,17 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const questionSchema = new Schema( {
+    id: {
+        type: Number,
+        required: [true, 'Missing ID!']
+    },
     question: {
         type: String,
         required: [true, 'Missing question!']
     },
     category: {
         type: [String],
-        required: [true, 'Missing category!'],
-        enum: ['Mathematics', 'Computer Science']
+        required: [true, 'Missing category!']
     },
     topic: {
         type: [String],

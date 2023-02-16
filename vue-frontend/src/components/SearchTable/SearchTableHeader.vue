@@ -4,22 +4,22 @@
 
 <template>
     <div class="search-table-header-row">
-        <div class="search-id search-header">
+        <div class="search-id search-header search-cell">
             ID
         </div>
-        <div class="search-question search-header">
+        <div class="search-question search-header search-cell">
             Question
         </div>
-        <div class="search-topic search-header">
+        <div class="search-topic search-header search-cell">
             Topics
         </div>
-        <div class="search-difficulty search-header">
+        <div class="search-difficulty search-header search-cell">
             Difficulty
         </div>
-        <div class="search-source search-header">
+        <div class="search-source search-header search-cell">
             Source
         </div>
-        <div class="search-options search-header">
+        <div class="search-options search-header search-cell">
             Options
         </div>
     </div>
@@ -34,9 +34,7 @@
 
 .search-header {
     background-color: #D9D9D9;
-    padding: 8px 10px;
     font-size: 16px;
-
 }
 
 </style>
