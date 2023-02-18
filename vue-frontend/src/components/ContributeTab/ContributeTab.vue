@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+    import { computed } from 'vue'
+
     export interface Props {
         idList: string[]
     }
@@ -8,12 +10,20 @@
         idList: () => ['M3234', 'M3235', 'CS420']
     })
 
+    const emits = defineEmits<{
+        (e: 'changeActiveQuestion', newQnID: string): void
+    }>()
+
+    function changeQn(newID : string) {
+        emits('changeActiveQuestion', newID)
+    }
+
 </script>
 
 <template>
     <div id="contribute-tab-container">
-        <div class="tab-question active">New</div>
-        <div class="tab-question" v-for="item in idList">{{ item }}</div>
+        <div class="tab-question active" id="contribute-0" @click="changeQn('0')">New</div>
+        <div class="tab-question" v-for="item in idList" @click="changeQn(item)" :id="'contribute-' + item">{{ item }}</div>
     </div>
 </template>
 
@@ -29,6 +39,10 @@
 .tab-question {
     font-size: 22px;
     padding: 7px 20px;
+    cursor: pointer;
+}
+.tab-question:hover {
+    text-decoration: underline;
 }
 
 .active {

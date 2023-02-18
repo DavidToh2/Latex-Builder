@@ -24,7 +24,7 @@ const questionSchema = new Schema( {
     },
 
     difficulty: {
-        type: String,
+        type: [String],
         required: [true, 'Missing difficulty!']
     },
     images: [String],
@@ -35,7 +35,7 @@ const questionSchema = new Schema( {
     solutionImages: [String],
     
     sourceName: {
-        type: String,
+        type: [String],
         uppercase: true
     },
     sourceYear: {

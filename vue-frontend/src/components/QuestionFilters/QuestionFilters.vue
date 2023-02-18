@@ -1,29 +1,39 @@
 <script setup lang="ts">
 
-    import { reactive, ref, computed } from 'vue'
+    import { watch, reactive } from 'vue'
     import DropdownSearch from '@/components/QuestionFilters/DropdownSearch.vue'
     import Input from '@/components/QuestionFilters/Input.vue'
     import paramdir from '@/assets/dropdown.json'
+    import type { qnFilters, qnFilterNames } from '@/types/Types'
 
     export interface Props {
         func: string
+        ss: qnFilters
     }
 
-    const props = defineProps<Props>()
+    const props = withDefaults(defineProps<Props>(), {
+        ss: Object.assign({ 
+            category: <string[]> [],
+            topic: <string[]> [],
+            subtopic: <string[]> [],
+            difficulty: <string[]> [],
+            sourceName: <string[]> [],
+            sourceYear: 0,
+            tags: <string[]> []
+        })
+    })  
 
     const defaultSelections = {
         category: <string[]> [],
         topic: <string[]> [],
         subtopic: <string[]> [],
         difficulty: <string[]> [],
-        source: <string[]> []
+        sourceName: <string[]> [],
     }
-
-    const ss = reactive({ ...defaultSelections })        // Actively selected items
-    const as = reactive({ ...defaultSelections })       // Available selections
+    var as = reactive({ ...defaultSelections })       
 
     function clearAvailableSelections() {
-        Object.assign(ss, defaultSelections)
+        Object.assign(as, defaultSelections)
     }       // https://stackoverflow.com/questions/61184749/how-to-properly-populate-vue-composition-apis-reactive-values
 
     function initialiseAvailableSelections() {
@@ -31,21 +41,22 @@
         populate('topic')
         populate('subtopic')
         populate('difficulty')
-        populate('source')
+        populate('sourceName')
     }
 
-        // The following populates this selection's available options based on its parent selection's active options.
+                // POPULATE SELECTION'S AVAILABLE OPTIONS
+                // BASED ON PARENT SELECTION'S ACTIVE OPTIONS
 
     function populate(intName: string) {
 
-        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'source']
+        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName']
         if (!permittedIntNames.includes(intName)) {
             console.log("Error: Active Selection internal name " + intName + " not permitted!\n")
         }
 
         as[intName as keyof typeof as] = []
 
-        let sc = ss.category        // Selected categories.
+        let sc = props.ss.category        // Selected categories.
         if (sc.length == 0) {
             sc = as.category        // If none selected, choose from all categories.
         }
@@ -63,7 +74,7 @@
                 }
             break
             case "subtopic":        // Populates all available subtopics based on the selected categories and topics
-                let st = ss.topic
+                let st = props.ss.topic
                 
                 for (var cat of sc) {
                     let a = paramdir[cat as keyof typeof paramdir]['topic']
@@ -84,7 +95,7 @@
                 }
             break
             case "difficulty":
-            case "source":          // Populates all available difficulties and sources based on the selected categories
+            case "sourceName":          // Populates all available difficulties and sources based on the selected categories
                 for (var cat of sc) {
                     let a = paramdir[cat as keyof typeof paramdir] 
                     let b = a[intName as keyof typeof a] as string[]
@@ -97,22 +108,23 @@
         // console.log(selections[intName as keyof typeof selections])
     }
 
-        // The following function updates the active selections,
-        // then updates the available child options.
+                // ON CHANGE OF ENTRY, UPDATE ACTIVE SELECTIONS ss
+                // THEN UPDATE AVAILABLE CHILD OPTIONS
 
-    function update(intName : string, updatedSelections : string[]) {
-
-        let permittedIntNames = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName']
-        if (!permittedIntNames.includes(intName)) {
-            console.log("Error: Active Selection internal name " + intName + " not permitted!\n")
+    function updateYear(intName : string, updatedSelections : string[] ) {
+        if (intName == "sourceYear") {
+            props.ss["sourceYear"] = parseInt(updatedSelections[0])
         }
-        
-        // Update the active selections of the field
-        ss[intName as keyof typeof ss] = updatedSelections
+    }
+
+    function update(intName : string, updatedSelections : string[] ) {
+
+        var i = intName as qnFilterNames
+        props.ss[i] = updatedSelections
 
         // In general, if a field is cleared by the user, treat it as "everything is possible" now --- reset the available options
         // Note that for category, everything is always displayed anyway
-        if (intName == 'year' || intName == 'tags') {
+        if (intName == 'tags') {
 
         } else {
             if (updatedSelections.length == 0) {
@@ -125,10 +137,10 @@
 
                     case "category":     // The category has changed
 
-                        // Update available topics, difficulty and sources
+                        // Update available topics, diffUPDATEDiculty and sources
                         populate("topic")
                         populate("difficulty")
-                        populate("source")
+                        populate("sourceName")
                     
                     case "topic":     // The topic was changed
 
@@ -139,6 +151,18 @@
                 }
             }
         }
+    }
+
+                // EMIT ALL ACTIVE SELECTIONS WHEN ENTRIES ARE CHANGED
+
+    watch({...props.ss}, updateAllEntries)
+
+    const emits = defineEmits<{
+        (e: 'updateAll', entries: qnFilters): void
+    }>()
+
+    function updateAllEntries(ssNew : qnFilters, ssOld : qnFilters) {
+        emits('updateAll', ssNew)
     }
 
     initialiseAvailableSelections()
@@ -160,9 +184,9 @@
             <DropdownSearch description="Difficulty" internalName="difficulty" :availableSelections="as.difficulty" @update="update"/>
         </div>
         <div class="question-filters">
-            <DropdownSearch description="Source" internalName="sourceName" :availableSelections="as.source" @update="update"/>
-            <Input description="Year" internalName="sourceYear"/>
-            <Input description="Tags" internalName="tags"/>
+            <DropdownSearch description="Source" internalName="sourceName" :availableSelections="as.sourceName" @update="update"/>
+            <Input description="Year" internalName="sourceYear" @update="updateYear"/>
+            <Input description="Tags" internalName="tags" @update="update"/>
         </div>
     </div>
 </template>

@@ -1,13 +1,18 @@
-export interface qn {
-    displayID: string
-    question: string
-
+export interface qnFilters {
     category: string[]
     topic: string[]
     subtopic: string[]
-    difficulty: string
-    sourceName: string
+    difficulty: string[]
+    sourceName: string[]
     sourceYear: number
+
+    tags: string[]
+}
+export type qnFilterNames = 'category' | 'topic' | 'subtopic' | 'difficulty' | 'sourceName' | 'tags'
+
+export interface qn extends qnFilters {
+    displayID: string
+    question: string
 
     images: string[]
 
@@ -15,8 +20,6 @@ export interface qn {
     solutionImages: string[]
 
     lastModified: string
-
-    tags: string[]
 }
 
 export interface qns {

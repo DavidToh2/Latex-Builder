@@ -17,7 +17,7 @@
         "difficulty": [
             "Primary", "Junior (C)", "Junior (B)", "Junior (A)", "Senior", "Open", "IMO (D)", "IMO (C)", "IMO (B)", "IMO (A)"
         ],
-        "source": [
+        "sourceName": [
             "SMO Junior", "SMO Senior", "SMO Open", "IMO"
         ]
     },
@@ -33,7 +33,7 @@
         "difficulty": [
             "NOI", "University"
         ],
-        "source": [
+        "sourceName": [
             "NOI", "IOI", "ICPC"
         ]
     }

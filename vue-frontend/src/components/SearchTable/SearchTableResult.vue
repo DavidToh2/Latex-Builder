@@ -16,7 +16,6 @@
         const r = ((img.parentElement as HTMLElement).parentElement as HTMLElement).children[0] as HTMLDivElement
 
         const dispID = r.innerText
-        console.log(dispID)
         emits('edit', dispID)
     }
 
@@ -34,11 +33,11 @@
             <p>{{ q.topic.join(', ') }}</p>
             <p>{{ q.subtopic.join(', ') }}</p>
         </div>
-        <div class="search-difficulty search-cell">
-            {{ q.difficulty }}
+        <div class="search-difficulty search-cell" v-for="i in q.difficulty">
+            {{ i }}
         </div>
-        <div class="search-source search-cell">
-            <p>{{ q.sourceName }}</p>
+        <div class="search-source search-cell" v-for="sn in q.sourceName">
+            <p>{{ sn }}</p>
             <p>{{ q.sourceYear }}</p>
         </div>
         <div class="search-options search-cell">

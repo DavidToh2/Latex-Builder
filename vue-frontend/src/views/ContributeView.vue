@@ -3,20 +3,46 @@ import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/QuestionFilters/QuestionFilters.vue'
 import ContributeTab from '@/components/ContributeTab/ContributeTab.vue'
 
-import type { qn, qns } from '@/types/Types'
+import type { qn, qnFilters, qnFilterNames } from '@/types/Types'
 import { useQuestionStore } from '@/stores/stores'
 import { postForm } from '@/post';
 import { reactive, ref, computed, watch } from 'vue'
 
-var actives : qns = reactive({
-    qns: []
+const emptyQn : qn = {
+    displayID: '0',
+    category: [],
+    question: '',
+
+    topic: [],
+    subtopic: [],
+    difficulty: [],
+    sourceName: [],
+    sourceYear: 0,
+
+    images: [],
+    solution: '',
+    solutionImages: [],
+    lastModified: '',
+    tags: []
+}
+
+var active : qn = reactive({...emptyQn})
+var newQn : qn = reactive({...emptyQn})
+
+var activeFilters = computed<qnFilters>(() => {
+    const f : qnFilters = {
+        category: <string[]> active.category,
+        topic: <string[]> active.topic,
+        subtopic: <string[]> active.subtopic,
+        difficulty: <string[]> active.difficulty,
+        sourceName: <string[]> active.sourceName,
+        sourceYear: active.sourceYear,
+        tags: <string[]> active.tags
+    }
+    return f
 })
-var activeIDs = computed<string[]>(() => {
-    var idArr : string[] = []
-    actives.qns.forEach((qn) => idArr.push(qn.displayID))
-    return idArr
-})
-var currentQnID = ref<string>('0')
+
+var activeIDs = ref<string[]>([])
 
 function saveQuestionEvent(e : Event) {
     const f = e.target as HTMLFormElement
@@ -26,13 +52,13 @@ async function saveQuestion(f : HTMLFormElement) {
 
     var response : Response
     // If the question is a new question:
-    if (currentQnID.value == '0') {
+    if (active.displayID == '0') {
         response = await postForm(f, 'http://localhost:3000/database/set/new') as Response
 
         console.log(response.json())
     // If the question is an existing question:
     } else {
-        const dispID = currentQnID.value as string
+        const dispID = active.displayID as string
         response = await postForm(f, `http://localhost:3000/database/set/update/${dispID}`) as Response
 
         console.log(response.json())
@@ -43,53 +69,95 @@ async function saveQuestion(f : HTMLFormElement) {
 const QuestionStore = useQuestionStore()
 QuestionStore.resetContribute()
 
+var oldActiveIDs = ref<string[]>([])
 
-watch(QuestionStore.getContributeIDList(), updateContribute)
+QuestionStore.$onAction(
+    ({name, store, args, after, onError }) => {
+        if (name == 'insertFromDatabaseToContribute') {
+            after((result) => {
+                if (result) {
+                    const newContributeIDList = QuestionStore.getContributeIDList() as string[]
+                    updateContribute(newContributeIDList, oldActiveIDs.value)
+                    oldActiveIDs.value = [...newContributeIDList]
+                }
+            })
+        }
+    }
+)
 
+// Run the following function whenever the CONTRIBUTE store is updated:
 // The CONTRIBUTE store was updated. 
-function updateContribute(updatedActives : string[], prevActives : string[]) {
+function updateContribute(updatedContribute : string[], prevContribute : string[]) {
 
     // Three possible actions could have happened:
-    const ul = updatedActives.length, pl = prevActives.length
+    const ul = updatedContribute.length, pl = prevContribute.length
 
-    // New question added to contribute. Get new question ID, then get new question from contribute
+    // New question added to contribute. Get new question ID, then add to tab
     if (ul - pl == 1) {
         var i = 0
-        while (i < pl && updatedActives[i] == prevActives[i]) {
+        while (i < pl && updatedContribute[i] == prevContribute[i]) {
             i++
         }
-        // The new question ID is at index i of updatedActives.
-        // Note that insertFromDatabaseToContribute uses .push, so usually [i] should be the last element of the array
-        
-        const newQn = (QuestionStore.getContribute() as qn[])[i] as qn
-        actives.qns.splice(i, 0, newQn)
+        // The new question ID is at index i of updatedContribute.
+        // Note that insertFromDatabaseToContribute uses .push, so usually [i] should be the last element of the array.
+        // activeIDs[] and prevContribute[] should be identical, except for the '0' at the front of the former.
+        const newQnID = updatedContribute[i]
+        activeIDs.value.splice(i+1, 0, newQnID)
     }
 
-    // Question removed from contribute
+    // Question removed from contribute. Remove from tab
     if (pl - ul == 1) {
         var i = 0
-        while (i < pl && updatedActives[i] == prevActives[i]) {
+        while (i < pl && updatedContribute[i] == prevContribute[i]) {
             i++
         }
-        // The deleted question ID is at index i of prevActives.
-
-        actives.qns.splice(i, 1)
+        // The deleted question ID is at index i of prevContribute.
+        activeIDs.value.splice(i+1, 1)
     }
 
     // Contribute store cleared
     if (ul == 0) {
-        actives.qns = []
+        activeIDs.value = []
     }
 }
 
+function updateQuestionFilters(ss : qnFilters) {
+    const qF = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
+    for (const key in qF) {
+        var k = key as qnFilterNames
+        active[k] = ss[k]
+    }
+    active['sourceYear'] = ss['sourceYear']
+}
+
+function changeDisplayedQuestion(newQnID : string) {
+
+    if (active.displayID == '0') {
+        // If current displayed question is the new question, store it
+        newQn = active
+    } else {
+        // Update current displayed question fields into Contribute store
+        QuestionStore.updateQn('contribute', active.displayID, active)
+    }
+
+    // Get new displayed question
+    if (newQnID == '0') {
+        active = newQn
+    } else {
+        const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
+        active = newQuestion
+    }
+
+    console.log(active.question)
+}
 
 </script>
 
 <template>
     <Title title="Contribute" />
-    <ContributeTab :id-list="activeIDs" />
+    <ContributeTab :id-list="activeIDs" @change-active-question="changeDisplayedQuestion" />
     <form id="contribute-question-container" autocomplete="false" @submit.prevent="saveQuestionEvent($event)">
-        <QuestionFilters func="contribute" />
+        <QuestionFilters func="contribute" @update-all="updateQuestionFilters" :ss="activeFilters"/>
         <!-- <input type="text" id="question-build-shortcut" name="question-tags" placeholder="Quickfill: Category - Topic - Subtopic - Difficulty - Source - Year - Tags"> -->
             
         <div id="latex-container">

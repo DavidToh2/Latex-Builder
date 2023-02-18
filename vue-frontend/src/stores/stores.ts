@@ -18,6 +18,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     const database : qnStore = reactive(structuredClone(initStore))
     const contribute : qnStore = reactive(structuredClone(initStore))
     const build : qnStore = reactive(structuredClone(initStore))
+    const allowedNames = ['database', 'build', 'contribute']
 
     function getIDList(targetArray : qn[]) {
         var idArr : string[] = []
@@ -34,7 +35,6 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     }
 
     function getQnUsingID(storeName : string, dispID : string) {
-        const allowedNames = ['database', 'build', 'contribute']
         if (allowedNames.includes(storeName)) {
             var qnArr : qn[]
             var i : number
@@ -53,6 +53,30 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
                     qnArr = contribute.qnArray
                     i = getQnIndexUsingID(contribute, dispID)
                     return qnArr[i]
+                break
+            }
+        }
+    }
+
+    function updateQn(storeName: string, dispID: string, data: qn) {
+        if (allowedNames.includes(storeName)) {
+            var qnArr : qn[]
+            var i : number
+            switch(storeName) {
+                case 'database':
+                    qnArr = database.qnArray
+                    i = getQnIndexUsingID(database, dispID)
+                    database.qnArray[i] = data
+                break
+                case 'build':
+                    qnArr = database.qnArray
+                    i = getQnIndexUsingID(database, dispID)
+                    database.qnArray[i] = data
+                break
+                case 'contribute':
+                    qnArr = contribute.qnArray
+                    i = getQnIndexUsingID(contribute, dispID)
+                    database.qnArray[i] = data
                 break
             }
         }
@@ -95,9 +119,14 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         database.displayIDArray = getIDList(v)
     }
     function insertFromDatabaseToContribute(dispID : string) {
-        const q = getQnUsingID('database', dispID) as qn
-        contribute.displayIDArray.push(dispID)
-        contribute.qnArray.push(q)
+        if (getContributeIDList().includes(dispID)) {
+            return false
+        } else {
+            const q = getQnUsingID('database', dispID) as qn
+            contribute.displayIDArray.push(dispID)
+            contribute.qnArray.push(q)
+            return true
+        }
     }
     function deleteFromContribute(dispID : string) {
         const i = getQnIndexUsingID(contribute, dispID)
@@ -105,9 +134,14 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         contribute.qnArray.splice(i, 1)
     }
     function insertFromDatabaseToBuild(dispID : string) {
-        const q = getQnUsingID('database', dispID) as qn
-        build.displayIDArray.push(dispID)
-        build.qnArray.push(q)
+        if (getBuildIDList().includes(dispID)) {
+            return false
+        } else {
+            const q = getQnUsingID('database', dispID) as qn
+            build.displayIDArray.push(dispID)
+            build.qnArray.push(q)
+            return true
+        }
     }
     function deleteFromBuild(dispID : string) {
         const i = getQnIndexUsingID(build, dispID)
@@ -116,7 +150,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     }
 
     return{ 
-        getQnUsingID,
+        getQnUsingID, updateQn,
         getDatabase, getContribute, getBuild, 
         getContributeIDList, getBuildIDList, 
         resetDatabase, resetContribute, resetBuild, 
