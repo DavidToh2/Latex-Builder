@@ -155,7 +155,7 @@
 
                 // EMIT ALL ACTIVE SELECTIONS WHEN ENTRIES ARE CHANGED
 
-    watch({...props.ss}, updateAllEntries)
+    watch(reactive({ ...props.ss }), updateAllEntries)
 
     const emits = defineEmits<{
         (e: 'updateAll', entries: qnFilters): void

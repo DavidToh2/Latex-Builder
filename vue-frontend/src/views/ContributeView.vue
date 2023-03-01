@@ -132,9 +132,12 @@ function updateQuestionFilters(ss : qnFilters) {
 
 function changeDisplayedQuestion(newQnID : string) {
 
+    console.log(`Formerly displayed question: active.displayID is ${active.displayID}`)
+    console.log(`New display question: newQnID is ${newQnID}`)
+
     if (active.displayID == '0') {
         // If current displayed question is the new question, store it
-        newQn = active
+        Object.assign(newQn, active)
     } else {
         // Update current displayed question fields into Contribute store
         QuestionStore.updateQn('contribute', active.displayID, active)
@@ -142,13 +145,14 @@ function changeDisplayedQuestion(newQnID : string) {
 
     // Get new displayed question
     if (newQnID == '0') {
-        active = newQn
+        Object.assign(active, newQn)
     } else {
         const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
-        active = newQuestion
+        Object.assign(active, newQuestion)
     }
 
     console.log(active.question)
+    console.log(activeFilters.value)
 }
 
 </script>
@@ -161,7 +165,7 @@ function changeDisplayedQuestion(newQnID : string) {
         <!-- <input type="text" id="question-build-shortcut" name="question-tags" placeholder="Quickfill: Category - Topic - Subtopic - Difficulty - Source - Year - Tags"> -->
             
         <div id="latex-container">
-            <textarea id="question-text" name="question" placeholder="Type LaTeX here:"></textarea>
+            <textarea id="question-text" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
         </div>
         <div id="display-container">
         </div>
