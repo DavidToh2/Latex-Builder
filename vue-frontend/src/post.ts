@@ -10,6 +10,8 @@ export async function postForm(f : HTMLFormElement, url : string) {
             const eValue = element.value
             if (eValue) {
                 reqBody[eName] = eValue
+            } else {
+                
             }
         }
     }
@@ -30,7 +32,7 @@ export async function postForm(f : HTMLFormElement, url : string) {
     })
     .catch((error) => console.log('post.ts returned error ', error))
     
-    console.log(response)
+    // console.log(response)
     
     return response
 }

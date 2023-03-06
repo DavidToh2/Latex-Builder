@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 import type { qn } from '@/types/Types'
+import { emptyQn } from '@/types/Types'
 
 interface qnStore {
     displayIDArray: string[],          // Used to speed up searching through indexes
@@ -11,12 +12,16 @@ const initStore : qnStore = {
     displayIDArray: [],
     qnArray: []
 }
+const initContributeStore : qnStore = {
+    displayIDArray: ['0'],
+    qnArray: [{...emptyQn}]
+}
 
 export const useQuestionStore = defineStore('QuestionStore', () => {
 
     // STATES
     const database : qnStore = reactive(structuredClone(initStore))
-    const contribute : qnStore = reactive(structuredClone(initStore))
+    const contribute : qnStore = reactive(structuredClone(initContributeStore))
     const build : qnStore = reactive(structuredClone(initStore))
     const allowedNames = ['database', 'build', 'contribute']
 
@@ -45,8 +50,8 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
                     return qnArr[i]
                 break
                 case 'build':
-                    qnArr = database.qnArray
-                    i = getQnIndexUsingID(database, dispID)
+                    qnArr = build.qnArray
+                    i = getQnIndexUsingID(build, dispID)
                     return qnArr[i]
                 break
                 case 'contribute':
@@ -69,8 +74,8 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
                     database.qnArray[i] = data
                 break
                 case 'build':
-                    qnArr = database.qnArray
-                    i = getQnIndexUsingID(database, dispID)
+                    qnArr = build.qnArray
+                    i = getQnIndexUsingID(build, dispID)
                     database.qnArray[i] = data
                 break
                 case 'contribute':
@@ -82,7 +87,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         }
     }
 
-    // GETTERS
+    // GETTERS (These objects are returned by reference and can be directly mutated)
     function getDatabase() {
         return database.qnArray
     }
@@ -105,8 +110,8 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         database.qnArray = []
     }
     function resetContribute() {
-        contribute.displayIDArray = []
-        contribute.qnArray = []
+        contribute.displayIDArray = ['0']
+        contribute.qnArray = [{...emptyQn}]
     }
     function resetBuild() {
         build.displayIDArray = []
@@ -132,6 +137,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         const i = getQnIndexUsingID(contribute, dispID)
         contribute.displayIDArray.splice(i, 1)
         contribute.qnArray.splice(i, 1)
+        return true
     }
     function insertFromDatabaseToBuild(dispID : string) {
         if (getBuildIDList().includes(dispID)) {
@@ -147,6 +153,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         const i = getQnIndexUsingID(build, dispID)
         build.displayIDArray.splice(i, 1)
         build.qnArray.splice(i, 1)
+        return true
     }
 
     return{ 

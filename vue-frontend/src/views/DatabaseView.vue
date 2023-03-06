@@ -28,8 +28,7 @@ async function submitSearchQuery(f : HTMLFormElement) {         // Submits searc
 }
 
 function displayDatabase() {            // Fetches data from store
-    results.qns = QuestionStore.getDatabase().slice().reverse()
-    console.log(results.qns)
+    results.qns = [...QuestionStore.getDatabase().slice().reverse()]
 }
 
 </script>

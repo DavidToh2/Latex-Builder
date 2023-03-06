@@ -3,7 +3,7 @@ var router = express.Router();
 var { newQuestion, findQuestions, deleteQuestion, saveQuestion } = require('../db')
 
 
-var stringToArrayFields = ['category', 'topic', 'subtopic', 'tags']
+var stringToArrayFields = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
 var stringToNumberFields = ['sourceYear']
 
 router.use((req, res, next) => {                        // MIDDLEWARE FUNCTION GETS CALLED ON EVERY QUERY
@@ -35,28 +35,27 @@ router.post('/set/new', async function(req, res) {              // SET NEW QUEST
 
     console.log("Input parameters:")
     const dataDict = parseWebToServer(req.body)
-    console.log(req.body)
+    console.log(dataDict)
 
     const nQ = await newQuestion(dataDict)      
     console.log("The following question has been set:")
     console.log(nQ)
 
-    res.header("Content-Type", "text/plain")
-    res.send(`The ID of the new question is ${nQ}`)
+    res.json(nQ)
 })
 
 router.post('/set/update/:displayID', async function(req, res) {           // UPDATE EXISTING QUESTION
 
     console.log("Input parameters:")
-    const reqData = req.body
+    const reqData = parseWebToServer(req.body)
     console.log(reqData)
     const displayID = req.params['displayID']
 
-    const r = await saveQuestion(displayID, reqData.dataDict)
+    const r = await saveQuestion(displayID, reqData)
+    console.log("The following question has been saved:")
     console.log(r)
 
-    res.header("Content-Type", "text/plain")
-    res.send(r)
+    res.json(r)
 })
 
 router.post('/delete/:displayID', async function(req, res) {
@@ -67,10 +66,10 @@ router.post('/delete/:displayID', async function(req, res) {
     const displayID = req.params['displayID']
 
     const d = await deleteQuestion(displayID)
+    console.log("Number of deleted questions:")
     console.log(d)
 
-    res.header("Content-Type", "text/plain")
-    res.send(d)
+    res.json(d)
 })
 
 

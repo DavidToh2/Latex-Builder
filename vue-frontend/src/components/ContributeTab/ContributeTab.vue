@@ -1,29 +1,66 @@
 <script setup lang="ts">
 
-    import { computed } from 'vue'
+    import { computed, watch } from 'vue'
 
     export interface Props {
-        idList: string[]
+        idList: string[],
+        activeID: string
     }
 
     const props = withDefaults(defineProps<Props>(), {
         idList: () => ['M3234', 'M3235', 'CS420']
     })
 
+    const displayedIDList = computed<string[]>(() => {
+        var l = [...props.idList]
+        l.splice(0, 1)
+        return l
+    })
+
     const emits = defineEmits<{
-        (e: 'changeActiveQuestion', newQnID: string): void
+        (e: 'changeActiveQuestion', newQnID: string): void,
+        (e: 'removeFromTab', qnID: string): void
     }>()
 
-    function changeQn(newID : string) {
-        emits('changeActiveQuestion', newID)
+    watch(() => props.activeID, (newID, oldID) => {
+        changeActiveQuestionDisplay(newID)
+    })
+
+    function changeActiveQuestionDisplay(newID : string) {
+        const tabs = document.querySelectorAll(".tab-question")
+        for (const t of tabs) {
+            const i = t.id
+            if (t.classList.contains("active")) {
+                t.classList.remove("active")
+            }
+            if (i == `contribute-${newID}`) {
+                t.classList.add("active")
+            }
+        }
+    }
+
+    function removeFromTab(id : string) {
+        if (props.activeID == id) {
+            var i = 0
+            while (props.idList[i] != id) {
+                i++
+            }
+            emits('changeActiveQuestion', props.idList[i-1])
+        }
+        emits('removeFromTab', id)
     }
 
 </script>
 
 <template>
     <div id="contribute-tab-container">
-        <div class="tab-question active" id="contribute-0" @click="changeQn('0')">New</div>
-        <div class="tab-question" v-for="item in idList" @click="changeQn(item)" :id="'contribute-' + item">{{ item }}</div>
+        <div class="tab-question active" id="contribute-0">
+            <div class="tab-question-text" @click="$emit('changeActiveQuestion', '0')">New</div>
+        </div>
+        <div class="tab-question" v-for="item in displayedIDList" :id="'contribute-' + item">
+            <div class="tab-question-text" @click="$emit('changeActiveQuestion', item)">{{ item }}</div>
+            <div class="tab-question-x" @click="removeFromTab(item)">&#0215;</div>
+        </div>
     </div>
 </template>
 
@@ -37,12 +74,26 @@
 }
 
 .tab-question {
-    font-size: 22px;
     padding: 7px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+}
+.tab-question-text {
+    font-size: 22px;
+}
+.tab-question-text:hover {
+    text-decoration: underline;
     cursor: pointer;
 }
-.tab-question:hover {
-    text-decoration: underline;
+
+.tab-question-x {
+    font-size: 22px;
+    font-weight: 800;
+}
+.tab-question-x:hover {
+    cursor: pointer;
 }
 
 .active {

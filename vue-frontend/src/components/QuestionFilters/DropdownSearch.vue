@@ -1,14 +1,12 @@
 <script setup lang="ts">
 
-    import { reactive, computed } from 'vue'
+    import { reactive, computed, watch } from 'vue'
     import { numberToPixels } from '@/aux'
-
-    // PROPS receive data from the parent components of this component.
-        // When the child component is refreshed, the list of available selections is received from the parent.
 
     export interface Props {
         description: string
         internalName: string
+        activeSelections?: string[]
         availableSelections?: string[]
         fontSize?: number
     }
@@ -16,18 +14,20 @@
         // Define the default value of props
 
     const props = withDefaults(defineProps<Props>(), {
+        activeSelections: Object.assign(<string[]>[]),
         fontSize: 16
     })
 
-    // REACTIVE VARIABLES
-        // These Javascript variables are bound using :value, and are automatically updated along with their bound HTML counterparts.
-        // Since this is TypeScript, we have to explicitly type the empty array.    
-
     const search = reactive({
         searchText: '',
-        activeSelections: <string[]>[],
         active: false,
+        activeSelections: <string[]> [...props.activeSelections as string[]]
     })
+
+    watch(() => props.activeSelections, (newActive, oldActive) => {
+        search.activeSelections = [...newActive as string[]]
+        displayActiveSelections()
+    }, {deep: true})
 
     const dropdownDir = (props.fontSize == 16) ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
 
@@ -43,21 +43,13 @@
         return p
     })
 
-    // EMITS send data to the parent components of this component.
-        // The update emit sends the list of selected items to the parent.
-
     const emits = defineEmits<{
-        (e: 'update', intName: string, values: string[]): void
+        (e: 'update', values: string[], intName: string): void
     }>()
 
     // When a user clicks on the input box, clear the searchText and let them type and search.
 
     let initialiseSearch = (e : Event) => {
-
-        // Sadly, TypeScript doesn't really support the use of 'this' in onclick="function(this)"
-        // One workaround is to use "function($event)", which directly accesses the DOM event (in this case, onclick),
-        // then use event.target to access the DOM element.
-
         let t = e.target as HTMLInputElement
         search.searchText = ""
         t.value = ""
@@ -99,10 +91,12 @@
 
     let displayActiveSelections = () => {
         let str = ''
-        for (var item of search.activeSelections) {
-            str += item += ", "
+        if (search.activeSelections.length > 0) {
+            for (var item of search.activeSelections) {
+                str += item += ", "
+            }
+            str = str.slice(0, -2)
         }
-        str = str.slice(0, -2)
         search.searchText = str
     }
 
@@ -110,7 +104,7 @@
 
     let setActiveSelections = () => {
         displayActiveSelections()
-        emits('update', props.internalName, search.activeSelections)
+        emits('update', search.activeSelections, props.internalName)
     }
 
 </script>
@@ -122,12 +116,18 @@
         </div>
         <div class="dropdown-search-container-outer">
             <div class="dropdown-search-container" @mouseenter="search.active = true" @mouseleave="search.active = false">
-                <textarea :rows="searchbarRows" class="dropdown-searchbar" autocomplete="off" :name="internalName" style="resize: none;" :value="search.searchText" @focus="initialiseSearch($event)" @input="searchAvailableSelections($event)" @blur="displayActiveSelections()"></textarea>
+                <textarea :rows="searchbarRows" class="dropdown-searchbar" autocomplete="off" style="resize: none;" 
+                    :name="internalName"
+                    :value="search.searchText" 
+                    @focus="initialiseSearch($event)" 
+                    @input="searchAvailableSelections($event)" 
+                    @blur="displayActiveSelections()">
+                </textarea>
+              
+                <select multiple class="dropdown-list" :class="{'dropdown-list-active': search.active}"
+                    @change="setActiveSelections()" 
+                    v-model="search.activeSelections">
 
-                <!-- Emits an event to update the parent component whenever the selection is changed. 
-                This is to allow other DropdownSearches to access this DropdownSearch's selections. -->
-                
-                <select multiple class="dropdown-list" v-model="search.activeSelections" @change="setActiveSelections()" :class="{'dropdown-list-active': search.active}">
                     <option class="dropdown-option" v-for="item in availableSelections" :value="item">{{ item }}</option>
                 </select>
             </div>

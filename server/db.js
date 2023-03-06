@@ -99,17 +99,17 @@ async function saveQuestion(i, dataDict) {
 
     try {
         console.log(`Saving question with displayID ${i}`)
-        const qID = [{'displayID': i}]
+        var qID = {'displayID': i}
         qID = parseID(qID, 'web')             // Parse displayID to ID before searching database
 
-        var q = await findQuestions(qID)
+        var q = await Question.findOne(qID)
         if (!qID) {
             throw new Error('Question not found!')
         }
 
-        Object.keys(dataDict).forEach(function(key) {
-            q.key = dataDict[key]
-        })
+        for (const [key, value] of Object.entries(dataDict)) {
+            q[key] = value
+        }
         
         var qs = await q.save()         // Returns a copy of the saved question
         if (!qs) {
