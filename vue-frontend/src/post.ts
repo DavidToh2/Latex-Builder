@@ -1,7 +1,9 @@
-export async function postForm(f : HTMLFormElement, url : string) {
+import type { qn } from '@/types/Types'
+
+export async function postForm(f : HTMLFormElement, url : string, fn : string) {
     const formc = f.elements as HTMLFormControlsCollection
     const form = Array.from(formc) as HTMLTextAreaElement[]
-    var reqBody = {} as { [key : string] : string | number | null }
+    var reqBody = {} as { [key : string] : string | number | Date | null }
 
     for (const element of form) {
 
@@ -14,6 +16,13 @@ export async function postForm(f : HTMLFormElement, url : string) {
                 
             }
         }
+    }
+
+    if (fn == "setNew" || fn == "setUpdate") {
+        var now = new Date()
+        reqBody['lastModified'] = now
+    
+        reqBody['solution'] = ''        // Temporary patch
     }
 
     console.log("Sending...")
@@ -35,4 +44,31 @@ export async function postForm(f : HTMLFormElement, url : string) {
     // console.log(response)
     
     return response
+}
+
+
+export async function submitSearch(f : HTMLFormElement) {         // Submits search query and uses it to populate store
+    const response = await postForm(f, 'http://localhost:3000/database/get', 'get') as Response
+    const responsejson = await response.json() as qn[]
+    return responsejson
+}
+
+export async function submitDelete(f : HTMLFormElement, displayID : string) {
+    const response = await postForm(f, `http://localhost:3000/database/delete/${displayID}`, 'delete') as Response
+    const responsejson = await response.json()
+    return responsejson
+}
+
+export async function submitSave(f : HTMLFormElement, displayID : string) {
+    // If the question is a new question:
+    if (displayID == '0') {
+        const response = await postForm(f, 'http://localhost:3000/database/set/new', 'setNew') as Response
+        const responsejson = await response.json()
+        return responsejson
+    // If the question is an existing question:
+    } else {
+        var response = await postForm(f, `http://localhost:3000/database/set/update/${displayID}`, 'setUpdate') as Response
+        const responsejson = await response.json()
+        return responsejson
+    }
 }

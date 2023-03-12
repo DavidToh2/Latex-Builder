@@ -38,10 +38,17 @@ async function newQuestion(nQ) {
         nQ['id'] = i
         console.log(`The new id is ${i}`)
 
-        const qns = await Question.insertMany([nQ])         // Returns a copy of the saved documents
+        var qns = await Question.insertMany([nQ])        // Returns a copy of the saved documents
         if (!qns) {
             throw new Error('insertMany() method failed!')
         }
+
+        // Parses IDs to displayIDs before passing to web
+        // NOT WORKING FOR SOME REASON
+        
+        qns.forEach((qn) => {
+            qn = parseID(qn, 'server')
+        })
         return qns
     }
     catch(err) {
@@ -74,7 +81,7 @@ async function deleteQuestion(i) {
 
     try {
         console.log(`Deleting question with displayID ${i}`)
-        var dQ = [{'displayID': i}]
+        var dQ = {'displayID': i}
         dQ = parseID(dQ, 'web')             // Parse displayID to ID before searching database
 
         const d = await deleteID(dQ['id'])

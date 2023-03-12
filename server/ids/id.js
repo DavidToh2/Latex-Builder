@@ -64,16 +64,17 @@ function parseID(data, source) {
             if (data['category'].length == 2) {
                 data['displayID'] = 'MCS' + data['id'].toString()
                 delete data['id']
-            }
-            switch(data['category'][0]) {
-                case 'Mathematics':
-                    data['displayID'] = 'M' + data['id'].toString()
-                    delete data['id']
-                break
-                case 'Computer Science':
-                    data['displayID'] = 'CS' + data['id'].toString()
-                    delete data['id']
-                break
+            } else {
+                switch(data['category'][0]) {
+                    case 'Mathematics':
+                        data['displayID'] = 'M' + data['id'].toString()
+                        delete data['id']
+                    break
+                    case 'Computer Science':
+                        data['displayID'] = 'CS' + data['id'].toString()
+                        delete data['id']
+                    break
+                }
             }
         }
         else if (source == 'web') {     // Parsing search data from frontend, or

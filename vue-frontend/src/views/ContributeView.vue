@@ -6,7 +6,7 @@ import ContributeTab from '@/components/ContributeTab/ContributeTab.vue'
 import type { qn, qnFilters, qnFilterNames } from '@/types/Types'
 import { emptyQn, emptyFilters, syncFiltersWithQn, syncQnWithFilters } from '@/types/Types'
 import { useQuestionStore } from '@/stores/stores'
-import { postForm } from '@/post';
+import { postForm, submitSave } from '@/post';
 import { reactive, ref, watch } from 'vue'
 
 var active : qn = reactive({...emptyQn})
@@ -26,22 +26,11 @@ watch(activeFilters, (newF, oldF) => {
 
 function saveQuestionEvent(e : Event) {
     const f = e.target as HTMLFormElement
-    saveQuestion(f)
-}
-
-            // Saving questions to database:
-
-async function saveQuestion(f : HTMLFormElement) {
-    var response : Response
-    // If the question is a new question:
+    const response = submitSave(f, active.displayID)   
+    console.log(response)
     if (active.displayID == '0') {
-        response = await postForm(f, 'http://localhost:3000/database/set/new') as Response
-        console.log(response.json())
-    // If the question is an existing question:
-    } else {
-        const dispID = active.displayID as string
-        response = await postForm(f, `http://localhost:3000/database/set/update/${dispID}`) as Response
-        console.log(response.json())
+        Object.assign(active, emptyQn)
+        
     }
 }
 
@@ -118,20 +107,22 @@ function updateQuestionFilters(ss : qnFilters) {
 
 function changeDisplayedQuestion(newQnID : string) {
 
+    const a = {...active} as qn
+
     if (active.displayID == '0') {
         // If current displayed question is the new question, store it
-        Object.assign(newQn, {...active})
+        Object.assign(newQn, a)
     } else {
         // Update current displayed question fields into Contribute store
-        QuestionStore.updateQn('contribute', active.displayID, {...active})
+        QuestionStore.updateQn('contribute', active.displayID, a)
     }
 
     // Get new displayed question
     if (newQnID == '0') {
-        Object.assign(active, {...newQn})
+        Object.assign(active, newQn)
     } else {
         const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
-        Object.assign(active, {...newQuestion})
+        Object.assign(active, newQuestion)
     }
 }
 
@@ -140,7 +131,8 @@ function dump() {
     console.log([...QuestionStore.getContributeIDList()])
     console.log({...QuestionStore.getContribute()})
     console.log({...QuestionStore.getDatabase()})
-
+    console.log(active)
+    console.log(activeFilters)
 }
 
 </script>

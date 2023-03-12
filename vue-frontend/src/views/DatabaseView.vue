@@ -5,7 +5,7 @@ import SearchTable from '@/components/SearchTable/SearchTable.vue'
 
 import type { qn, qns } from '@/types/Types'
 import { useQuestionStore } from '@/stores/stores'
-import { postForm } from '@/post'
+import { postForm, submitSearch, submitDelete } from '@/post'
 
 import { reactive, onMounted } from 'vue'
 
@@ -18,11 +18,9 @@ onMounted(async () => { submitSearchEvent() })
 
 async function submitSearchEvent() {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
-    await submitSearchQuery(f)
-}
-async function submitSearchQuery(f : HTMLFormElement) {         // Submits search query and uses it to populate store
-    const response = await postForm(f, 'http://localhost:3000/database/get') as Response
-    const responsejson = await response.json() as qn[]
+    const responsejson = await submitSearch(f)
+
+    QuestionStore.resetDatabase()
     QuestionStore.populateDatabase(responsejson)
     displayDatabase()
 }
@@ -31,21 +29,31 @@ function displayDatabase() {            // Fetches data from store
     results.qns = [...QuestionStore.getDatabase().slice().reverse()]
 }
 
+async function submitDeleteEvent(displayID : string) {
+    const f = document.querySelector('form#question-search-container') as HTMLFormElement
+    const responsejson = await submitDelete(f, displayID)
+    console.log(responsejson)
+
+    QuestionStore.deleteFromContribute(displayID)
+    
+    submitSearchEvent()
+}
+
 </script>
 
 <template>
     <Title title="Database" />
-    <form id="question-search-container" autocomplete="false" @submit.prevent="submitSearchEvent()">
+    <form id="question-search-container" autocomplete="false" @submit.prevent="submitSearchEvent">
         <QuestionFilters func="database" />
         <div id="question-search-bar">
             <textarea rows="1" id="question-search" name="question" placeholder="Search question text"></textarea>
             <button type="submit" id="question-search-button">
-                <img src="@/assets/search.png" style="width: 30px; height: 30px;">
+                <img src="@/assets/search.png" style="width: 25px; height: 25px;">
             </button>
         </div>
     </form>
     <div id="no-of-results">Number of results: {{ results.qns.length }}</div>
-    <SearchTable :qns="results.qns" />
+    <SearchTable :qns="results.qns" @delete="submitDeleteEvent" />
 </template>
 
 <style scoped>

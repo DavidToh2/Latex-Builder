@@ -56,19 +56,21 @@ const emptyQn = {
 
 function syncFiltersWithQn(filters : qnFilters, q : qn) {
     const a = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
+    const qn = {...q}
     for (var key of a) {
         const k = key as qnFilterNames
-        filters[k] = q[k]
+        filters[k] = qn[k]
     }
-    filters['sourceYear'] = q['sourceYear']
+    filters['sourceYear'] = qn['sourceYear']
 }
 function syncQnWithFilters(q : qn, filters : qnFilters) {
     const a = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
+    const f = {...filters}
     for (var key of a) {
         const k = key as qnFilterNames
-        q[k] = filters[k]
+        q[k] = f[k]
     }
-    q['sourceYear'] = filters['sourceYear']
+    q['sourceYear'] = f['sourceYear']
 }
 
 

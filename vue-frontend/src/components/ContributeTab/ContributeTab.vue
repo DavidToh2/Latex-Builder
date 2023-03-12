@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-    import { computed, watch } from 'vue'
+    import { computed, watch, onUpdated } from 'vue'
 
     export interface Props {
         idList: string[],
@@ -25,7 +25,6 @@
     watch(() => props.activeID, (newID, oldID) => {
         changeActiveQuestionDisplay(newID)
     })
-
     function changeActiveQuestionDisplay(newID : string) {
         const tabs = document.querySelectorAll(".tab-question")
         for (const t of tabs) {
@@ -35,8 +34,11 @@
             }
             if (i == `contribute-${newID}`) {
                 t.classList.add("active")
+                console.log(t)
             }
         }
+
+        console.log(tabs)
     }
 
     function removeFromTab(id : string) {
@@ -49,6 +51,10 @@
         }
         emits('removeFromTab', id)
     }
+
+    onUpdated(() => {
+        changeActiveQuestionDisplay(props.activeID)
+    })
 
 </script>
 

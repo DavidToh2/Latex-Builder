@@ -3,15 +3,23 @@
     import SearchTableResult from "./SearchTableResult.vue"
     import type { qn } from '@/types/Types'
     import { useQuestionStore } from '@/stores/stores'
+    import { postForm } from '@/post'
 
     export interface Props {
         qns?: qn[]
     }
     const props = defineProps<Props> ()
 
+    const emits = defineEmits<{
+        (e: 'delete', displayID: string): void
+    }>()
+
     const QuestionStore = useQuestionStore()
     function moveQuestionToContribute(displayID : string) {
         QuestionStore.insertFromDatabaseToContribute(displayID)
+    }
+    async function deleteQuestionFromDatabase(displayID: string) {
+        emits('delete', displayID)
     }
 
 </script>
@@ -20,7 +28,7 @@
     <div class="search-table">
         <SearchTableHeader />
         <div class="search-table-results" v-for="item in qns"> 
-            <SearchTableResult :q="item" @edit="moveQuestionToContribute"/>
+            <SearchTableResult :q="item" @edit="moveQuestionToContribute" @delete="deleteQuestionFromDatabase"/>
         </div>
     </div>
 </template>

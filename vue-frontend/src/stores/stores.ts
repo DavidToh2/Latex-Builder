@@ -65,23 +65,19 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
 
     function updateQn(storeName: string, dispID: string, data: qn) {
         if (allowedNames.includes(storeName)) {
-            var qnArr : qn[]
             var i : number
             switch(storeName) {
                 case 'database':
-                    qnArr = database.qnArray
                     i = getQnIndexUsingID(database, dispID)
                     database.qnArray[i] = data
                 break
                 case 'build':
-                    qnArr = build.qnArray
                     i = getQnIndexUsingID(build, dispID)
-                    database.qnArray[i] = data
+                    build.qnArray[i] = data
                 break
                 case 'contribute':
-                    qnArr = contribute.qnArray
                     i = getQnIndexUsingID(contribute, dispID)
-                    database.qnArray[i] = data
+                    contribute.qnArray[i] = data
                 break
             }
         }
@@ -120,7 +116,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
 
     // POPULATE ACTIONS
     function populateDatabase(v : qn[]) {
-        database.qnArray = v
+        Object.assign(database.qnArray, v)
         database.displayIDArray = getIDList(v)
     }
     function insertFromDatabaseToContribute(dispID : string) {
@@ -145,7 +141,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         } else {
             const q = getQnUsingID('database', dispID) as qn
             build.displayIDArray.push(dispID)
-            build.qnArray.push(q)
+            build.qnArray.push({...q})
             return true
         }
     }
