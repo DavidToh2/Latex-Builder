@@ -15,7 +15,7 @@
 
     const props = withDefaults(defineProps<Props>(), {
         activeSelections: Object.assign(<string[]>[]),
-        fontSize: 16
+        fontSize: 18
     })
 
     const search = reactive({
@@ -29,7 +29,7 @@
         displayActiveSelections()
     }, {deep: true})
 
-    const dropdownDir = (props.fontSize == 16) ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
+    const dropdownDir = (props.fontSize == 18) ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
 
     const searchbarRows = computed<number>(() => {
         if (search.searchText.length >= 25) {
@@ -148,7 +148,7 @@
 }
 
 .dropdown-description {
-    font-size: v-bind('fontSize');
+    font-size: calc(v-bind(numberToPixels(fontSize)));
 }
 
 .dropdown-search-container-outer {
@@ -163,7 +163,7 @@
 .dropdown-searchbar {
     width: 100%;
     font-family: 'Gothic A1', sans-serif;
-    font-size: calc(v-bind(numberToPixels(fontSize - 4)));
+    font-size: calc(v-bind(numberToPixels(fontSize - 2)));
     resize: none;
 }
 
@@ -180,7 +180,7 @@
 }
 
 .dropdown-option {
-    font-size: 16px;
+    font-size: calc(v-bind(numberToPixels(fontSize - 2)));
 }
 
 .dropdown-option-inactive {

@@ -136,7 +136,7 @@
 <template>
     <div class="question-filters-row" :id="func">
         <div class="question-filters">
-            <DropdownSearch description="Category" internalName="category" :fontSize="20" 
+            <DropdownSearch description="Category" internalName="category" :fontSize="21" 
                 :activeSelections="s.category" 
                 :availableSelections="as.category" 
                 @update="updateSelections"

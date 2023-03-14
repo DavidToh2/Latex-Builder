@@ -50,11 +50,11 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    font-size: 14px;
 }
 
 .search-table :deep(.search-cell) {
     padding: 8px 10px;
-    font-size: 13px;
     flex-shrink: 0;
     flex-grow: 0;
 }
@@ -64,6 +64,7 @@
 }
 .search-table :deep(.search-question) {
     flex-basis: var(--search-questions-width);
+    white-space: pre;
 }
 .search-table :deep(.search-topic) {
     flex-basis: var(--search-topic-width);

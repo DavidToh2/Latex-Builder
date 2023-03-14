@@ -48,7 +48,7 @@
 }
 
 .dropdown-description {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .dropdown-search-container-outer {
@@ -64,7 +64,7 @@
 .dropdown-input {
     width: 100%;
     font-family: 'Gothic A1', sans-serif;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 </style>

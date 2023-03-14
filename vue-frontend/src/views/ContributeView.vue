@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/QuestionFilters/QuestionFilters.vue'
-import ContributeTab from '@/components/ContributeTab/ContributeTab.vue'
+import ContributeTab from '@/components/Tab/ContributeTab.vue'
+import Tab from '@/components/Tab/Tab.vue'
 
 import type { qn, qnFilters, qnFilterNames } from '@/types/Types'
 import { emptyQn, emptyFilters, syncFiltersWithQn, syncQnWithFilters } from '@/types/Types'
 import { useQuestionStore } from '@/stores/stores'
-import { postForm, submitSave } from '@/post';
+import { postForm, submitSave, submitDelete } from '@/post';
 import { reactive, ref, watch } from 'vue'
+
+const contributeOptionsLeftTab = ['Question', 'Solution', 'Images', 'Packages']
+const contributeOptionsRightTab = ['Save', 'Save As', 'Delete']
 
 var active : qn = reactive({...emptyQn})
 var newQn : qn = reactive({...emptyQn})
 var activeFilters : qnFilters = reactive({...emptyFilters})
+var activeOptions = reactive([true, false, false, false])
+var activeOptionID = ref<number>(0)
 var IDlist = ref<string[]>(['0'])
 
             // Sync active and activeFilters:
@@ -24,15 +30,7 @@ watch(activeFilters, (newF, oldF) => {
     syncQnWithFilters(active, newF)
 }, {deep: true})
 
-function saveQuestionEvent(e : Event) {
-    const f = e.target as HTMLFormElement
-    const response = submitSave(f, active.displayID)   
-    console.log(response)
-    if (active.displayID == '0') {
-        Object.assign(active, emptyQn)
-        
-    }
-}
+
 
 const QuestionStore = useQuestionStore()
 QuestionStore.resetContribute()
@@ -110,7 +108,7 @@ function changeDisplayedQuestion(newQnID : string) {
     const a = {...active} as qn
 
     if (active.displayID == '0') {
-        // If current displayed question is the new question, store it
+        // If current displayed question i0]s the new question, store it
         Object.assign(newQn, a)
     } else {
         // Update current displayed question fields into Contribute store
@@ -124,6 +122,64 @@ function changeDisplayedQuestion(newQnID : string) {
         const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
         Object.assign(active, newQuestion)
     }
+
+}
+
+async function changeOptionTab(s : string) {
+
+    const mainForm = document.getElementById('contribute-container') as HTMLFormElement
+
+    for (var i=0; i<4; i++) { activeOptions[i] = false }
+
+    switch(s) {
+        case 'Question':
+            activeOptionID.value = 0
+        break;
+        case 'Solution':
+            activeOptionID.value = 1
+        break;
+        case 'Images':
+            activeOptionID.value = 2
+        break;
+        case 'Packages':
+            activeOptionID.value = 3
+        break;
+
+        case 'Save':
+            if ((active.category.length == 0) || (active.question.trim().length == 0)) {
+                alert("Your question is empty!")
+            } else {
+                const response = await submitSave(mainForm, active.displayID)   
+                console.log(response)
+                if (active.displayID == '0') {
+                    Object.assign(active, emptyQn)
+                }
+            }
+
+            activeOptionID.value = 0
+        break;
+
+        case 'Save As':
+            alert('Save As to be implemented!')
+
+            activeOptionID.value = 0
+        break;
+
+        case 'Delete':
+            if (active.displayID == '0') {
+                Object.assign(active, emptyQn)
+            } else {
+                removeFromContribute(active.displayID)
+                const response = await submitDelete(mainForm, active.displayID)   
+                    console.log(response)
+                changeDisplayedQuestion('0')
+            }
+
+            activeOptionID.value = 0
+        break;
+    }
+
+    activeOptions[activeOptionID.value] = true
 }
 
 function dump() {
@@ -138,35 +194,70 @@ function dump() {
 </script>
 
 <template>
+
     <Title title="Contribute" />
+
     <ContributeTab :id-list="IDlist" :active-i-d="active.displayID" 
         @change-active-question="changeDisplayedQuestion" @remove-from-tab="removeFromContribute"
     />
 
-    <form id="contribute-question-container" autocomplete="false" @submit.prevent="saveQuestionEvent($event)">
+    <form id="contribute-container" autocomplete="false">
+
         <QuestionFilters func="contribute" :ss="activeFilters" @update="updateQuestionFilters"/>
-        <!-- <input type="text" id="question-build-shortcut" name="question-tags" placeholder="Quickfill: Category - Topic - Subtopic - Difficulty - Source - Year - Tags"> -->
-            
-        <div id="latex-container">
-            <textarea id="question-text" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
+
+        <Tab :tab-left="contributeOptionsLeftTab" :tab-right="contributeOptionsRightTab" 
+            internal-name="questionOptions" :font-size=21 :active-i-d="activeOptionID"
+            @change-tab="changeOptionTab"
+        />
+        
+        <div id="question-container" :class="{ 'inactive-container': !activeOptions[0] }">
+            <div class="latex">
+                <textarea class="latex-text" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
+            </div>
+            <div class="display" @click="dump">
+            </div>
         </div>
-        <div id="display-container" @click="dump">
+
+        <div id="solution-container" :class="{ 'inactive-container': !activeOptions[1] }">
+            <div class="latex">
+                <textarea class="latex-text" name="solution" placeholder="Type solution here:" v-model="active.solution"></textarea>
+            </div>
+            <div class="display" @click="dump">
+            </div>
         </div>
-        <button type="submit" id="question-save-button">
-            <img src="@/assets/save.png" style="width: 30px; height: 30px;">
-        </button>
+
+        <div id="image-container" :class="{ 'inactive-container': !activeOptions[2] }">
+            Image container to be implemented!
+        </div>
+
+        <div id="package-container" :class="{ 'inactive-container': !activeOptions[3] }">
+            Package container to be implemented!
+        </div>
+
     </form>
 </template>
 
 <style scoped>
 
-#contribute-question-container {
+#contribute-container {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 10px 10px;
     align-items: center;
+}
+
+#contribute-options {
+    width: 100%;
+    display: flex;
+	flex-direction: row;
+	padding: 10px 10px;
+	gap: 20px;
+}
+
+.contribute-options-tab {
+    font-size: 20px;
 }
 
 #question-build-shortcut {
@@ -177,21 +268,37 @@ function dump() {
     font-size: 18px;
 }
 
-#question-content-container {
+#question-container {
     width: 100%;
     padding: 0px 10px;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+#solution-container {
+    width: 100%;
+    padding: 0px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+#image-container {
+    width: 100%;
+}
+#package-container {
+    width: 100%;
+}
+.inactive-container {
+    display: none !important;
+}
 
-#latex-container {
+.latex {
 	width: 100%;
 	height: 250px;
 	max-height: none;
 }
 
-#display-container {
+.display {
 	width: 100%;
 	height: 250px;
 	max-height: none;
@@ -200,7 +307,7 @@ function dump() {
     overflow-y: scroll;
 }
 
-#question-text {
+.latex-text {
 	width: 100%;
     height: 100%;
     border-radius: 8px;

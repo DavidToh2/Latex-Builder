@@ -34,11 +34,8 @@
             }
             if (i == `contribute-${newID}`) {
                 t.classList.add("active")
-                console.log(t)
             }
         }
-
-        console.log(tabs)
     }
 
     function removeFromTab(id : string) {

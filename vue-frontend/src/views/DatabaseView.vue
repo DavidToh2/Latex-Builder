@@ -27,6 +27,7 @@ async function submitSearchEvent() {
 
 function displayDatabase() {            // Fetches data from store
     results.qns = [...QuestionStore.getDatabase().slice().reverse()]
+    console.log(results.qns)
 }
 
 async function submitDeleteEvent(displayID : string) {
@@ -75,7 +76,7 @@ async function submitDeleteEvent(displayID : string) {
     width: 80%;
     margin: 0 2% 0 6%;
     border: 1px solid #000000;
-    padding: 4px;
+    padding: 8px 4px;
     border-radius: 8px;
     font-size: 16px;
 }
