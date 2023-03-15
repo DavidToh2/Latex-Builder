@@ -36,9 +36,23 @@ async function submitDeleteEvent(displayID : string) {
     console.log(responsejson)
 
     QuestionStore.deleteFromContribute(displayID)
-    
+    // Refresh the database
     submitSearchEvent()
 }
+
+/* QuestionStore.$onAction(
+    ({name, store, args, after, onError }) => {
+        if (name == 'insertIntoDatabase') {
+            after((result) => {
+                if (result) {
+                    const newContributeIDList = QuestionStore.getContributeIDList() as string[]
+                    updateContributeTab(newContributeIDList, [...IDlist.value])
+                }
+            })
+        }
+    }
+) */
+
 
 </script>
 

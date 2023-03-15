@@ -76,6 +76,8 @@ function parseID(data, source) {
                     break
                 }
             }
+            console.log(data)
+            console.log(data['displayID'])
         }
         else if (source == 'web') {     // Parsing search data from frontend, or
                                         // saving / inserting a new question.

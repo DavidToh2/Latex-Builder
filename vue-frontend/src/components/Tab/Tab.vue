@@ -15,10 +15,10 @@
         activeID: 0
     })
 
-    var activeID = ref(0)
+    var ac = ref(0)
     watch(() => props.activeID, (n, o) => {
-        activeID.value = n
-    }, {deep: true})
+        ac.value = n
+    }, {immediate: true, deep: true})
 
     var l = computed<number>(() => { return props.tabLeft.length })
     var r = computed<number>(() => { return props.tabRight.length })
@@ -26,7 +26,7 @@
         const c = l.value + r.value
         var arr = new Array(c) as boolean[]
         for (var i=0; i<c; i++) {
-            if (i == activeID.value) {
+            if (i == ac.value) {
                 arr[i] = true
             } else {
                 arr[i] = false
@@ -36,18 +36,23 @@
     })
 
     const emit = defineEmits<{
-        (e: 'changeTab', tabName: string): void
+        (e: 'changeTab', tabName: string, tabNumber : number): void
     }>()
 
     function changeActiveTab(n : number) {
-        activeID.value = n
+        ac.value = n
         var s : string
         if (n < l.value) {
             s = props.tabLeft[n]
         } else {
             s = props.tabRight[n - l.value]
         }
-        emit('changeTab', s)
+        emit('changeTab', s, n)
+    }
+
+    function debug() {
+        console.log(`Prop activeID: ${props.activeID}`)
+        console.log(`Ref activeID: ${ac.value}`)
     }
 
 </script>
@@ -61,6 +66,7 @@
         <div class="options-tab" v-for="i in r" :class="{'options-active': a[l+i-1]}"
             @click="changeActiveTab(l+i-1)">{{ tabRight[i-1] }}
         </div>
+        <div class="options-tab" @click="debug">Hi</div>
     </div>
 </template>
 

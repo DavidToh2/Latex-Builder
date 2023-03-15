@@ -46,10 +46,9 @@ async function newQuestion(nQ) {
         // Parses IDs to displayIDs before passing to web
         // NOT WORKING FOR SOME REASON
         
-        qns.forEach((qn) => {
-            qn = parseID(qn, 'server')
-        })
-        return qns
+        var q = qns[0].toObject()
+        q = parseID(q, 'server')
+        return q
     }
     catch(err) {
         dbError(err, "db/newQuestion: Failed to save!")

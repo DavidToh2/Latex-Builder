@@ -43,7 +43,7 @@ function removeFromContribute(qnID : string) {
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if (name == 'insertFromDatabaseToContribute') {
+        if ((name == 'insertFromDatabaseToContribute') || (name == 'insertIntoContribute')) {
             after((result) => {
                 if (result) {
                     const newContributeIDList = QuestionStore.getContributeIDList() as string[]
@@ -125,24 +125,29 @@ function changeDisplayedQuestion(newQnID : string) {
 
 }
 
-async function changeOptionTab(s : string) {
+async function changeOptionTab(s : string, n : number) {
 
     const mainForm = document.getElementById('contribute-container') as HTMLFormElement
+
+    if (n == activeOptionID.value) {
+        return
+    }
+    activeOptionID.value = n
 
     for (var i=0; i<4; i++) { activeOptions[i] = false }
 
     switch(s) {
         case 'Question':
-            activeOptionID.value = 0
+
         break;
         case 'Solution':
-            activeOptionID.value = 1
+
         break;
         case 'Images':
-            activeOptionID.value = 2
+
         break;
         case 'Packages':
-            activeOptionID.value = 3
+
         break;
 
         case 'Save':
@@ -150,13 +155,15 @@ async function changeOptionTab(s : string) {
                 alert("Your question is empty!")
             } else {
                 const response = await submitSave(mainForm, active.displayID)   
-                console.log(response)
+                const dispID = response['displayID']
                 if (active.displayID == '0') {
                     Object.assign(active, emptyQn)
+                    QuestionStore.insertIntoContribute(dispID, response)
+                    changeDisplayedQuestion(dispID)
                 }
             }
-
             activeOptionID.value = 0
+
         break;
 
         case 'Save As':
@@ -171,7 +178,7 @@ async function changeOptionTab(s : string) {
             } else {
                 removeFromContribute(active.displayID)
                 const response = await submitDelete(mainForm, active.displayID)   
-                    console.log(response)
+                console.log(response)
                 changeDisplayedQuestion('0')
             }
 
