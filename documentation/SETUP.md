@@ -24,22 +24,43 @@ This document is intended as a guide for people wishing to start their own conta
    
 3. Installing packages
     - Execute `npm install <package>` to install packages locally in `node_modules`
-    - Execute `sudo npm install -g <package>` to install packages globally
+    - Execute `sudo npm install -g <package>` to install packages globally. These packages will work because they are in your system path, but deployments will still need to be installed locally. Use only for testing.
   
 4. Enable application running in debug mode
     - Execute `npm install --save-dev nodemon` to install `nodemon` as a development dependency
-    - Edit `package.json` as follows:
+
+### package.json
 
 ```
-"scripts": {
-    "start": "node ./bin/www",
-    "devstart": "nodemon ./bin/www",
-    "serverstart": "DEBUG=<app-name>:* npm run devstart"
+{
+    'name': [name of module - in this case, our app],
+    'version': [version of module],
+    'scripts': {
+        [script name]: [command]
+    },
+    'dependencies': {
+        [module name]: [module version]
     }
+    'devDependencies': {
+        [module name]: [module version]
+    }
+}
 ```
 
-5. Run the app
-   - Execute `npm run serverstart`
+### Scripts
+- Execute `npm run [script name]` to run a script
+  - For 'special'/built-in scripts, such as `start`, `test` and `stop`, you don't need the 'run' keyword.
+
+### Modules and Dependencies
+`Dependencies` refers to the list of modules required by the application in production and deployment. These modules are required to run the application.
+
+- `npm install [package]` implicitly sets the `--save` flag, which downloads the module and adds it to `package.json` as a dependency.
+
+`devDependencies` refers to the list of modules that are used in testing and development, but are not required in deployment. Examples include linting.
+
+- `npm install [package] --save-dev` downloads the module and adds it to `package.json` as a devDependency.
+
+- Execute `npm install --production` or set `NODE_ENV=production` during deployment. This only installs production dependencies.
 
 ## Part 2. Docker
 
@@ -48,6 +69,41 @@ This document is intended as a guide for people wishing to start their own conta
 1. Install Docker and the VSCode Docker Extension
 
 2. Open the Command Palette and select *Add Docker Files to Workspace*
+
+### Dockerfile
+
+The `Dockerfile` is a **list of instructions** on what Docker should do to build an image. It's usually located at the root of the image's local directory (i.e. the source of all its files), known as the **context**.
+
+```
+FROM [base image, usually Linux/Node base image]
+ENV [key]=[value]
+WORKDIR [container working directory]
+COPY [source, from context] [destination, in container]
+COPY [ 'source1', 'source2', ..., 'destination directory' ]
+RUN [commands to set-up application - e.g. download dependencies]
+EXPOSE [container port]
+CMD [ 'command to execute application', 'arg1', 'arg2', ... ]
+```
+
+For NodeJS applications, a typical Dockerfile looks like [this](https://docs.docker.com/language/nodejs/build-images/#create-a-dockerfile-for-nodejs):
+
+```
+FROM node:lts-alpine
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Install Node dependencies
+COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
+RUN npm install --production
+
+# Copy all project files over
+COPY . .
+
+# Start the app
+CMD [ 'npm', 'start' ]
+```
+
+### Images and Containers
 
 3. Build the Docker image
     - Execute `docker build --tag <image-name> .` (note the dot at the end) This also sets the image's name
@@ -70,7 +126,22 @@ This document is intended as a guide for people wishing to start their own conta
     - Execute `docker restart <container-name>` to restart the container
     - Execute `docker rm <container-name>` to remove the container from the list of containers on the machine
 
-6. Delete the Docker volume to reset the database
+### Volumes and Volume Mounts
+
+A **volume** is a 'bucket' of data, stored on a local filesystem, that are *mounted* onto Docker containers.
+
+6. Volumes have a *name*, as well as a *target/destination directory* for mounting inside the container.
+    - For our MongoDB container, the default `target=/data/db`
+    - Execute `docker run [container] --mount source=[name] target=[dest]` or `docker run [container] --volume [name]:[dest]` to create a volume
+    - Volumes are actually stored somewhere on the local system! Execute `docker volume inspect` and refer to the `Mountpoint` for the mounted location.
+
+A **bind mount** is a local file/directory that is directly mounted onto Docker containers. 
+
+7. Bind mounts have a *source directory* from our local filesystem, and a *destination directory* for mounting inside the container.
+   - Execute `docker run [container] --mount source=[source] target=[dest]` or `docker run [container] --volume [source]:[dest]` to create a volume
+   - You can use `source=$(pwd)` to refer to the current working directory.
+
+8. Delete the Docker volume to reset the database
     - Execute `docker volume ls` to list all volumes
     - Execute `docker volume prune` to delete all dangling volumes
     - Execute `docker volume rm <volume-name>` to remove a volume
@@ -81,7 +152,7 @@ This document is intended as a guide for people wishing to start their own conta
 
 **MongoDB** is a NoSQL database framework. **Mongoose** is the NodeJS version of this framework.
 
-**Docker Compose** is a tool that allows us to define and configure multi-container Docker applications. We do so by editing the `docker-compose.yml` file.
+### Mongoose
 
 1. Install the Mongoose NodeJS extension
     - Execute `npm install mongoose`
@@ -98,6 +169,30 @@ This document is intended as a guide for people wishing to start their own conta
    - Set-up the `MONGO_URI`
      - The format is `mongodb://<username>:<password>@<container>/<database>`
      - Reference in Javascript with `process.env.MONGO_URI`
+
+### Docker Compose
+
+**Docker Compose** is a tool that allows us to define and configure multi-container Docker applications. We do so by editing the `docker-compose.yml` file.
+
+The file format is as follows:
+
+```
+services:
+    [network name]:
+        container_name: [optional, defaults to <project>_<service>_<index>]
+        command: [command to execute on launch, overrides the one specified by Dockerfile]
+        image: [image name]
+        ports:
+            - [host port]:[container port]
+        working_dir: [container working directory, overrides the one specified by Dockerfile]
+        volumes:
+            - [source/name]:[destination]
+        environment:
+            - [VARIABLE]: [VALUE]
+
+volumes:
+    [source/name]: (uses default options)
+```
 
 4. Update `docker-compose.yml` with our second service
     - Include the names of the container and image used
