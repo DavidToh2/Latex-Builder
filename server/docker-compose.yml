@@ -6,7 +6,7 @@ services:
     image: latexquestionbank
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile-server
     env_file:
       - .env      
     ports:

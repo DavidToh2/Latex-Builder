@@ -216,15 +216,44 @@ const options = {
 mongoose.connect(mongoURI, options)
 ```
 
-## Part 4: Building and Development
+## Part 4: Latex Installation
 
-1. Build both containers at once
-    - Execute `docker-compose up`
-    - Execute `docker-compose up --build` to rebuild images
+### Latex
 
-2. Stop all containers
-    - Execute `docker-compose down`
+[Install Texlive](https://www.tug.org/texlive/quickinstall.html)
 
-[Docker compose example](https://hub.docker.com/r/excellalabs/mongo)
+[install-tl Reference](https://www.tug.org/texlive/doc/install-tl.html)
 
-[Docker with authentication](https://hub.docker.com/r/duluca/minimal-mongo)
+[tlmgr Reference](https://tug.org/texlive/tlmgr.html)
+
+[Texlive Guide](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-420004.2)
+
+### Dockerising Latex
+
+[Overleaf's base Texlive image](https://github.com/overleaf/overleaf/blob/main/server-ce/Dockerfile-base)
+
+[StackExchange: Minimal Dockerised Texlive installation](https://tex.stackexchange.com/questions/397174/minimal-texlive-installation)
+
+```
+RUN wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
+    && mkdir /texlive-installer
+    && tar -xzf install-tl-unx.tar.gz -C /texlive-installer \
+    && rm install-tl-unx.tar.gz* \
+```
+- `wget`: Downloads texlive installer from mirror
+- `tar`: `x` extracts, `z` filters through gzip2, `f` sets the filename, and `C` sets the destination directory
+
+```
+    && cd texlive-installer \
+    && echo "selected_scheme scheme-basic" >> texlive.profile \ 
+    && echo "tlpdbopt_install_docfiles 0" >> texlive.profile \ 
+    && echo "tlpdbopt_install_srcfiles 0" >> texlive.profile \
+    && echo "tlpdbopt_autobackup 0" >> texlive.profile \
+    && cd .. \
+    && /texlive-installer/install-tl -profile texlive.profile \
+    && $(find /usr/local/texlive -name tlmgr) path add
+    && rm -rf /texlive-installer
+```
+- `install-tl` profile setup: do not install documentation and source files, do not autobackup, only install the basic scheme
+- Texlive is installed at `/usr/local/texlive` using the aforementioned profile
+- The Texlive binary, at `/usr/local/texlive/2023/bin/x86_64-linux/tlmgr`, is added to the system PATH (and can now be executed simply with `tlmgr`)
