@@ -7,7 +7,7 @@ import pdf from 'vue-pdf-embed'
 
 var activeDoc = ref('https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf')
 
-var activeDocument = ref('Hi')
+var activeDocument = ref('http://localhost:3000/file/get/document1')
 var openDocuments = reactive<string[]>(['Hi'])
 
 </script>
@@ -16,14 +16,14 @@ var openDocuments = reactive<string[]>(['Hi'])
     <Title title="Drive" />
 
     <div id="storage">
-
+        
     </div>
 
     <UserTab :active-tab="activeDocument" :tab-list="openDocuments" />
 
     <div id="document-viewer">
         <pdf 
-            :source="activeDoc"
+            :source="activeDocument"
             
         />
     </div>

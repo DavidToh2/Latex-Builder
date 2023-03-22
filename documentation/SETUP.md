@@ -1,8 +1,8 @@
 ## Introduction
 
-This document is intended as a guide for people wishing to start their own containerised NodeJS / MongoDB cdatabase-backed application.
+This document is intended as a guide for people wishing to start their own containerised NodeJS / MongoDB database-backed application.
 
-## Part 1. NodeJS
+## Part 1. Setting up NodeJS
 
 **NodeJS** is a cross-platform runtime environment that can be used to create both server-side tools and applications in Javascript.
 
@@ -19,7 +19,7 @@ This document is intended as a guide for people wishing to start their own conta
  
 2. Set-up the Express Application
     - Execute `sudo npm install -g express-application`
-    - Execute `express --view=pug <app-name>` to generate a skeleton Express app using the `pug` render engine. This initialises Node
+    - Execute `express --no-view <app-name>` to generate a skeleton Express app. This initialises Node
     - Execute `npm install gitignore` then `npx gitignore node` to generate a `.gitignore` file specific to NodeJs applications
    
 3. Installing packages
@@ -28,6 +28,7 @@ This document is intended as a guide for people wishing to start their own conta
   
 4. Enable application running in debug mode
     - Execute `npm install --save-dev nodemon` to install `nodemon` as a development dependency
+    - `nodemon` allows the application to automatically refresh/reinitialise on code change.
 
 ### package.json
 
@@ -62,7 +63,7 @@ This document is intended as a guide for people wishing to start their own conta
 
 - Execute `npm install --production` or set `NODE_ENV=production` during deployment. This only installs production dependencies.
 
-## Part 2. Docker
+## Part 2. Setting up Docker
 
 **Docker** is a containerisation service. The container itself is controlled by the `Dockerfile`.
 
@@ -216,23 +217,21 @@ const options = {
 mongoose.connect(mongoURI, options)
 ```
 
-## Part 4: Latex Installation
+## Part 4: Building the Container
 
-### Latex
+### Building the Base Image: Node and Dependencies
 
-[Install Texlive](https://www.tug.org/texlive/quickinstall.html)
+We use the **phusion/Baseimage** image, found [here](https://github.com/phusion/baseimage-docker). This is a minimal Ubuntu image.
+```
+RUN apt-get update \
+    && apt-get install -y build-essential wget perl
 
-[install-tl Reference](https://www.tug.org/texlive/doc/install-tl.html)
+RUN curl -sSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+```
+- `perl` is a required dependency for `install-tl` and `tlmgr`.
 
-[tlmgr Reference](https://tug.org/texlive/tlmgr.html)
-
-[Texlive Guide](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-420004.2)
-
-### Dockerising Latex
-
-[Overleaf's base Texlive image](https://github.com/overleaf/overleaf/blob/main/server-ce/Dockerfile-base)
-
-[StackExchange: Minimal Dockerised Texlive installation](https://tex.stackexchange.com/questions/397174/minimal-texlive-installation)
+### Building the Base Image: Latex Installation
 
 ```
 RUN wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
@@ -257,3 +256,75 @@ RUN wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
 - `install-tl` profile setup: do not install documentation and source files, do not autobackup, only install the basic scheme
 - Texlive is installed at `/usr/local/texlive` using the aforementioned profile
 - The Texlive binary, at `/usr/local/texlive/2023/bin/x86_64-linux/tlmgr`, is added to the system PATH (and can now be executed simply with `tlmgr`)
+
+[Overleaf's base Texlive image](https://github.com/overleaf/overleaf/blob/main/server-ce/Dockerfile-base)
+
+[StackExchange: Minimal Dockerised Texlive installation](https://tex.stackexchange.com/questions/397174/minimal-texlive-installation)
+
+Other references:
+
+[Install Texlive](https://www.tug.org/texlive/quickinstall.html)
+
+[install-tl Reference](https://www.tug.org/texlive/doc/install-tl.html)
+
+[tlmgr Reference](https://tug.org/texlive/tlmgr.html)
+
+[Texlive Guide](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-420004.2)
+
+### Building the Base Image: Configuring the User
+
+We create a new user `node`, with home directory `/app`, and set it as the owner of the `/app` directory. 
+```
+RUN adduser --system --home /app node
+RUN chown -R node /app
+```
+This user does not have sudo privileges, and `node` will run as this user.
+
+### Building latexquestionbank: Installing Node Dependencies
+```
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
+RUN npm install --production --silent && mv node_modules ../
+COPY . .
+```
+
+### Building latexquestionbank: Setting the Startup Scripts
+```
+RUN mv /app/startup_scripts/* /etc/my_init.d
+RUN chmod +x /etc/my_init.d/*
+```
+The **phusion/Baseimage** image will perform the following, in sequence, on startup:
+- Runs all system startup files, which are stored in `/etc/my_init.d`
+- Starts all runit services.
+- Runs the specified command in `CMD`.
+- When the specified command exits, stops all runit services.
+
+### Building latexquestionbank: Startup
+```
+EXPOSE 3000
+CMD ["/sbin/my_init", "--", "setuser", "node", "npm", "start"]
+```
+- Expose the container's port 3000
+- Run `/sbin/my_init` to start the container. This executes the specified command that appears after the double dashes.
+- `setuser` will execute the specified command `npm start` as the user `node`.
+
+### Building the Containers
+
+To build **latexbase**, execute `make latex-base` in `/`.
+
+To build **latexquestionbank**, execute `docker compose build` in `/server`.
+
+## Part 5: Scripting Latex
+
+Drive. To implement ability to:
+- upload .tex and .pdf files
+- view .pdf files
+- remove files
+
+Latex compiler. To implement ability to:
+- collate build into a .tex file, and:
+  - export as .tex file
+  - compile into .pdf, then export as .pdf. The file will not be saved
+  - compile into .pdf, then save both .tex and .pdf in drive

@@ -25,7 +25,3 @@ RUN wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
 
 RUN adduser --system --home /app node
 RUN chown -R node /app
-
-CMD ["/sbin/my_init", "--", "setuser", "node", "bash"]
-# https://github.com/phusion/baseimage-docker/issues/264#issuecomment-162853995
-# setuser is a custom command that runs bash using node.
