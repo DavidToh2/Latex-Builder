@@ -12,7 +12,7 @@ router.use((req, res, next) => {                        // MIDDLEWARE FUNCTION G
     next()
 })
 
-router.post('/', function(req, res) {
+router.post('/f/:fileID', function(req, res) {
 
     console.log("Request received!")
     res.json(req.body)

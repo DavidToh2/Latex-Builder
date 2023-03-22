@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/QuestionFilters/QuestionFilters.vue'
-import ContributeTab from '@/components/Tab/ContributeTab.vue'
+import UserTab from '@/components/Tab/UserTab.vue'
 import Tab from '@/components/Tab/Tab.vue'
 
 import type { qn, qnFilters, qnFilterNames } from '@/types/Types'
@@ -38,7 +38,12 @@ QuestionStore.resetContribute()
             // Whenever the CONTRIBUTE store is updated...
 
 function removeFromContribute(qnID : string) {
-    QuestionStore.deleteFromContribute(qnID)
+    if (qnID == '0') {
+        Object.assign(newQn, emptyQn)
+        Object.assign(active, newQn)
+    } else {
+        QuestionStore.deleteFromContribute(qnID)
+    }
 }
 
 QuestionStore.$onAction(
@@ -108,7 +113,7 @@ function changeDisplayedQuestion(newQnID : string) {
     const a = {...active} as qn
 
     if (active.displayID == '0') {
-        // If current displayed question i0]s the new question, store it
+        // If current displayed question is the new question, store it
         Object.assign(newQn, a)
     } else {
         // Update current displayed question fields into Contribute store
@@ -157,7 +162,9 @@ async function changeOptionTab(s : string, n : number) {
                 const response = await submitSave(mainForm, active.displayID)   
                 const dispID = response['displayID']
                 if (active.displayID == '0') {
-                    Object.assign(active, emptyQn)
+
+                    removeFromContribute(active.displayID)
+
                     QuestionStore.insertIntoContribute(dispID, response)
                     changeDisplayedQuestion(dispID)
                 }
@@ -174,7 +181,7 @@ async function changeOptionTab(s : string, n : number) {
 
         case 'Delete':
             if (active.displayID == '0') {
-                Object.assign(active, emptyQn)
+                removeFromContribute(active.displayID)
             } else {
                 removeFromContribute(active.displayID)
                 const response = await submitDelete(mainForm, active.displayID)   
@@ -196,6 +203,7 @@ function dump() {
     console.log({...QuestionStore.getDatabase()})
     console.log(active)
     console.log(activeFilters)
+    console.log(newQn)
 }
 
 </script>
@@ -204,7 +212,7 @@ function dump() {
 
     <Title title="Contribute" />
 
-    <ContributeTab :id-list="IDlist" :active-i-d="active.displayID" 
+    <UserTab :tab-list="IDlist" :active-tab="active.displayID" 
         @change-active-question="changeDisplayedQuestion" @remove-from-tab="removeFromContribute"
     />
 

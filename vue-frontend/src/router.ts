@@ -3,6 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import DatabaseView from '@/views/DatabaseView.vue'
 import BuildView from '@/views/BuildView.vue'
 import ContributeView from '@/views/ContributeView.vue'
+import DriveView from '@/views/DriveView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,6 +30,14 @@ const router = createRouter({
       components: {
         left: DatabaseView,
         right: ContributeView
+      }
+    },
+    {
+      path: '/drive',
+      name: 'drive',
+      components: {
+        left: DriveView,
+        right: BuildView
       }
     }
   ]

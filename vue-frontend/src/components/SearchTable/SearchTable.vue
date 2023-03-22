@@ -54,7 +54,7 @@
 }
 
 .search-table :deep(.search-cell) {
-    padding: 8px 10px;
+    padding: 10px 8px;
     flex-shrink: 0;
     flex-grow: 0;
 }

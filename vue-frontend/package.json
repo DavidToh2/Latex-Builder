@@ -12,6 +12,7 @@
   "dependencies": {
     "pinia": "^2.0.26",
     "vue": "^3.2.41",
+    "vue-pdf-embed": "^1.1.5",
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
