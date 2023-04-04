@@ -8,7 +8,7 @@
             ID
         </div>
         <div class="search-question search-header search-cell">
-            Question
+            
         </div>
         <div class="search-topic search-header search-cell">
             Topics

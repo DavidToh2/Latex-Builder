@@ -1,2 +1,4 @@
 #!/bin/sh
-echo "Hello there!"
+whoami
+pwd
+ls -l /app

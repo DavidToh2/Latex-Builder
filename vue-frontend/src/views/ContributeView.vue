@@ -39,6 +39,7 @@ QuestionStore.resetContribute()
 
 function removeFromContribute(qnID : string) {
     if (qnID == '0') {
+        // removeFromContribute(0) just resets the newQn and displays it
         Object.assign(newQn, emptyQn)
         Object.assign(active, newQn)
     } else {
@@ -159,13 +160,15 @@ async function changeOptionTab(s : string, n : number) {
             if ((active.category.length == 0) || (active.question.trim().length == 0)) {
                 alert("Your question is empty!")
             } else {
-                const response = await submitSave(mainForm, active.displayID)   
-                const dispID = response['displayID']
+                const response = await submitSave(mainForm, active.displayID) as qn[]
+                const dispID = response[0]['displayID']
                 if (active.displayID == '0') {
-
                     removeFromContribute(active.displayID)
 
-                    QuestionStore.insertIntoContribute(dispID, response)
+                    response.forEach((q : qn) => {
+                        const d = q['displayID']
+                        QuestionStore.insertIntoContribute(d, q)
+                    })
                     changeDisplayedQuestion(dispID)
                 }
             }
@@ -229,7 +232,7 @@ function dump() {
             <div class="latex">
                 <textarea class="latex-text" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
             </div>
-            <div class="display" @click="dump">
+            <div class="latex-view" id="question-latex-view" @click="dump">
             </div>
         </div>
 
@@ -237,7 +240,7 @@ function dump() {
             <div class="latex">
                 <textarea class="latex-text" name="solution" placeholder="Type solution here:" v-model="active.solution"></textarea>
             </div>
-            <div class="display" @click="dump">
+            <div class="latex-view" id="solution-latex-view" @click="dump">
             </div>
         </div>
 
@@ -313,7 +316,7 @@ function dump() {
 	max-height: none;
 }
 
-.display {
+.latex-view {
 	width: 100%;
 	height: 250px;
 	max-height: none;

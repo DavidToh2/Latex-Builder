@@ -13,9 +13,9 @@ var openDocuments = reactive<string[]>(['Hi'])
 </script>
 
 <template>
-    <Title title="Drive" />
+    <Title title="PDF Viewer" />
 
-    <div id="storage">
+    <div id="drive">
         
     </div>
 
@@ -24,7 +24,6 @@ var openDocuments = reactive<string[]>(['Hi'])
     <div id="document-viewer">
         <pdf 
             :source="activeDocument"
-            
         />
     </div>
 

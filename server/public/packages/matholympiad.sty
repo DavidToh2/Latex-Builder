@@ -1,0 +1,102 @@
+\ProvidesPackage{matholympiad}[Package for typesetting math olympiad handouts. Includes some base packages]
+\RequirePackage{amsmath}
+
+    % Typesetting Shortcuts
+
+\newcommand{\we}[1]{\par\textbf{Worked Example {#1}.} }
+\newcommand{\ex}[1]{\par\textbf{Example {#1}.} }
+\newcommand{\soln}{\par\textbf{Solution.} }
+\newcommand{\sol}[1]{\par\textbf{Solution {#1}.} }
+\newcommand{\rank}[1]{\textbf{[#1]}}
+\def\+{\texttt{+}}	% Smaller plus symbol
+\newcommand{\used}[1]{\textbf{[Used in: #1]} }
+
+    % Math Shortcuts
+
+\let\disp\displaystyle
+\newcommand{\bbr}[1]{\bigl(#1\bigr)}
+\newcommand{\Bbr}[1]{\Bigl(#1\Bigr)}
+\newcommand{\br}[1]{\left(#1\right)}
+\newcommand{\floor}[1]{\left\lfloor #1\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1\right\rceil}
+\newcommand{\fracpart}[1]{\left\{ #1\right\}}
+
+    % Table
+
+\newenvironment{mathtable}[1]
+    {
+        \renewcommand{\arraystretch}{1.8}
+        \begin{center}
+            \begin{tabular}{#1}
+    }
+    {       \end{tabular}
+        \end{center}
+    }
+
+% Algebra FEs
+\newcommand{\func}[5]{$#1 \colon \mathbb{#2}^{#3} \rightarrow \mathbb{#4}^{#5}$}
+	
+% Geometry
+\let\tr\triangle
+
+% Number Theory
+\newcommand{\lcm}{\text{lcm}}
+    \let\oldmod\mod
+\renewcommand{\mod}[1]{\text{ (mod $#1$)} }
+
+% Option selection
+\newcommand{\option}[2]{(#1) \, #2 \quad}
+
+    % Figures
+
+\newcommand{\fig}[2]{
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale = #1]{#2}
+\end{figure}
+}
+
+	% 2 subfigures
+\newcommand{\figs}[6]{
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{#1\textwidth}
+		\centering
+		\includegraphics[scale = #2]{#3}
+	\end{subfigure}
+	\begin{subfigure}{#4\textwidth}
+		\centering
+		\includegraphics[scale = #5]{#6}
+	\end{subfigure}
+\end{figure}}
+
+	% 3 subfigures
+\newcommand{\figss}[9]{
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{#1\textwidth}
+		\centering
+		\includegraphics[scale = #2]{#3}
+	\end{subfigure}
+	\begin{subfigure}{#4\textwidth}
+		\centering
+		\includegraphics[scale = #5]{#6}
+	\end{subfigure}
+	\begin{subfigure}{#7\textwidth}
+		\centering
+		\includegraphics[scale = #8]{#9}
+	\end{subfigure}
+\end{figure}}
+
+    % Display Box
+
+\newcommand{\dispbox}[2]{
+\begin{center}{\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{|p{#1cm}|}
+\hline
+#2 \\
+\hline
+\end{tabular}}
+\end{center}}
+
+\endinput

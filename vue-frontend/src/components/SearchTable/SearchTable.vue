@@ -1,25 +1,32 @@
 <script setup lang="ts">
     import SearchTableHeader from "./SearchTableHeader.vue"
-    import SearchTableResult from "./SearchTableResult.vue"
+    import SearchTableResult from "./SearchTableEntry.vue"
     import type { qn } from '@/types/Types'
-    import { useQuestionStore } from '@/stores/stores'
-    import { postForm } from '@/post'
 
     export interface Props {
+        internalName: string
         qns?: qn[]
     }
     const props = defineProps<Props> ()
 
     const emits = defineEmits<{
         (e: 'delete', displayID: string): void
+        (e: 'insert', displayID: string): void
+        (e: 'up', displayID: string): void
+        (e: 'down', displayID: string): void
     }>()
 
-    const QuestionStore = useQuestionStore()
-    function moveQuestionToContribute(displayID : string) {
-        QuestionStore.insertFromDatabaseToContribute(displayID)
-    }
     async function deleteQuestionFromDatabase(displayID: string) {
         emits('delete', displayID)
+    }
+    function insertQuestion(displayID : string) {
+        emits('insert', displayID)
+    }
+    function questionUp(dispID : string) {
+        emits('up', dispID)
+    }
+    function questionDown(dispID : string) {
+        emits('down', dispID)
     }
 
 </script>
@@ -28,7 +35,7 @@
     <div class="search-table">
         <SearchTableHeader />
         <div class="search-table-results" v-for="item in qns"> 
-            <SearchTableResult :q="item" @edit="moveQuestionToContribute" @delete="deleteQuestionFromDatabase"/>
+            <SearchTableResult :internalName="props.internalName + '-qn'" :q="item" @insert="insertQuestion" @delete="deleteQuestionFromDatabase" @up="questionUp" @down="questionDown"/>
         </div>
     </div>
 </template>
@@ -77,6 +84,9 @@
 }
 .search-table :deep(.search-options) {
     flex-basis: var(--search-options-width);
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
 }
 
 </style>

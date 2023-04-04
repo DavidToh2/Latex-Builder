@@ -26,7 +26,9 @@
         </div>
     </div>
     <div class="hover-menu" v-show="isActive">
-        
+        <slot name="hover-content">
+            <!-- Hover display content goes here -->
+        </slot>
         <div class="hover-close">
             <img src="@/assets/rightarrow.png" class="hover-close-button" @click="switchActive(false)">
         </div>
@@ -63,6 +65,7 @@
     z-index: 10;
     border: 3px solid black;
     border-radius: 30px;
+    padding: 30px 30px;
 }
 
 .hover-menu-inactive {

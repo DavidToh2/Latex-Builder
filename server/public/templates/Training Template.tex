@@ -1,0 +1,55 @@
+
+	% To open template folder, go to 
+	% C:\Users\user\AppData\Local\MiKTeX\TeXworks\0.6\templates
+
+
+\documentclass[a4paper,twoside]{article}
+\usepackage{geometry}		% Customise page layout
+\usepackage{fancyhdr}		% Adds a fancy header
+\usepackage{graphicx}		% Adds customisation to \includefigure
+\usepackage{enumitem}		% Adds list customisation (labels, indents, etc.)
+\usepackage{amsmath}		% Adds \begin{equation} and \begin{align} environments
+\usepackage{gensymb}		% Adds \degree
+\usepackage{amssymb}		% Adds symbols, in particular \mathbb{text} and \blacksquare
+\usepackage{longtable}		% Tables spanning multiple pages
+\usepackage{multirow}		% Merge rows and columns in {tabular}
+\usepackage{caption}		% Adds customisable captions
+\usepackage{subcaption}		% Adds multi-figures
+\usepackage{array}			% Adds fixed-length table columns p, m, b
+\usepackage{mathtools}		% Use \floor{x} instead of \lfloor x \rfloor
+    
+\graphicspath{{./images/}}
+
+					% PAGE SETUP --- FILL UP HEADERS AND TITLE
+
+\pagestyle{fancy}
+
+	% Headers and footers
+\fancyhf{}
+\fancyhead[LO, RE]{}
+\fancyhead[RO, LE]{\textbf{Math Core}}
+\fancyfoot[LO, RE]{}
+\fancyfoot[C] {\thepage}
+
+	% Indents and spacing
+\setlength\parindent{0pt}
+\setlength\parskip{0.8ex}
+\setlist[itemize]{noitemsep}
+\renewcommand{\footrulewidth}{0.5pt}
+% By default, the footer line has 0pt and is not visible.
+
+\title{}
+\author{}
+\date{}
+
+					% START OF DOCUMENT
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+
+
+
+
+\end{document}

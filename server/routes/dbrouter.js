@@ -13,63 +13,81 @@ router.use((req, res, next) => {                        // MIDDLEWARE FUNCTION G
     next()
 })
 
-router.post('/get', async function(req, res) {                  // FIND / GET QUESTIONS BASED ON DATADICT
+router.post('/get', async function(req, res, next) {                  // FIND / GET QUESTIONS BASED ON DATADICT
 
-    console.log("Search parameters:")
-    const dataDict = parseWebToServer(req.body)
-    console.log(req.body)
+    try {
+        console.log("Search parameters:")
+        const dataDict = parseWebToServer(req.body)
+        console.log(req.body)
 
-    const fQ = await findQuestions(dataDict)
-    console.log("Found the following questions:")
-    console.log(fQ)
+        const fQ = await findQuestions(dataDict)
+        console.log("Found the following questions:")
+        console.log(fQ)
 
-    res.json(fQ)
+        res.json(fQ)
 
+    } catch(err) {
+        next(err)
+    }
+    
     /* res.json does the following:
         res.header("Content-Type", "application/json")
         res.send(JSON.stringify(data))
     */
 })
 
-router.post('/set/new', async function(req, res) {              // SET NEW QUESTION
+router.post('/set/new', async function(req, res, next) {              // SET NEW QUESTION
 
-    console.log("Input parameters:")
-    const dataDict = parseWebToServer(req.body)
-    console.log(dataDict)
+    try {
+        console.log("Input parameters:")
+        const dataDict = parseWebToServer(req.body)
+        console.log(dataDict)
 
-    const nQ = await newQuestion(dataDict)      
-    console.log("The following question has been set:")
-    console.log(nQ)
+        const nQ = await newQuestion(dataDict)      
+        console.log("The following question has been set:")
+        console.log(nQ)
 
-    res.json(nQ)
+        res.json(nQ)
+    } catch(err) {
+        next(err)
+    }
 })
 
-router.post('/set/update/:displayID', async function(req, res) {           // UPDATE EXISTING QUESTION
+router.post('/set/update/:displayID', async function(req, res, next) {           // UPDATE EXISTING QUESTION
 
-    console.log("Input parameters:")
-    const reqData = parseWebToServer(req.body)
-    console.log(reqData)
-    const displayID = req.params['displayID']
+    try {
+        console.log("Input parameters:")
+        const reqData = parseWebToServer(req.body)
+        console.log(reqData)
+        const displayID = req.params['displayID']
 
-    const r = await saveQuestion(displayID, reqData)
-    console.log("The following question has been saved:")
-    console.log(r)
+        const r = await saveQuestion(displayID, reqData)
+        console.log("The following question has been saved:")
+        console.log(r)
 
-    res.json(r)
+        res.json(r)
+    } catch(err) {
+        next(err)
+    }
 })
 
-router.post('/delete/:displayID', async function(req, res) {
+router.post('/delete/:displayID', async function(req, res, next) {
 
-    console.log("Input parameters:")
-    const reqData = req.body
-    console.log(reqData)
-    const displayID = req.params['displayID']
+    try {    
+        console.log("Input parameters:")
+        const reqData = req.body
+        console.log(reqData)
+        const displayID = req.params['displayID']
 
-    const d = await deleteQuestion(displayID)
-    console.log("Number of deleted questions:")
-    console.log(d)
+        const d = await deleteQuestion(displayID)
+        console.log("Number of deleted questions:")
+        console.log(d)
 
-    res.json(d)
+        res.json(d)
+        
+    } catch(err) {
+        next(err)
+    }
 })
 
 

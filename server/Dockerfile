@@ -11,6 +11,15 @@ COPY . .
 RUN mv /app/startup_scripts/* /etc/my_init.d
 RUN chmod +x /etc/my_init.d/*
 
+RUN mv /app/public/packages/* /usr/local/texlive/texmf-local/tex/latex/local
+RUN chmod +r /usr/local/texlive/texmf-local/tex/latex/local/*
+RUN texhash
+
+# Configure the node user
+RUN chown -R node /app \
+    && chmod -R +x /app/scripts \
+    && chmod -R 700 /app/public/files
+
 EXPOSE 3000
 
 CMD ["/sbin/my_init", "--", "setuser", "node", "npm", "start"]

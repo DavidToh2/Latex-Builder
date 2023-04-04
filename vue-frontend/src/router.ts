@@ -3,7 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import DatabaseView from '@/views/DatabaseView.vue'
 import BuildView from '@/views/BuildView.vue'
 import ContributeView from '@/views/ContributeView.vue'
-import DriveView from '@/views/DriveView.vue'
+import DriveView from '@/views/DocumentView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

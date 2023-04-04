@@ -24,6 +24,7 @@ export interface qn extends qnFilters {
 
 export interface qns {
     qns: qn[]
+    // Required for typescript to correctly parse reactive qn[] arrays
 }
 
 const emptyFilters = { 

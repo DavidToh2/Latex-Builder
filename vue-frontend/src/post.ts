@@ -1,5 +1,27 @@
 import type { qn } from '@/types/Types'
 
+export async function postJSON(j : {[key : string] : string | number | Date | null}, url : string) {
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(j)
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok')
+        }
+        return response
+    })
+    .catch((error) => console.log('post.ts returned error ', error))
+    
+    // console.log(response)
+    
+    return response
+}
+
 export async function postForm(f : HTMLFormElement, url : string, fn : string) {
     const formc = f.elements as HTMLFormControlsCollection
     const form = Array.from(formc) as HTMLTextAreaElement[]
@@ -26,23 +48,8 @@ export async function postForm(f : HTMLFormElement, url : string, fn : string) {
     }
 
     console.log("Sending...")
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(reqBody)
-    })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok')
-        }
-        return response
-    })
-    .catch((error) => console.log('post.ts returned error ', error))
     
-    // console.log(response)
-    
+    const response = await postJSON(reqBody, url)
     return response
 }
 

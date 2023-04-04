@@ -1,5 +1,5 @@
 
-var { newID, deleteID, parseID } = require('./ids/id')
+var { parseID } = require('./ids/id')
 var mongoose = require('mongoose')
 var async = require('async')
 
@@ -38,21 +38,28 @@ async function newQuestion(nQ) {
         nQ['id'] = i
         console.log(`The new id is ${i}`)
 
-        var qns = await Question.insertMany([nQ])        // Returns a copy of the saved documents
-        if (!qns) {
+        var qnsRaw = await Question.insertMany([nQ])        // Returns a copy of the saved documents
+        if (!qnsRaw) {
             throw new Error('insertMany() method failed!')
         }
+
+        console.log('Questions inserted!')
 
         // Parses IDs to displayIDs before passing to web
         // NOT WORKING FOR SOME REASON
         
-        var q = qns[0].toObject()
-        q = parseID(q, 'server')
-        return q
+        var qns = []
+        for (var j=0; j<qnsRaw.length; j++) {
+            var q = qnsRaw[j].toObject()
+            q = parseID(q, 'server')
+            qns.push(q)
+        }
+
+        return qns
     }
     catch(err) {
         dbError(err, "db/newQuestion: Failed to save!")
-        return
+        return 0
     }
 }
 
@@ -72,7 +79,6 @@ async function findQuestions(dataDict) {
     }
     catch(err) {
         dbError(err, "db/findQuestions: Failed to find question!")
-        return
     }
 }
 
@@ -81,12 +87,7 @@ async function deleteQuestion(i) {
     try {
         console.log(`Deleting question with displayID ${i}`)
         var dQ = {'displayID': i}
-        dQ = parseID(dQ, 'web')             // Parse displayID to ID before searching database
-
-        const d = await deleteID(dQ['id'])
-        if (!d) {
-            throw new Error('Unable to delete ID!')
-        }
+        dQ = parseID(dQ, 'web')
 
         const res = await Question.deleteOne(dQ)        // Returns {deletedCount: 1}
         if (!res) {
@@ -97,7 +98,6 @@ async function deleteQuestion(i) {
     }
     catch {
         dbError(err, `db/deleteQuestion: Failed to delete question with ID ${i}!`)
-        return
     }
 }
 
@@ -117,7 +117,7 @@ async function saveQuestion(i, dataDict) {
             q[key] = value
         }
         
-        var qs = await q.save()         // Returns a copy of the saved question
+        const qs = await q.save()         // Returns a copy of the saved question
         if (!qs) {
             throw new Error('save() method failed!')
         }
@@ -127,13 +127,30 @@ async function saveQuestion(i, dataDict) {
     }
     catch(err) {
         dbError(err, `db/saveQuestion: Failed to save question with ID ${i}`)
-        return
+    }
+}
+
+async function newID() {
+    try {
+        console.log("Querying database for new ID...")
+
+        const usedIDs = await Question.distinct('id')
+        console.log(usedIDs)
+
+        i = 1
+        while (usedIDs.includes(i)) {
+            i++
+        }
+
+        return i
+
+    } catch(err) {
+        dbError(err, `Failed to find new ID`)
     }
 }
 
 function dbError(err, errorMsg) {
-    console.log(err, errorMsg)
-    console.log(err)
+    throw new Error(`Database error: ${errorMsg}`, { cause: err } )
 }
 
 module.exports = {

@@ -6,7 +6,13 @@ import HoverMenu from './HoverMenu.vue';
 <template>
     <div class="worksheet-filters-row">
         <div class="worksheet-filters">
-            <HoverMenu description="Custom Packages" />
+            <HoverMenu description="Custom Packages">
+                <template v-slot:hover-content>
+                    <div>
+                        This is a test
+                    </div>
+                </template>
+            </HoverMenu>
         </div>
         <div class="worksheet-filters">
             <Input description="Title" internalName="title" />
@@ -14,7 +20,13 @@ import HoverMenu from './HoverMenu.vue';
             <Input description="Date" internalName="date" />
         </div>
         <div class="worksheet-filters">
-            <HoverMenu description="Headers/Footers" />
+            <HoverMenu description="Document Layout">
+                <template v-slot:hover-content>
+                    <div>
+                        This is another test
+                    </div>
+                </template>
+            </HoverMenu>
         </div>
     </div>
 </template>

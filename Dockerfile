@@ -24,4 +24,3 @@ RUN wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
     && rm -rf texlive-install 
 
 RUN adduser --system --home /app node
-RUN chown -R node /app

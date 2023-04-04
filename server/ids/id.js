@@ -1,62 +1,3 @@
-var fs = require('fs').promises
-
-const dir = __dirname
-const csv = `${dir}/list.csv`
-
-async function newID() {
-    try {
-        const data = await fs.readFile(csv, 'utf-8') 
-        var list = data.split(', ')
-        var i = 1
-        const l = list.length
-        if (l > 1) {
-            while (list[i] == i.toString() && i < l) {
-                i += 1
-            }                       // i is the smallest id index that doesn't exist as of now
-                                    // 0 always exists and is not used as an ID
-            list.splice(i, 0, i.toString())    // inserts 'i' into index i
-        } else {
-            list.push('1')
-        }
-        var newString = list.join(', ')
-        console.log(newString)
-        const newfile = await fs.writeFile(csv, newString, 'utf-8')
-        return i
-    }
-    catch(err) {
-        idError(err, "Failed to assign new ID!")
-        return 0
-    }
-}
-
-async function deleteID(x) {
-    try {
-        const data = await fs.readFile(csv, 'utf-8') 
-        var list = data.split(', ')
-        var i = 1
-        const l = list.length
-        if (l > 1) {
-            while (list[i] != x.toString() && i < l) {
-                i += 1
-            }
-            if (i == l) {       // ID x not found
-                return -1
-            }
-            list.splice(i, 1)   // i = position of ID x                 
-        } else {
-            return -1
-        }
-        var newString = list.join(', ')
-        console.log(newString)
-        const newfile = await fs.writeFile(csv, newString, 'utf-8')
-        return i
-    }
-    catch(err) {
-        idError(err, `Failed to delete ID ${x}!`)
-        return 0
-    }
-}
-
 function parseID(data, source) {
     try {
         if (source == 'server') {       // Sending a question from server to frontend.
@@ -76,7 +17,6 @@ function parseID(data, source) {
                     break
                 }
             }
-            console.log(data)
             console.log(data['displayID'])
         }
         else if (source == 'web') {     // Parsing search data from frontend, or
@@ -99,6 +39,7 @@ function parseID(data, source) {
                     delete data['displayID']
                 }
             }
+            
         }
         return data
     }
@@ -113,7 +54,7 @@ function idError(err, errorMsg) {
     console.log(err)
 }
 
-module.exports = { newID, deleteID, parseID }
+module.exports = { parseID }
 
 // ( async() => { console.log(await newID()) } )()
 

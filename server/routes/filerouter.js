@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var path = require('path')
+var { latexCompile } = require('../file')
 
 var sendFileOptions = {
     root: path.join(__dirname, '../public'),
@@ -25,24 +26,38 @@ router.post('/upload', function(req, res, next) {
 
 // Get the PDF file with "filename"
 
-router.get('/get/:fileName', function(req, res) {
+router.get('/get/:fileName', function(req, res, next) {
 
-    const fileName = req.params.fileName
-    const filePath = `files/${fileName}/${fileName}.pdf`
-    console.log(filePath)
-    res.sendFile(filePath, sendFileOptions, function(err) {
-        if (err) {
-            next(err)
-        }
-    })
+    try {
+        const fileName = req.params.fileName
+        const filePath = `files/${fileName}/${fileName}.pdf`
+        console.log(filePath)
+        res.sendFile(filePath, sendFileOptions)
+    } catch(err) {
+        next(err)
+    }
     // https://expressjs.com/en/api.html#res.sendFile
 
 })
 
 // Compile a build into a latex document
 
-router.post('/build', function(req, res) {
+router.get('/compile/:fileName', function(req, res, next) {
+    try {    
+        const fileName = req.params.fileName
+        console.log(`Compiling file ${fileName}...`)
+        const compileres = latexCompile(fileName)
 
+        if (compileres == 0) {
+            const filePath = `files/${fileName}/${fileName}.pdf`
+            console.log(`Sending file at ${filePath} to front-end...`)
+            res.sendFile(filePath, sendFileOptions)
+        } else {
+            throw new Error(`Invalid compile response: code ${compileres}`)
+        }
+    } catch(err) {
+        next(err)
+    }
 })
 
 

@@ -14,10 +14,10 @@ import { RouterLink } from 'vue-router'
             <RouterLink to="/contribute">Contribute</RouterLink>
         </li>
         <li class="navbar-item">
-            <RouterLink to="/drive">Drive</RouterLink>
+            <RouterLink to="/drive">Document</RouterLink>
         </li>
         <li class="navbar-item">
-            <RouterLink to="/">Login</RouterLink>
+            <RouterLink to="/">LaTeX Editor</RouterLink>
         </li>
     </ul>
 </template>

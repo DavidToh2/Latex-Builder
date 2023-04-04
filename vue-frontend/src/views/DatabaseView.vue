@@ -5,9 +5,12 @@ import SearchTable from '@/components/SearchTable/SearchTable.vue'
 
 import type { qn, qns } from '@/types/Types'
 import { useQuestionStore } from '@/stores/stores'
-import { postForm, submitSearch, submitDelete } from '@/post'
+import { submitSearch, submitDelete } from '@/post'
 
 import { reactive, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const QuestionStore = useQuestionStore()
 var results : qns = reactive({
@@ -30,6 +33,17 @@ function displayDatabase() {            // Fetches data from store
     console.log(results.qns)
 }
 
+function insertIntoOtherView(displayID : string) {
+    switch(route.name) {
+        case 'build':
+            QuestionStore.insertFromDatabaseToBuild(displayID)
+        break;
+        case 'contribute':
+            QuestionStore.insertFromDatabaseToContribute(displayID)
+        break;
+    }
+}
+
 async function submitDeleteEvent(displayID : string) {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
     const responsejson = await submitDelete(f, displayID)
@@ -39,19 +53,6 @@ async function submitDeleteEvent(displayID : string) {
     // Refresh the database
     submitSearchEvent()
 }
-
-/* QuestionStore.$onAction(
-    ({name, store, args, after, onError }) => {
-        if (name == 'insertIntoDatabase') {
-            after((result) => {
-                if (result) {
-                    const newContributeIDList = QuestionStore.getContributeIDList() as string[]
-                    updateContributeTab(newContributeIDList, [...IDlist.value])
-                }
-            })
-        }
-    }
-) */
 
 
 </script>
@@ -68,7 +69,7 @@ async function submitDeleteEvent(displayID : string) {
         </div>
     </form>
     <div id="no-of-results">Number of results: {{ results.qns.length }}</div>
-    <SearchTable :qns="results.qns" @delete="submitDeleteEvent" />
+    <SearchTable internal-name="database-table" :qns="results.qns" @delete="submitDeleteEvent" @insert="insertIntoOtherView" />
 </template>
 
 <style scoped>
