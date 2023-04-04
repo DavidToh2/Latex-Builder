@@ -6,16 +6,18 @@ Latex building web-app capable of linking and compiling LaTeX code to build PDF 
 
 Front-end:
 - NodeJS, Vue
-- SASS
-- TypeScript
+- Styling: vanilla CSS for now, plan to integrate SASS in the future
+- Scripting: TypeScript
 
 Server:
-- NodeJS, ExpressJS
-- Need to natively install LaTeX somehow
+- Base Image: [phusion/baseimage](https://github.com/phusion/baseimage-docker)
+- Intermediate Image: natively installs NodeJS + TeXLive
+- Routing: ExpressJS
 
 Database:
 - Mongoose/MongoDB
 
 Hosting:
 - Hosted on Azure (TBD)
-- Containerised using Docker
+
+More details [here](./documentation/SETUP.md)
