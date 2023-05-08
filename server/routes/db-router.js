@@ -1,10 +1,10 @@
-var express = require('express');
-var router = express.Router();
-var { newQuestion, findQuestions, deleteQuestion, saveQuestion } = require('../db')
+const express = require('express');
+const router = express.Router();
+const { newQuestion, findQuestions, deleteQuestion, saveQuestion } = require('./../db-function')
 
 
-var stringToArrayFields = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
-var stringToNumberFields = ['sourceYear']
+const stringToArrayFields = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
+const stringToNumberFields = ['sourceYear']
 
 router.use((req, res, next) => {                        // MIDDLEWARE FUNCTION GETS CALLED ON EVERY QUERY
     res.header("Access-Control-Allow-Origin", "*")

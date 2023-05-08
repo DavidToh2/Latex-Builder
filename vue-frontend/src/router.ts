@@ -4,6 +4,7 @@ import DatabaseView from '@/views/DatabaseView.vue'
 import BuildView from '@/views/BuildView.vue'
 import ContributeView from '@/views/ContributeView.vue'
 import DriveView from '@/views/DocumentView.vue'
+import LoginView from '@/views/LoginView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,7 +14,7 @@ const router = createRouter({
       name: 'home',
       components: {
         left: HomeView,
-        right: HomeView
+        right: LoginView
       }
     },
     {

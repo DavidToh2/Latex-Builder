@@ -1,31 +1,15 @@
 
 var { parseID } = require('./ids/id')
-var mongoose = require('mongoose')
 var async = require('async')
-
-const mongoURI = "mongodb://questiondb/questions"
-const options = { 
-    useNewUrlParser: true, 
-    useUnifiedTopology: true,
-    user: process.env.MONGO_INITDB_ROOT_USERNAME,
-    pass: process.env.MONGO_INITDB_ROOT_PASSWORD,
-    authSource: 'admin'
-};
-
-mongoose.connect(mongoURI, options)
-.then(() => console.log("Connection success!"))
-.catch((error) => console.log(error));
-
-var db = mongoose.connection;
-
-db.on("error", console.error.bind(console, "MongoDB connection error:"))
-
+const { mongoose } = require('./db-connection')
 const { questionSchema } = require("./models/question.js")
 
 // https://forum.freecodecamp.org/t/cant-export-require-a-module-mongoose-model-typeerror-user-is-not-a-constructor/452317/6
 // Exporting the schemas rather than the models works better for some reason.
 
-const Question = mongoose.model("questions", questionSchema);
+const questionDB = mongoose.connection.useDb('questions', { useCache: true} )
+
+const Question = questionDB.model("questions", questionSchema);
 
 async function newQuestion(nQ) {
     try {
@@ -46,7 +30,6 @@ async function newQuestion(nQ) {
         console.log('Questions inserted!')
 
         // Parses IDs to displayIDs before passing to web
-        // NOT WORKING FOR SOME REASON
         
         var qns = []
         for (var j=0; j<qnsRaw.length; j++) {

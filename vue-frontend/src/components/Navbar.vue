@@ -16,9 +16,6 @@ import { RouterLink } from 'vue-router'
         <li class="navbar-item">
             <RouterLink to="/drive">Document</RouterLink>
         </li>
-        <li class="navbar-item">
-            <RouterLink to="/">LaTeX Editor</RouterLink>
-        </li>
     </ul>
 </template>
 

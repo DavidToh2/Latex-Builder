@@ -2,18 +2,22 @@
 		
 		// Import all relevant JS modules
 
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const { mongoose } = require('./db-connection')
 
 		// Import routing modules
 
-var dbrouter = require('./routes/dbrouter')
-var filerouter = require('./routes/filerouter')
+const dbrouter = require('./routes/db-router')
+const filerouter = require('./routes/file-router')
 
-var app = express();                              	// Initialise the app
+const app = express();                              	// Initialise the app
 
 		// Add middleware libraries using app.use()
 
@@ -23,12 +27,29 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));	// allows us to serve static (i.e. unchanged) files from the /public directory.
 
+		// Session configuration
+
+const sessionOptions = {
+	secret: process.env.AUTH_SECRET,
+	saveUninitialized: false,
+	cookie: {
+		secure: true,
+		httpOnly: true,
+		maxAge: 1000 * 60 * 60 * 24
+	},
+	store: MongoStore.create({
+		client: mongoose.connection.getClient(),
+		autoRemove: 'interval',
+		autoRemoveInterval: 10
+	})
+};
+app.use(session(sessionOptions))
+
 		// The following two lines map our application URLs to the routing modules.
 		// Overall URL: [the stuff below]/[the stuff in the router module]
 
 app.use('/database', dbrouter)
 app.use('/file', filerouter)
-
 
 		// Error handlers
 
