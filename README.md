@@ -1,6 +1,6 @@
 # Introduction
 
-Latex building web-app capable of linking and compiling LaTeX code to build PDF documents from a server-side LaTeX installation and question database.
+Latex web-app capable of linking and compiling LaTeX code to build PDF documents from a server-side LaTeX installation and question database.
 
 # Project structure
 
@@ -11,13 +11,20 @@ Front-end:
 
 Server:
 - Base Image: [phusion/baseimage](https://github.com/phusion/baseimage-docker)
-- Intermediate Image: natively installs NodeJS + TeXLive
+- Intermediate Image `latexbase`: natively installs NodeJS + TeXLive
+- Server Image `latexquestionbank`
 - Routing: ExpressJS
 
 Database:
-- Mongoose/MongoDB
+- Mongoose + MongoDB Atlas
 
 Hosting:
-- Hosted on Azure (TBD)
+- Frontend on AWS S3 + Cloudfront
+- Backend on AWS EC2
 
-More details [here](./documentation/SETUP.md)
+## Documentation
+- [Setup](./documentation/SETUP.md)
+- [Development](./documentation/DEVELOPMENT.md)
+- [Data](./documentation/DATA.md)
+- [Staging](./documentation/STAGING.md)
+- [Production](./documentation/PRODUCTION.md)
