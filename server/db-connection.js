@@ -1,20 +1,19 @@
 var mongoose = require('mongoose')
 var async = require('async')
 
+// Connect to local docker mongo if in dev mode, or connect to Atlas deployment if in prod mode
 // Note: questiondb here is the name of the docker container
 
-const mongoURI = "mongodb://questiondb/"
-const options = { 
-    useNewUrlParser: true, 
-    useUnifiedTopology: true,
-    user: process.env.MONGO_INITDB_ROOT_USERNAME,
-    pass: process.env.MONGO_INITDB_ROOT_PASSWORD,
-    authSource: 'admin',
-    dbName: process.env.MONGO_SESSION_DATABASE
+var mongoURI
+
+if (process.env.NODE_ENV == 'development') {
+    mongoURI = process.env.MONGO_DEV_URI
+} else if (process.env.NODE_ENV == 'production') {
+    mongoURI = process.env.MONGO_URI
 }
 
-mongoose.connect(mongoURI, options)
-    .then(console.log("Connection success!"))
+mongoose.connect(mongoURI)
+    .then(console.log(`Connection success! Mongo URI is ${mongoURI}`))
     .catch((err) => {console.log(err)})
 
 mongoose.connection

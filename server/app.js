@@ -31,6 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));	// allows us to serve s
 
 const sessionOptions = {
 	secret: process.env.AUTH_SECRET,
+	resave: true,
 	saveUninitialized: false,
 	cookie: {
 		secure: true,
@@ -39,6 +40,7 @@ const sessionOptions = {
 	},
 	store: MongoStore.create({
 		client: mongoose.connection.getClient(),
+		dbName: 'sessions',
 		autoRemove: 'interval',
 		autoRemoveInterval: 10
 	})
