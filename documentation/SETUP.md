@@ -1,8 +1,24 @@
-## Introduction
+# Introduction
 
-This document is intended as a guide for people wishing to start their own containerised NodeJS / MongoDB database-backed application.
+This document is intended as a guide for people wishing to start their own containerised NodeJS / MongoDB database-backed application. It documents the steps needed to download and set up all dependencies, as well as instructions on their basic usage.
 
-## Part 1. Setting up NodeJS
+- [Introduction](#introduction)
+- [Part 1. Setting up NodeJS](#part-1-setting-up-nodejs)
+  - [Installation](#installation)
+  - [Basic Concepts](#basic-concepts)
+    - [package.json](#packagejson)
+    - [Scripts](#scripts)
+    - [Modules and Dependencies](#modules-and-dependencies)
+- [Part 2. Setting up Docker](#part-2-setting-up-docker)
+  - [Dockerfile](#dockerfile)
+  - [Images and Containers](#images-and-containers)
+  - [Volumes and Volume Mounts](#volumes-and-volume-mounts)
+- [Part 3: Setting Up MongoDB/Mongoose and Docker Compose](#part-3-setting-up-mongodbmongoose-and-docker-compose)
+  - [Mongoose/Mongo Image](#mongoosemongo-image)
+  - [MongoDB with Docker Compose](#mongodb-with-docker-compose)
+
+
+# Part 1. Setting up NodeJS
 
 **NodeJS** is a cross-platform runtime environment that can be used to create both server-side tools and applications in Javascript.
 
@@ -12,7 +28,7 @@ This document is intended as a guide for people wishing to start their own conta
 - setting of web app parameters, like ports and resource directories
 - adding request-processing "middlewares" in the request-response pipeline
 
-### Set-up
+## Installation
 
 1. Install Node
     - Verify installation using `node -v` and `npm -v`
@@ -29,6 +45,8 @@ This document is intended as a guide for people wishing to start their own conta
 4. Enable application running in debug mode
     - Execute `npm install --save-dev nodemon` to install `nodemon` as a development dependency
     - `nodemon` allows the application to automatically refresh/reinitialise on code change.
+
+## Basic Concepts
 
 ### package.json
 
@@ -63,7 +81,7 @@ This document is intended as a guide for people wishing to start their own conta
 
 - Execute `npm install --production` or set `NODE_ENV=production` during deployment. This only installs production dependencies.
 
-## Part 2. Setting up Docker
+# Part 2. Setting up Docker
 
 **Docker** is a containerisation service. The container itself is controlled by the `Dockerfile`.
 
@@ -71,7 +89,7 @@ This document is intended as a guide for people wishing to start their own conta
 
 2. Open the Command Palette and select *Add Docker Files to Workspace*
 
-### Dockerfile
+## Dockerfile
 
 The `Dockerfile` is a **list of instructions** on what Docker should do to build an image. It's usually located at the root of the image's local directory (i.e. the source of all its files), known as the **context**.
 
@@ -104,7 +122,7 @@ COPY . .
 CMD [ 'npm', 'start' ]
 ```
 
-### Images and Containers
+## Images and Containers
 
 3. Build the Docker image
     - Execute `docker build --tag <image-name> .` (note the dot at the end) This also sets the image's name
@@ -127,7 +145,7 @@ CMD [ 'npm', 'start' ]
     - Execute `docker restart <container-name>` to restart the container
     - Execute `docker rm <container-name>` to remove the container from the list of containers on the machine
 
-### Volumes and Volume Mounts
+## Volumes and Volume Mounts
 
 A **volume** is a 'bucket' of data, stored on a local filesystem, that are *mounted* onto Docker containers.
 
@@ -149,29 +167,21 @@ A **bind mount** is a local file/directory that is directly mounted onto Docker 
 
 [Docker tutorial](https://docs.docker.com/language/nodejs/build-images/)
 
-## Part 3: Setting Up MongoDB/Mongoose and Docker Compose
+# Part 3: Setting Up MongoDB/Mongoose and Docker Compose
 
 **MongoDB** is a NoSQL database framework. **Mongoose** is the NodeJS version of this framework.
 
-### Mongoose
+## Mongoose/Mongo Image
 
 1. Install the Mongoose NodeJS extension
     - Execute `npm install mongoose`
 
-2. Download the official Mongo Docker image
+2. Download the official Mongo Docker image. This will serve as our local database during development.
     - Execute `docker pull mongo:latest`
     - We do not need to install MongoDB natively on our own machine. Anyway, the MongoDB Community Edition Server doesn't support Ubuntu 22.04, and MongoDB Atlas is paid
+    - The `mongo` image requires environment variables to be set up. Refer to [DEVELOPMENT.md](./DEVELOPMENT.md) for more details
 
-3. Create an environment variable file `.env`. 
-   - Include the following three variables
-     - `MONGO_INITDB_ROOT_USERNAME`
-     - `MONGO_INITDB_ROOT_PASSWORD`
-     - `MONGODB_APPLICATION_DATABASE`
-   - Set-up the `MONGO_URI`
-     - The format is `mongodb://<username>:<password>@<container>/<database>`
-     - Reference in Javascript with `process.env.MONGO_URI`
-
-### Docker Compose
+## MongoDB with Docker Compose
 
 **Docker Compose** is a tool that allows us to define and configure multi-container Docker applications. We do so by editing the `docker-compose.yml` file.
 
@@ -194,137 +204,18 @@ services:
 volumes:
     [source/name]: (uses default options)
 ```
+Our app will have two services - one for the server, and one for the database. Both services will need to be configured in the `docker-compose.yml`.
 
-4. Update `docker-compose.yml` with our second service
+4. To configure the MongoDB database:
     - Include the names of the container and image used
     - Port: `27017:27017`, the MongoDB default
     - Create a mounted volume `<host-dir>:/data/db`. This allows the database data, normally stored under `/data/db`, to be persistent across container start/stops.
     - Add a reference to the `env_file`
     - Add a link from our app service to the database service
-    - Copy the `MONGO_URI` over to the app service's environment variable file
+    - Copy the `MONGO_URI` over to our `.env` file
 
-5. Set-up Mongoose authentication
-    - In `db.js`: connect to the MongoDB using the following code
+5. Mongoose authentication can be set-up using the following code in the server:
 ```
-const mongoURI = "mongodb://<container>/<database>"
-const options = {
-    useNewUrlParser: true, 
-    useUnifiedTopology: true,
-    user: <MONGO_INITDB_ROOT_USERNAME>,
-    pass: <MONGO_INITDB_ROOT_PASSWORD>,
-    authSource: 'admin'         // Important
-}
-mongoose.connect(mongoURI, options)
+const mongoURI = "mongodb://<container>:27017/<database>" OR process.env.MONGO_URI
+mongoose.connect(mongoURI[, options])
 ```
-
-## Part 4: Building the Container
-
-### Building the Base Image: Node and Dependencies
-
-We use the **phusion/Baseimage** image, found [here](https://github.com/phusion/baseimage-docker). This is a minimal Ubuntu image.
-```
-RUN apt-get update \
-    && apt-get install -y build-essential wget perl
-
-RUN curl -sSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
-```
-- `perl` is a required dependency for `install-tl` and `tlmgr`.
-
-### Building the Base Image: Latex Installation
-
-```
-RUN wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
-    && mkdir /texlive-installer
-    && tar -xzf install-tl-unx.tar.gz -C /texlive-installer \
-    && rm install-tl-unx.tar.gz* \
-```
-- `wget`: Downloads texlive installer from mirror
-- `tar`: `x` extracts, `z` filters through gzip2, `f` sets the filename, and `C` sets the destination directory
-
-```
-    && cd texlive-installer \
-    && echo "selected_scheme scheme-basic" >> texlive.profile \ 
-    && echo "tlpdbopt_install_docfiles 0" >> texlive.profile \ 
-    && echo "tlpdbopt_install_srcfiles 0" >> texlive.profile \
-    && echo "tlpdbopt_autobackup 0" >> texlive.profile \
-    && cd .. \
-    && /texlive-installer/install-tl -profile texlive.profile \
-    && $(find /usr/local/texlive -name tlmgr) path add
-    && rm -rf /texlive-installer
-```
-- `install-tl` profile setup: do not install documentation and source files, do not autobackup, only install the basic scheme
-- Texlive is installed at `/usr/local/texlive` using the aforementioned profile
-- The Texlive binary, at `/usr/local/texlive/2023/bin/x86_64-linux/tlmgr`, is added to the system PATH (and can now be executed simply with `tlmgr`)
-
-[Overleaf's base Texlive image](https://github.com/overleaf/overleaf/blob/main/server-ce/Dockerfile-base)
-
-[StackExchange: Minimal Dockerised Texlive installation](https://tex.stackexchange.com/questions/397174/minimal-texlive-installation)
-
-Other references:
-
-[Install Texlive](https://www.tug.org/texlive/quickinstall.html)
-
-[install-tl Reference](https://www.tug.org/texlive/doc/install-tl.html)
-
-[tlmgr Reference](https://tug.org/texlive/tlmgr.html)
-
-[Texlive Guide](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-420004.2)
-
-### Building the Base Image: Configuring the User
-
-We create a new user `node`, with home directory `/app`, and set it as the owner of the `/app` directory. 
-```
-RUN adduser --system --home /app node
-RUN chown -R node /app
-```
-This user does not have sudo privileges, and `node` will run as this user.
-
-### Building latexquestionbank: Installing Node Dependencies
-```
-ENV NODE_ENV=production
-WORKDIR /app
-
-COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && mv node_modules ../
-COPY . .
-```
-
-### Building latexquestionbank: Setting the Startup Scripts
-```
-RUN mv /app/startup_scripts/* /etc/my_init.d
-RUN chmod +x /etc/my_init.d/*
-```
-The **phusion/Baseimage** image will perform the following, in sequence, on startup:
-- Runs all system startup files, which are stored in `/etc/my_init.d`
-- Starts all runit services.
-- Runs the specified command in `CMD`.
-- When the specified command exits, stops all runit services.
-
-### Building latexquestionbank: Startup
-```
-EXPOSE 3000
-CMD ["/sbin/my_init", "--", "setuser", "node", "npm", "start"]
-```
-- Expose the container's port 3000
-- Run `/sbin/my_init` to start the container. This executes the specified command that appears after the double dashes.
-- `setuser` will execute the specified command `npm start` as the user `node`.
-
-### Building the Containers
-
-To build **latexbase**, execute `make latex-base` in `/`.
-
-To build **latexquestionbank**, execute `docker compose build` in `/server`.
-
-## Part 5: Scripting Latex
-
-Drive. To implement ability to:
-- upload .tex and .pdf files
-- view .pdf files
-- remove files
-
-Latex compiler. To implement ability to:
-- collate build into a .tex file, and:
-  - export as .tex file
-  - compile into .pdf, then export as .pdf. The file will not be saved
-  - compile into .pdf, then save both .tex and .pdf in drive
