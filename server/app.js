@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));	// allows us to serve s
 		// Session configuration
 
 const sessionOptions = {
-	secret: process.env.AUTH_SECRET,
+	secret: process.env.COOKIE_SECRET,
 	resave: true,
 	saveUninitialized: false,
 	cookie: {

@@ -1,6 +1,6 @@
 
-var { parseID } = require('./ids/id')
-var async = require('async')
+const { parseID } = require('./ids/id')
+const async = require('async')
 const { mongoose } = require('./db-connection')
 const { questionSchema } = require("./models/question.js")
 

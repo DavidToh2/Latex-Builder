@@ -4,19 +4,30 @@ const Schema = mongoose.Schema
 
 const userSchema = new Schema( {
     id: {
-        type: Number,
+        type: String,
         required: [true, 'Missing User ID']
     },
     username: {
         type: String,
         required: [true, 'Missing username']
     },
-    password: {
+    hashedPassword: {
         type: String,
         required: [true, 'Missing password']
+    },
+    salt: {
+        type: String,
+        required: true
     },
     email: {
         type: String,
         required: [true, 'Missing email']
+    },
+    groups: {
+        type: [String]
     }
 })
+
+module.exports = {
+    userSchema: userSchema
+}
