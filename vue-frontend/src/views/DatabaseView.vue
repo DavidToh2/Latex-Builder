@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Title from '@/components/PageTitle.vue'
-import QuestionFilters from '@/components/QuestionFilters/QuestionFilters.vue'
+import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
 import SearchTable from '@/components/SearchTable/SearchTable.vue'
 
 import type { qn, qns } from '@/types/Types'

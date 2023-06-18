@@ -44,13 +44,15 @@
 
 
 .search-table {
-    margin: 0px 10px;
+    padding: 0px 10px;
     --search-id-width: 40px;
     --search-topic-width: 130px;
     --search-difficulty-width: 80px;
     --search-source-width: 70px;
     --search-options-width: 80px;
-    --search-questions-width: calc(100% - var(--search-id-width) - var(--search-topic-width) - var(--search-difficulty-width) - var(--search-source-width) - var(--search-options-width))
+    --search-questions-width: calc(100% - var(--search-id-width) - var(--search-topic-width) - var(--search-difficulty-width) - var(--search-source-width) - var(--search-options-width));
+    flex-grow: 1;
+    width: 100%;
 }
 
 .search-table-results {

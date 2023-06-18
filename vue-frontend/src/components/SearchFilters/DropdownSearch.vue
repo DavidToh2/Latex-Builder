@@ -39,7 +39,7 @@
         }
     })
     const inputContainerHeight = computed<number>(() => {
-        const p : number = (1 + searchbarRows.value) * 16 - 7
+        const p : number = (1 + searchbarRows.value) * 16
         return p
     })
 
@@ -53,6 +53,7 @@
         let t = e.target as HTMLInputElement
         search.searchText = ""
         t.value = ""
+        searchAvailableSelections(e)
     }
 
         // Whenever the input text is updated, get the list of matching available selections.
@@ -114,23 +115,21 @@
         <div class="dropdown-description textbox">
             {{ description }}
         </div>
-        <div class="dropdown-search-container-outer">
-            <div class="dropdown-search-container" @mouseenter="search.active = true" @mouseleave="search.active = false">
-                <textarea :rows="searchbarRows" class="dropdown-searchbar" autocomplete="off" style="resize: none;" 
-                    :name="internalName"
-                    :value="search.searchText" 
-                    @focus="initialiseSearch($event)" 
-                    @input="searchAvailableSelections($event)" 
-                    @blur="displayActiveSelections()">
-                </textarea>
-              
-                <select multiple class="dropdown-list" :class="{'dropdown-list-active': search.active}"
-                    @change="setActiveSelections()" 
-                    v-model="search.activeSelections">
+        <div class="dropdown-search-container" @mouseenter="search.active = true" @mouseleave="search.active = false">
+            <textarea :rows="searchbarRows" class="input-sm dropdown-searchbar" autocomplete="off"
+                :name="internalName"
+                :value="search.searchText" 
+                @focus="initialiseSearch($event)" 
+                @input="searchAvailableSelections($event)" 
+                @blur="displayActiveSelections()">
+            </textarea>
+            
+            <select multiple class="dropdown-list" :class="{'dropdown-list-active': search.active}"
+                @change="setActiveSelections()" 
+                v-model="search.activeSelections">
 
-                    <option class="dropdown-option" v-for="item in availableSelections" :value="item">{{ item }}</option>
-                </select>
-            </div>
+                <option class="dropdown-option" v-for="item in availableSelections" :value="item">{{ item }}</option>
+            </select>
         </div>
     </div>
 </template>
@@ -141,7 +140,7 @@
     display: flex;
     height: calc(v-bind(numberToPixels(inputContainerHeight)));
     flex-direction: v-bind('dropdownDir');
-    justify-content: center;
+    /* align-items: center; */
     gap: 7px;
     padding: 0px 7px;
     position: relative;
@@ -149,22 +148,16 @@
 
 .dropdown-description {
     font-size: calc(v-bind(numberToPixels(fontSize)));
-}
-
-.dropdown-search-container-outer {
-    flex-grow: 1;
+    height: 100%;
 }
 
 .dropdown-search-container {
     width: 100%;
-    position: absolute;
 }
 
 .dropdown-searchbar {
     width: 100%;
-    font-family: 'Gothic A1', sans-serif;
     font-size: calc(v-bind(numberToPixels(fontSize - 2)));
-    resize: none;
 }
 
 .dropdown-list {

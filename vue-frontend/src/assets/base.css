@@ -1,4 +1,4 @@
-/* color palette from <https://github.com/vuejs/theme> */
+/* colour palette from <https://github.com/vuejs/theme> */
 
 @import url("https://fonts.googleapis.com/css?family=Gothic A1");
 
@@ -11,8 +11,6 @@
   --vt-c-black-soft: #222222;
   --vt-c-black-mute: #282828;
 
-  --vt-c-indigo: #2c3e50;
-
   --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
   --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
   --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
@@ -22,32 +20,41 @@
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+
+  --vt-c-green-theme: #004607;
+  --vt-c-green-ultradark: #002504;
+  --vt-c-green-light: #00760c;
 }
 
-/* semantic color variables for this project */
 :root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
+  --colour-background: var(--vt-c-white);
+  --colour-background-soft: var(--vt-c-white-soft);
+  --colour-background-mute: var(--vt-c-white-mute);
 
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
+  --colour-theme: var(--vt-c-green-theme);
+  --colour-theme-hover: var(--vt-c-green-ultradark);
+  --colour-theme-light: var(--vt-c-green-light);
 
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
+  --colour-border: var(--vt-c-divider-light-2);
+  --colour-border-hover: var(--vt-c-divider-light-1);
+  --colour-border-dark: var(--vt-c-divider-dark-1);
+
+  --colour-heading: var(--vt-c-text-light-1);
+  --colour-text: var(--vt-c-text-light-1);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-colour-scheme: dark) {
   :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
+    --colour-background: var(--vt-c-black);
+    --colour-background-soft: var(--vt-c-black-soft);
+    --colour-background-mute: var(--vt-c-black-mute);
 
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
+    --colour-border: var(--vt-c-divider-dark-2);
+    --colour-border-hover: var(--vt-c-divider-dark-1);
+    --colour-border-dark: var(--vt-c-divider-light-1);
 
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
+    --colour-heading: var(--vt-c-text-dark-1);
+    --colour-text: var(--vt-c-text-dark-2);
   }
 }
 
@@ -60,17 +67,24 @@
   font-weight: normal;
 }
 
+:root {
+  --font-size-sm2: 12px;
+  --font-size-sm1: 14px;
+  --font-size: 16px;
+  --font-size-lg3: 32px;
+}
+
 
 body {
   min-height: 100vh;
-  color: #000000; /* var(--color-text); */
-  background: var(--color-background);
+  color: var(--colour-text);
+  background: var(--colour-background);
   transition: color 0.5s, background-color 0.5s;
   /* line-height: 1.6; */
   font-family: 'Gothic A1', sans-serif;
   --default-font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
     Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  font-size: 16px;
+  font-size: var(--font-size);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -43,7 +43,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .navbar-item:hover {
-    background-color: #002504;
+    background-color: var(--colour-theme-hover);
     font-weight: 800;
     cursor: pointer;
 }

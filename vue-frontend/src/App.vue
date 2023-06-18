@@ -21,7 +21,7 @@ import { RouterView } from 'vue-router'
 
 .navbar {
 	grid-column: 1 / span 2;
-	background-color: #004607;
+	background-color: var(--colour-theme);
 	width: 100%;
 	height: 64px;
 	display: flex;
@@ -32,7 +32,9 @@ import { RouterView } from 'vue-router'
 }
 
 .container-main {
-	display: block;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	position: relative;
 	width: 100%;
 	height: calc(100vh - 64px);

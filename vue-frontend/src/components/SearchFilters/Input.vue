@@ -28,10 +28,8 @@
         <div class="dropdown-description textbox">
             {{ description }}
         </div>
-        <div class="dropdown-search-container-outer">
-            <div class="dropdown-search-container">
-                <textarea rows="1" class="dropdown-input" autocomplete="off" :name="internalName" style="resize: none;" v-model="search.inputText" @input="updateInput()"></textarea>
-            </div>
+        <div class="dropdown-search-container">
+            <textarea rows="1" class="input-sm dropdown-input" autocomplete="off" :name="internalName" style="resize: none;" v-model="search.inputText" @input="updateInput()"></textarea>
         </div>
     </div>
 </template>
@@ -41,7 +39,7 @@
 .dropdown-container {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    align-items: center;
     gap: 7px;
     padding: 0px 7px;
     position: relative;
@@ -51,20 +49,13 @@
     font-size: 18px;
 }
 
-.dropdown-search-container-outer {
-    flex-grow: 1;
-    height: 25px;
-}
-
 .dropdown-search-container {
     width: 100%;
-    position: absolute;
+    height: 32px;
 }
 
 .dropdown-input {
     width: 100%;
-    font-family: 'Gothic A1', sans-serif;
-    font-size: 16px;
 }
 
 </style>

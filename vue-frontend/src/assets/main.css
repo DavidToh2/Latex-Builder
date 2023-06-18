@@ -8,27 +8,47 @@
   font-weight: normal;
 } */
 
+.input-sm {
+	font-family: 'Gothic A1', sans-serif;
+    font-size: var(--font-size);
+    resize: none;
+
+	border: 1px solid var(--colour-border-dark);
+	padding: 5px 12px;
+	border-radius: 6px;
+}
 
 @media (min-width: 1024px) {
-  /* body {
-    display: flex;
-    place-items: center;
-  } */
 
-  #app {
-    width: 100%;
-    height: 100vh;
-    display: grid;
-    grid-template:
-      "a a" 64px
-      "b c" / 50% 50%;
-    grid-row-gap: 0;
-  }
+	#app {
+		width: 100%;
+		height: 100vh;
+		display: grid;
+		grid-template:
+		"a a" 64px
+		"b c" / 50% 50%;
+		grid-row-gap: 0;
+	}
 
-  .textbox {
-    display: flex;
-    align-items: center;
-    justify-content: left;
-  }
+	.textbox {
+		display: flex;
+		align-items: center;
+	}
+
+	.btn {
+		border: 1px solid var(--colour-border-dark);
+		background-color: var(--colour-theme);
+		padding: 5px 12px;
+		border-radius: 6px;
+		font-size: 14px;
+		color: white;
+	}
+
+	.tooltip::after {
+		border: 1px solid var(--colour-border);
+		background-color: var(--colour-background-soft);
+		padding: 6px;
+		border-radius: 6px;
+	}
 }
   

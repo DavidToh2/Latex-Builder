@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Title from '@/components/PageTitle.vue'
-import WorksheetFilters from '@/components/QuestionFilters/WorksheetFilters.vue';
+import WorksheetFilters from '@/components/SearchFilters/WorksheetFilters.vue';
 import SearchTable from '@/components/SearchTable/SearchTable.vue'
 import Tab from '@/components/Tab/Tab.vue';
 

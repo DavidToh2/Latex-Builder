@@ -1,1 +1,5 @@
+async function authenticateUser() {
+
+}
+
 export {}

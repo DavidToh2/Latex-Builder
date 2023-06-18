@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
     import { watch, reactive, computed } from 'vue'
-    import DropdownSearch from '@/components/QuestionFilters/DropdownSearch.vue'
-    import Input from '@/components/QuestionFilters/Input.vue'
+    import DropdownSearch from '@/components/SearchFilters/DropdownSearch.vue'
+    import Input from '@/components/SearchFilters/Input.vue'
     import paramdir from '@/assets/dropdown.json'
     import type { qnFilters, qnFilterNames } from '@/types/Types'
     import { emptyFilters } from '@/types/Types'
