@@ -6,7 +6,7 @@ const { newQuestion, findQuestions, deleteQuestion, saveQuestion } = require('./
 const stringToArrayFields = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
 const stringToNumberFields = ['sourceYear']
 
-router.use((req, res, next) => {                        // MIDDLEWARE FUNCTION GETS CALLED ON EVERY QUERY
+router.use((req, res, next) => {                                        // MIDDLEWARE FUNCTION GETS CALLED ON EVERY QUERY
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "*")
     res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")

@@ -1,9 +1,9 @@
-var express = require('express')
-var router = express.Router()
-var path = require('path')
-var { latexCompile } = require('../file')
+const express = require('express')
+const router = express.Router()
+const path = require('path')
+const { latexCompile } = require('../file')
 
-var sendFileOptions = {
+const sendFileOptions = {
     root: path.join(__dirname, '../public'),
     headers: {
         'x-timestamp': Date.now()

@@ -10,8 +10,6 @@ This file documents the overall functionalities of the project's components as t
   - [Building latexquestionbank: Setting the Startup Scripts](#building-latexquestionbank-setting-the-startup-scripts)
   - [Building latexquestionbank: Startup](#building-latexquestionbank-startup)
   - [Building the Containers](#building-the-containers)
-- [Frontend: Login System (current WIP)](#frontend-login-system-current-wip)
-- [Server: Scripting Latex](#server-scripting-latex)
 
 
 # Docker Images
@@ -112,20 +110,3 @@ CMD ["/sbin/my_init", "--", "setuser", "node", "npm", "start"]
 To build **latexbase**, execute `make latex-base` in `/`.
 
 To build **latexquestionbank**, execute `docker compose build` in `/server`.
-
-
-
-# Frontend: Login System (current WIP)
-
-# Server: Scripting Latex
-
-Drive. To implement ability to:
-- upload .tex and .pdf files
-- view .pdf files
-- remove files
-
-Latex compiler. To implement ability to:
-- collate build into a .tex file, and:
-  - export as .tex file
-  - compile into .pdf, then export as .pdf. The file will not be saved
-  - compile into .pdf, then save both .tex and .pdf in drive

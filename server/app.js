@@ -16,6 +16,7 @@ const { mongoose } = require('./db-connection')
 
 const dbrouter = require('./routes/db-router')
 const filerouter = require('./routes/file-router')
+const authrouter = require('./routes/auth-router')
 
 const app = express();                              	// Initialise the app
 
@@ -52,6 +53,7 @@ app.use(session(sessionOptions))
 
 app.use('/database', dbrouter)
 app.use('/file', filerouter)
+app.use('/auth', authrouter)
 
 		// Error handlers
 
