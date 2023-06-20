@@ -6,8 +6,8 @@ import Tab from '@/components/Tab/Tab.vue'
 
 import type { qn, qnFilters, qnFilterNames } from '@/types/Types'
 import { emptyQn, emptyFilters, syncFiltersWithQn, syncQnWithFilters } from '@/types/Types'
-import { useQuestionStore } from '@/stores/stores'
-import { postForm, submitSave, submitDelete } from '@/post';
+import { useQuestionStore } from '@/stores/questionStore'
+import { questionSave, questionDelete } from '@/post/postQn';
 import { reactive, ref, watch } from 'vue'
 
 const contributeOptionsLeftTab = ['Question', 'Solution', 'Images', 'Packages']
@@ -160,7 +160,7 @@ async function changeOptionTab(s : string, n : number) {
             if ((active.category.length == 0) || (active.question.trim().length == 0)) {
                 alert("Your question is empty!")
             } else {
-                const response = await submitSave(mainForm, active.displayID) as qn[]
+                const response = await questionSave(mainForm, active.displayID) as qn[]
                 const dispID = response[0]['displayID']
                 if (active.displayID == '0') {
                     removeFromContribute(active.displayID)
@@ -187,7 +187,7 @@ async function changeOptionTab(s : string, n : number) {
                 removeFromContribute(active.displayID)
             } else {
                 removeFromContribute(active.displayID)
-                const response = await submitDelete(mainForm, active.displayID)   
+                const response = await questionDelete(mainForm, active.displayID)   
                 console.log(response)
                 changeDisplayedQuestion('0')
             }

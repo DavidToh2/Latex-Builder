@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { newQuestion, findQuestions, deleteQuestion, saveQuestion } = require('./../db-function')
+const { newQuestion, getQuestions, deleteQuestion, saveQuestion } = require('./../db-function')
 
 
 const stringToArrayFields = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
@@ -20,7 +20,7 @@ router.post('/get', async function(req, res, next) {                  // FIND / 
         const dataDict = parseWebToServer(req.body)
         console.log(req.body)
 
-        const fQ = await findQuestions(dataDict)
+        const fQ = await getQuestions(dataDict)
         console.log("Found the following questions:")
         console.log(fQ)
 

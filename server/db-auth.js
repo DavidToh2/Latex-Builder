@@ -13,26 +13,31 @@ async function newUser(new_username, new_password, new_email) {
     // Returns the user data if signup successful, otherwise throws error.
 
     try {
-        console.log("Inserting new user...")
-
         const new_salt = crypto.randomBytes(32)
         const new_userID = crypto.randomBytes(64).toString('hex')
         const new_hashedpassword = hashPassword(new_password, new_salt)
+
+        const nU_social = {
+            email: new_email,
+            groups: [],
+            bio: 'Default bio',
+            joinDate: Date.now()
+        }
 
         const nU = {
             id: new_userID,
             username: new_username,
             salt: new_salt,
             hashedPassword: new_hashedpassword,
-            email: new_email,
-            groups: []
+            socialInfo: nU_social
         }
 
-        if (findUserID(nU['username'])) {
+        if (await findUserID(nU['username'])) {
             console.log(`User ${nU['username']} already exists!`)
             return 0
         }
 
+        console.log(`Inserting new user ${nU['username']}`)
         const newUser = await Users.insertMany([nU])
 
         if (!newUser) {
@@ -75,6 +80,10 @@ async function authenticateUser(username, password) {
     // Called when user logs in.
 
     try {
+        if (!password) {
+            return 0
+        }
+
         const u = {
             username: username
         }
@@ -89,7 +98,12 @@ async function authenticateUser(username, password) {
         var userValidated = false
 
         const hashedPassword = hashPassword(password, user['salt'])
-        if (crypto.timingSafeEqual(hashedPassword = user['hashedPassword'])) {
+        const expectedPassword = user['hashedPassword']
+        console.log(`hashedPassword: ${hashedPassword}`)
+        console.log(`expectedPassword: ${expectedPassword}`)
+
+        if (hashedPassword.length == expectedPassword.length
+            && crypto.timingSafeEqual(Buffer.from(hashedPassword), Buffer.from(expectedPassword))) {
             userValidated = true
         }
 
@@ -105,7 +119,17 @@ async function authenticateUser(username, password) {
     }
 }
 
+function isAuthenticated(req, res, next) {
 
+    // Check that user's session is authenticated
+    // Check for a session in the sessionStore with the correct session cookie and userID.
+    // https://stackoverflow.com/questions/73049959/express-session-middleware-to-check-authentication
+    
+    console.log('Authenticating session.')
+    if (req.session.user) next()
+    else next('route')
+    // next('route') tells the router to skip all the remaining route callbacks, i.e. go to the next route.
+}
 
 function hashPassword(pwd, salt) {
     const hashedPasswordBlob = crypto.pbkdf2Sync(pwd, salt, 100000, 64, 'sha512')
@@ -118,5 +142,5 @@ function authError(err, errorMsg) {
 }
 
 module.exports = {
-    newUser, authenticateUser
+    newUser, findUserID, authenticateUser, isAuthenticated
 }

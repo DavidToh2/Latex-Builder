@@ -2,7 +2,27 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
 
+const userSocialInfoSchema = new Schema( {
+
+    email: {
+        type: String,
+        required: [true, 'Missing email']
+    },
+    groups: {
+        type: [String]
+    },
+    bio: {
+        type: String
+    },
+    joinDate: {
+        type: Date
+    }
+})
+
 const userSchema = new Schema( {
+
+    // Authentication info
+
     id: {
         type: String,
         required: [true, 'Missing User ID']
@@ -19,12 +39,12 @@ const userSchema = new Schema( {
         type: String,
         required: true
     },
-    email: {
-        type: String,
-        required: [true, 'Missing email']
-    },
-    groups: {
-        type: [String]
+
+    // Social info
+
+    socialInfo: {
+        type: userSocialInfoSchema,
+        required: [true, 'Missing social info']
     }
 })
 

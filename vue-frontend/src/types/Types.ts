@@ -75,4 +75,29 @@ function syncQnWithFilters(q : qn, filters : qnFilters) {
 }
 
 
-export { emptyFilters, emptyQn, syncFiltersWithQn, syncQnWithFilters }
+interface userSocialData {
+    email: string,
+    groups: string[],
+    bio: string,
+    joinDate: string
+}
+
+export interface userData{
+    username: string
+    socialData: userSocialData
+}
+
+const emptyUserSocialData = {
+    email: '',
+    groups: <string[]>[],
+    bio: '',
+    joinDate: ''
+}
+
+const emptyUserData = {
+    username: '',
+    socialData: emptyUserSocialData
+} as userData
+
+
+export { emptyFilters, emptyQn, syncFiltersWithQn, syncQnWithFilters, emptyUserData }

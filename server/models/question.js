@@ -2,7 +2,21 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
 
+const question_userPerms = new Schema( {
+    owner: {
+        type: String,
+        required: [true, 'Question is missing owner']
+    },
+    contributingUsers: {
+        type: [String]
+    },
+    contributingGroups: {
+        type: [String]
+    }
+})
+
 const questionSchema = new Schema( {
+
     id: {
         type: Number,
         required: [true, 'Missing ID!']
@@ -11,6 +25,9 @@ const questionSchema = new Schema( {
         type: String,
         required: [true, 'Missing question!']
     },
+    
+    // Question filters
+
     category: {
         type: [String],
         required: [true, 'Missing category!']
@@ -22,18 +39,10 @@ const questionSchema = new Schema( {
     subtopic: {
         type: [String]
     },
-
     difficulty: {
         type: [String],
         required: [true, 'Missing difficulty!']
     },
-    images: [String],
-
-    solution: {
-        type: String
-    },
-    solutionImages: [String],
-    
     sourceName: {
         type: [String],
         uppercase: true
@@ -42,27 +51,30 @@ const questionSchema = new Schema( {
         type: Number,
         min: 1800
     },
+    // Question filters: tags
+    tags: {
+        type: [String]
+    },
+
+    // Images
+    images: [String],
+
+    // Solution and Images
+
+    solution: {
+        type: String
+    },
+    solutionImages: [String],
+
+    // User permission and modification data
+
     lastModified: {
         type: Date
     },
-
-    tags: {
-        type: [String]
+    userPerms: {
+        type: question_userPerms
     }
-}, 
-/* {
-    virtuals: {
-        qnID: {
-            get() {
-                if (this.category == 'Mathematics') {
-                    return 'M' + this.id
-                } else if (this.category == 'Computer Science') {
-                    return 'CS' + this.id
-                }
-            }
-        }
-    }
-} */
+}
 )
 
 module.exports = {

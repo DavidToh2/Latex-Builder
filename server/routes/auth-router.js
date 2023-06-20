@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { newUser, authenticateUser } = require('./../db-auth')
+const { newUser, authenticateUser, isAuthenticated } = require('./../db-auth')
 
 router.use((req, res, next) => {                                        // MIDDLEWARE FUNCTION GETS CALLED ON EVERY QUERY
     res.header("Access-Control-Allow-Origin", "*")
@@ -56,7 +56,10 @@ router.post('/login', async function(req, res, next) {
         if (!nU) {
             response['returnCode'] = "failure_authenticationFailure"
         } else {
+            req.session.regenerate()
             req.session.uID = nU['id']
+            response['username'] = nU['username']
+            response['socialInfo'] = nU['socialInfo']
         }
 
         res.json(response)
@@ -66,19 +69,36 @@ router.post('/login', async function(req, res, next) {
 
 })
 
-router.post('/authenticate', async function(req, res, next) {
-
-    // Check that user's session is authenticated
-    // Check for a session in the sessionStore with the correct session cookie and userID.
+router.post('/logout', isAuthenticated, function(req, res, next) {
 
     try {
-        console.log('Authenticating session.')
+        const userID = req.session.uID
+
+        req.session.uID = null
+
+        req.session.regenerate()
+        
+        var response = {
+            returnCode: "success"
+        }
+
+        res.json(returnCode)
     } catch(err) {
         next(err)
     }
-
 })
 
-router.post('/logout', async function(req, res, next) {
-
+router.post('/check', isAuthenticated, function(req, res, next) {
+    var response = {
+        isAuth: "true"
+    }
+    res.json(response)
 })
+router.post('/check', function(req, res, next) {
+    var response = {
+        isAuth: "false"
+    }
+    res.json(response)
+})
+
+module.exports = router

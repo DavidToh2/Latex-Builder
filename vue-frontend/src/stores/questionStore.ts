@@ -3,6 +3,10 @@ import { reactive } from 'vue'
 import type { qn } from '@/types/Types'
 import { emptyQn } from '@/types/Types'
 
+
+
+        // THE QUESTION STORE: stores all questions active or displayed in the user's current browsing session.
+
 interface qnStore {
     displayIDArray: string[],          // Used to speed up searching through indexes
     qnArray: qn[]
@@ -244,3 +248,4 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         insertIntoContribute, insertFromDatabaseToContribute, deleteFromContribute
     }
 })
+

@@ -1,15 +1,21 @@
 <script setup lang="ts">
 
+import { authLogin } from '@/post/postAuth'
 
+async function loginUser() {
+    const f = document.querySelector('form#login-form') as HTMLFormElement
+    const responsejson = await authLogin(f)
+    console.log(responsejson)
+}
 
 </script>
 
 <template>
-    <form id="login-form">
+    <form id="login-form" @submit.prevent="loginUser">
         <label for="login-user-input">Username or Email Address</label>
-        <input id="login-user-input" name="user-input" class="input-sm">
+        <input id="login-user-input" name="username" class="input-sm">
         <label for="login-password-input">Password</label>
-        <input id="login-password-input" name="password-input" class="input-sm">
+        <input id="login-password-input" name="password" class="input-sm">
 
         <input id="login-submit" type="submit" class="btn" value="Sign in">
     </form>

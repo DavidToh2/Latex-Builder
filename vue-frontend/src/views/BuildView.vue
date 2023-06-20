@@ -8,7 +8,7 @@ import { ref, reactive, onMounted } from 'vue'
 import pdf from 'vue-pdf-embed'
 
 import type { qn, qns } from '@/types/Types'
-import { useQuestionStore } from '@/stores/stores';
+import { useQuestionStore } from '@/stores/questionStore';
 
 const QuestionStore = useQuestionStore()
 

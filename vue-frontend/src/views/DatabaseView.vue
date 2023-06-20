@@ -4,8 +4,8 @@ import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
 import SearchTable from '@/components/SearchTable/SearchTable.vue'
 
 import type { qn, qns } from '@/types/Types'
-import { useQuestionStore } from '@/stores/stores'
-import { submitSearch, submitDelete } from '@/post'
+import { useQuestionStore } from '@/stores/questionStore'
+import { questionGet, questionDelete } from '@/post/postQn'
 
 import { reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
@@ -21,7 +21,7 @@ onMounted(async () => { submitSearchEvent() })
 
 async function submitSearchEvent() {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
-    const responsejson = await submitSearch(f)
+    const responsejson = await questionGet(f)
 
     QuestionStore.resetDatabase()
     QuestionStore.populateDatabase(responsejson)
@@ -46,7 +46,7 @@ function insertIntoOtherView(displayID : string) {
 
 async function submitDeleteEvent(displayID : string) {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
-    const responsejson = await submitDelete(f, displayID)
+    const responsejson = await questionDelete(f, displayID)
     console.log(responsejson)
 
     QuestionStore.deleteFromContribute(displayID)

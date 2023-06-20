@@ -48,7 +48,7 @@ async function newQuestion(nQ) {
 
 // Question.find({}) returns all questions.
 
-async function findQuestions(dataDict) {   
+async function getQuestions(dataDict) {   
     try {
         console.log("Finding questions...")
         const qns = await Question.find(dataDict).lean()
@@ -61,7 +61,7 @@ async function findQuestions(dataDict) {
         return qns
     }
     catch(err) {
-        dbError(err, "db/findQuestions: Failed to find question!")
+        dbError(err, "db/getQuestions: Failed to find question!")
     }
 }
 
@@ -137,5 +137,5 @@ function dbError(err, errorMsg) {
 }
 
 module.exports = {
-    newQuestion, findQuestions, deleteQuestion, saveQuestion
+    newQuestion, getQuestions, deleteQuestion, saveQuestion
 }
