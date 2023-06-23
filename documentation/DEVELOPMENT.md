@@ -10,6 +10,7 @@ This file documents the overall functionalities of the project's components as t
   - [Building latexquestionbank: Setting the Startup Scripts](#building-latexquestionbank-setting-the-startup-scripts)
   - [Building latexquestionbank: Startup](#building-latexquestionbank-startup)
   - [Building the Containers](#building-the-containers)
+- [Logs](#logs)
 
 
 # Docker Images
@@ -110,3 +111,7 @@ CMD ["/sbin/my_init", "--", "setuser", "node", "npm", "start"]
 To build **latexbase**, execute `make latex-base` in `/`.
 
 To build **latexquestionbank**, execute `docker compose build` in `/server`.
+
+# Logs
+
+We use [winston](https://www.npmjs.com/package/winston)

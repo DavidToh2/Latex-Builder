@@ -6,13 +6,6 @@ const { newQuestion, getQuestions, deleteQuestion, saveQuestion } = require('./.
 const stringToArrayFields = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
 const stringToNumberFields = ['sourceYear']
 
-router.use((req, res, next) => {                                        // MIDDLEWARE FUNCTION GETS CALLED ON EVERY QUERY
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "*")
-    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
-    next()
-})
-
 router.post('/get', async function(req, res, next) {                  // FIND / GET QUESTIONS BASED ON DATADICT
 
     try {
@@ -90,8 +83,6 @@ router.post('/delete/:displayID', async function(req, res, next) {
     }
 })
 
-
-
 function parseWebToServer(dataDict) {
     for (const f of stringToArrayFields) {
         if (dataDict.hasOwnProperty(f)) {
@@ -105,5 +96,11 @@ function parseWebToServer(dataDict) {
     }
     return dataDict
 }
+
+        // Local error handler
+
+router.use(function(err) {
+
+})
 
 module.exports = router

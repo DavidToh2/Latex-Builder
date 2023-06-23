@@ -7,13 +7,16 @@ const userDB = mongoose.connection.useDb('users', { useCache: true })
 
 const Users = userDB.model('users', userSchema)
 
-async function newUser(new_username, new_password, new_email) {
+async function newUser(userdata) {
 
     // Called when user signs up.
     // Returns the user data if signup successful, otherwise throws error.
 
     try {
-        const new_salt = crypto.randomBytes(32)
+        const new_username = userdata['username']
+        const new_password = userdata['password']
+        const new_email = userdata['email']
+        const new_salt = crypto.randomBytes(32).toString('hex')
         const new_userID = crypto.randomBytes(64).toString('hex')
         const new_hashedpassword = hashPassword(new_password, new_salt)
 
@@ -75,7 +78,7 @@ async function findUserID(username) {
     }
 }
 
-async function authenticateUser(username, password) {
+async function authenticateUser(userdata) {
 
     // Called when user logs in.
 
@@ -84,8 +87,16 @@ async function authenticateUser(username, password) {
             return 0
         }
 
-        const u = {
-            username: username
+        const userstring = userdata['username']
+        var u = {
+            password: userdata['password']
+        }
+        if (userstring.match(/@/)) {
+            u['email'] = userstring
+        } else if (userstring.match(/[A-Za-z0-9\-\_]/)) {
+            u['username'] = userstring
+        } else {
+            throw new Error('Invalid userstring input format!')
         }
 
         const userArr = await Users.find(u).lean()
@@ -126,7 +137,7 @@ function isAuthenticated(req, res, next) {
     // https://stackoverflow.com/questions/73049959/express-session-middleware-to-check-authentication
     
     console.log('Authenticating session.')
-    if (req.session.user) next()
+    if (req.session.uID) next()
     else next('route')
     // next('route') tells the router to skip all the remaining route callbacks, i.e. go to the next route.
 }

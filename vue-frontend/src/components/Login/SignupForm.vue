@@ -17,7 +17,7 @@ async function signupUser() {
 <template>
     <form id="signup-form" method="post" @submit.prevent="signupUser">
         <label for="signup-user-input">Username</label>
-        <input id="signup-user-input" name="username" class="input-sm">
+        <input id="signup-user-input" name="username" class="input-sm" pattern="[A-Za-z0-9\-\_]">
 
         <label for="signup-user-input">Email</label>
         <input id="signup-user-input" name="email" class="input-sm" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">

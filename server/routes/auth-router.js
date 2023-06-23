@@ -2,13 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { newUser, authenticateUser, isAuthenticated } = require('./../db-auth')
 
-router.use((req, res, next) => {                                        // MIDDLEWARE FUNCTION GETS CALLED ON EVERY QUERY
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "*")
-    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
-    next()
-})
-
 router.post('/signup', async function(req, res, next) {
 
     // When a user signs up
@@ -18,7 +11,7 @@ router.post('/signup', async function(req, res, next) {
         const userData = req.body
         console.log(userData)
 
-        const nU = await newUser(userData['username'], userData['password'], userData['email'])
+        const nU = await newUser(userData)
 
         var response = {
             returnCode: "success"
@@ -28,6 +21,7 @@ router.post('/signup', async function(req, res, next) {
             response['returnCode'] = "failure_userExists"
         }
 
+        req.session.regenerate()
         res.json(response)
     } catch(err) {
         next(err)
@@ -47,7 +41,7 @@ router.post('/login', async function(req, res, next) {
         const userData = req.body
         console.log(userData)
 
-        const nU = await authenticateUser(userData['username'], userData['password'])
+        const nU = await authenticateUser(userData)
 
         var response = {
             returnCode: "success"
@@ -56,7 +50,9 @@ router.post('/login', async function(req, res, next) {
         if (!nU) {
             response['returnCode'] = "failure_authenticationFailure"
         } else {
-            req.session.regenerate()
+            req.session.regenerate(function(err) {
+                if (err) next(err)
+            })
             req.session.uID = nU['id']
             response['username'] = nU['username']
             response['socialInfo'] = nU['socialInfo']
@@ -76,7 +72,9 @@ router.post('/logout', isAuthenticated, function(req, res, next) {
 
         req.session.uID = null
 
-        req.session.regenerate()
+        req.session.regenerate(function(err) {
+            if (err) next(err)
+        })
         
         var response = {
             returnCode: "success"
@@ -99,6 +97,12 @@ router.post('/check', function(req, res, next) {
         isAuth: "false"
     }
     res.json(response)
+})
+
+        // Local error handler
+
+router.use(function(err) {
+    
 })
 
 module.exports = router
