@@ -5,7 +5,18 @@ import { authLogin } from '@/post/postAuth'
 async function loginUser() {
     const f = document.querySelector('form#login-form') as HTMLFormElement
     const responsejson = await authLogin(f)
-    console.log(responsejson)
+    if (responsejson.status == -1) {
+	    // Error occured
+	    const error = responsejson.error
+        console.log(error)
+    } else if (responsejson.status == 1) {
+        // Failure
+        console.log("Login failed!")
+    } else {
+        // Success
+        const data = responsejson.body
+        console.log(data)
+    }
 }
 
 </script>

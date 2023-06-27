@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { newUser, authenticateUser, isAuthenticated } = require('./../db-auth')
+const { ResponseBody, ResponseError } = require('../express-classes/response')
 
 router.post('/signup', async function(req, res, next) {
 
@@ -12,16 +13,10 @@ router.post('/signup', async function(req, res, next) {
         console.log(userData)
 
         const nU = await newUser(userData)
+        const response = new ResponseBody(userData['fn'])
+        response.status = 0
 
-        var response = {
-            returnCode: "success"
-        }
-
-        if (!nU) {
-            response['returnCode'] = "failure_userExists"
-        }
-
-        req.session.regenerate()
+        req.session.regenerate((err) => {if(err) next(err)})
         res.json(response)
     } catch(err) {
         next(err)
@@ -42,20 +37,16 @@ router.post('/login', async function(req, res, next) {
         console.log(userData)
 
         const nU = await authenticateUser(userData)
-
-        var response = {
-            returnCode: "success"
-        }
-
+        const response = new ResponseBody(userData['fn'])
         if (!nU) {
-            response['returnCode'] = "failure_authenticationFailure"
+            response.status = 1
+            response.body = {}
         } else {
-            req.session.regenerate(function(err) {
-                if (err) next(err)
-            })
+            response.status = 0
+            req.session.regenerate((err) => {if(err) next(err)})
             req.session.uID = nU['id']
-            response['username'] = nU['username']
-            response['socialInfo'] = nU['socialInfo']
+            response.body['username'] = nU['username']
+            response.body['socialInfo'] = nU['socialInfo']
         }
 
         res.json(response)
@@ -69,16 +60,10 @@ router.post('/logout', isAuthenticated, function(req, res, next) {
 
     try {
         const userID = req.session.uID
-
         req.session.uID = null
-
-        req.session.regenerate(function(err) {
-            if (err) next(err)
-        })
-        
-        var response = {
-            returnCode: "success"
-        }
+        req.session.regenerate((err) => {if(err) next(err)})
+        const response = new ResponseBody(userData['fn'])
+        response.status = 0
 
         res.json(returnCode)
     } catch(err) {
@@ -87,22 +72,43 @@ router.post('/logout', isAuthenticated, function(req, res, next) {
 })
 
 router.post('/check', isAuthenticated, function(req, res, next) {
-    var response = {
+    const response = {
         isAuth: "true"
     }
+    console.log(response)
     res.json(response)
 })
 router.post('/check', function(req, res, next) {
-    var response = {
+    const response = {
         isAuth: "false"
     }
+    console.log(response)
     res.json(response)
 })
 
-        // Local error handler
+        // Local error handler.
+        // Catches all errors from auth-router and db-auth
 
-router.use(function(err) {
-    
+router.use(function(err, req, res, next) {
+
+    if (err instanceof UserError) {
+        const response = new ResponseBody()
+        response.status = 1
+        response.fn = `${req.body['fn']}-UserError`
+        response.body = err
+        console.log(response)
+
+        res.json(response)
+    } else {
+        const response = new ResponseError()
+        response.status = -1
+        response.fn = `${req.body['fn']}-Error`
+        response.error = err
+        console.log(response)
+
+        res.status(502)
+        res.json(response)
+    }
 })
 
 module.exports = router

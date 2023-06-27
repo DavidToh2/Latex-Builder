@@ -2,6 +2,7 @@ const async = require('async')
 const { mongoose } = require('./db-connection')
 const { userSchema } = require('./models/user')
 const crypto = require('crypto')
+const { ServerError, UserError, DatabaseError, newError } = require('./express-classes/error')
 
 const userDB = mongoose.connection.useDb('users', { useCache: true })
 
@@ -11,6 +12,8 @@ async function newUser(userdata) {
 
     // Called when user signs up.
     // Returns the user data if signup successful, otherwise throws error.
+
+    const errorString = 'db-auth/newUser: Failed to insert new user!'
 
     try {
         const new_username = userdata['username']
@@ -35,21 +38,22 @@ async function newUser(userdata) {
             socialInfo: nU_social
         }
 
+        // User error: user already exists
         if (await findUserID(nU['username'])) {
-            console.log(`User ${nU['username']} already exists!`)
-            return 0
+            throw new UserError(errorString, `User ${nU['username']} already exists!`)
         }
 
         console.log(`Inserting new user ${nU['username']}`)
         const newUser = await Users.insertMany([nU])
 
+        // Database error: insert operation failed
         if (!newUser) {
-            throw new Error('newUser() method failed!')
+            throw new DatabaseError(errorString, 'newUser() method failed!')
         }
 
         return newUser
     } catch(err) {
-        authError(err, 'Failed to save new user')
+        newError(err, errorString)
     }
 }
 
@@ -57,6 +61,8 @@ async function findUserID(username) {
 
     // Called when user signs up, to check for uniqueness.
     // Also called when userID is required.
+
+    const errorString = 'db-auth/findUserID: Failed to find user ID!'
 
     try {
         const u = {
@@ -66,7 +72,7 @@ async function findUserID(username) {
         const userArr = await Users.find(u).lean()
 
         if (userArr.length > 1) {
-            throw new Error(`findUser() found multiple users for username ${username}!`)
+            throw new DatabaseError(errorString, `findUser() found multiple users for username ${username}!`)
         } else if (userArr.length == 0) {
             return 0
         } else {
@@ -74,13 +80,15 @@ async function findUserID(username) {
         }
 
     } catch(err) {
-        authError(err, 'Failed to find user')
+        newError(err, errorString)
     }
 }
 
 async function authenticateUser(userdata) {
 
     // Called when user logs in.
+
+    const errorString = 'Failed to authenticate user!'
 
     try {
         if (!password) {
@@ -93,16 +101,18 @@ async function authenticateUser(userdata) {
         }
         if (userstring.match(/@/)) {
             u['email'] = userstring
-        } else if (userstring.match(/[A-Za-z0-9\-\_]/)) {
+        } else if (userstring.match(/[\w\-_]+/)) {
             u['username'] = userstring
         } else {
-            throw new Error('Invalid userstring input format!')
+            throw new UserError(errorString, 'Invalid userstring input format!')
         }
 
         const userArr = await Users.find(u).lean()
 
         if (userArr.length > 1) {
-            throw new Error(`authenticateUser() found multiple users for username ${username}!`)
+            throw new DatabaseError(errorString, `authenticateUser() found multiple users for username ${username}!`)
+        } else if (!userArr) {
+            throw new DatabaseError(errorString, `User ${userstring} not found!`)
         }
 
         const user = userArr[0]
@@ -110,8 +120,6 @@ async function authenticateUser(userdata) {
 
         const hashedPassword = hashPassword(password, user['salt'])
         const expectedPassword = user['hashedPassword']
-        console.log(`hashedPassword: ${hashedPassword}`)
-        console.log(`expectedPassword: ${expectedPassword}`)
 
         if (hashedPassword.length == expectedPassword.length
             && crypto.timingSafeEqual(Buffer.from(hashedPassword), Buffer.from(expectedPassword))) {
@@ -126,30 +134,26 @@ async function authenticateUser(userdata) {
         }
 
     } catch(err) {
-        authError(err, 'Failed to authenticate user')
+        newError(err, errorString)
     }
 }
 
 function isAuthenticated(req, res, next) {
-
-    // Check that user's session is authenticated
-    // Check for a session in the sessionStore with the correct session cookie and userID.
-    // https://stackoverflow.com/questions/73049959/express-session-middleware-to-check-authentication
-    
     console.log('Authenticating session.')
     if (req.session.uID) next()
     else next('route')
-    // next('route') tells the router to skip all the remaining route callbacks, i.e. go to the next route.
+    // next('route') tells the router to skip all the remaining route callbacks
 }
 
 function hashPassword(pwd, salt) {
-    const hashedPasswordBlob = crypto.pbkdf2Sync(pwd, salt, 100000, 64, 'sha512')
-    const hashedPassword = hashedPasswordBlob.toString('hex')
-    return hashedPassword
-}
-
-function authError(err, errorMsg) {
-    throw new Error(`Authentication error: ${errorMsg}`, { cause: err } )
+    errorString = "Password hashing failed!"
+    try {
+        const hashedPasswordBlob = crypto.pbkdf2Sync(pwd, salt, 100000, 64, 'sha512')
+        const hashedPassword = hashedPasswordBlob.toString('hex')
+        return hashedPassword
+    } catch(err) {
+        authError(errorString, err)
+    }
 }
 
 module.exports = {

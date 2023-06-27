@@ -56,12 +56,15 @@ const allowedOrigins = ['placeholder']
 if (process.env.NODE_ENV == 'development') {
 	allowedOrigins.push('http://localhost:5173')
 }
-app.use(function(req, res, next) {
+app.use('/*', (req, res, next) => {
 	const origin = req.get('origin')
 	if (allowedOrigins.includes(origin)) {
 		res.header("Access-Control-Allow-Origin", origin)
 		res.header("Access-Control-Allow-Headers", "Content-Type")
 		res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
+	}
+	if (req.method == "OPTIONS") {
+		return res.status(200).end()
 	}
 	next()
 })
@@ -75,14 +78,15 @@ app.use('/auth', authrouter)
 
 		// Error handlers
 
-// catch 404 and forward to error handler
+// Catch 404 and forward to error handler
 app.use(function (req, res, next) {
 	next(createError(404));
 });
 
-// error handler
+// Network/Resource Error Handler
 app.use(function (err, req, res, next) {
 	// render the error page
+	console.log("Error caught by global handler")
 	console.log(err.message)
 	console.log(err.cause)
 	res.status(err.status || 500);

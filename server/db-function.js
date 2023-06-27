@@ -1,8 +1,8 @@
-
 const { parseID } = require('./ids/id')
 const async = require('async')
 const { mongoose } = require('./db-connection')
 const { questionSchema } = require("./models/question.js")
+const { ServerError, UserError, DatabaseError, newError } = require('./express-classes/error')
 
 // https://forum.freecodecamp.org/t/cant-export-require-a-module-mongoose-model-typeerror-user-is-not-a-constructor/452317/6
 // Exporting the schemas rather than the models works better for some reason.
@@ -12,11 +12,14 @@ const questionDB = mongoose.connection.useDb('questions', { useCache: true} )
 const Question = questionDB.model("questions", questionSchema);
 
 async function newQuestion(nQ) {
+
+    const errorString = "db/newQuestion: Failed to save!"
+
     try {
         console.log("Setting new question...")
         const i = await newID()
         if (!i) {
-            throw new Error('Unable to assign new ID!')
+            throw new DatabaseError(errorString, 'Unable to assign new ID!')
         }
 
         nQ['id'] = i
@@ -24,7 +27,7 @@ async function newQuestion(nQ) {
 
         var qnsRaw = await Question.insertMany([nQ])        // Returns a copy of the saved documents
         if (!qnsRaw) {
-            throw new Error('insertMany() method failed!')
+            throw new DatabaseError(errorString, 'insertMany() method failed!')
         }
 
         console.log('Questions inserted!')
@@ -39,16 +42,16 @@ async function newQuestion(nQ) {
         }
 
         return qns
-    }
-    catch(err) {
-        dbError(err, "db/newQuestion: Failed to save!")
-        return 0
+    } catch(err) {
+        newError(err, errorString)
     }
 }
 
 // Question.find({}) returns all questions.
 
-async function getQuestions(dataDict) {   
+async function getQuestions(dataDict) {
+    
+    const errorString = 'db-function/getQuestions: Failed to find question!'
     try {
         console.log("Finding questions...")
         const qns = await Question.find(dataDict).lean()
@@ -59,13 +62,14 @@ async function getQuestions(dataDict) {
         })
 
         return qns
-    }
-    catch(err) {
-        dbError(err, "db/getQuestions: Failed to find question!")
+    } catch(err) {
+        newError(err, errorString)
     }
 }
 
 async function deleteQuestion(i) {
+
+    const errorString = `db-function/deleteQuestion: Failed to delete question with ID ${i}!`
 
     try {
         console.log(`Deleting question with displayID ${i}`)
@@ -74,17 +78,18 @@ async function deleteQuestion(i) {
 
         const res = await Question.deleteOne(dQ)        // Returns {deletedCount: 1}
         if (!res) {
-            throw new Error('deleteOne() method failed!')
+            throw new DatabaseError('deleteOne() method failed!')
         }
 
         return res      
-    }
-    catch {
-        dbError(err, `db/deleteQuestion: Failed to delete question with ID ${i}!`)
+    } catch(err) {
+        newError(err, errorString)
     }
 }
 
 async function saveQuestion(i, dataDict) {
+
+    const errorString = `db-function/saveQuestion: Failed to save question with ID ${i}`
 
     try {
         console.log(`Saving question with displayID ${i}`)
@@ -93,7 +98,7 @@ async function saveQuestion(i, dataDict) {
 
         var q = await Question.findOne(qID)
         if (!qID) {
-            throw new Error('Question not found!')
+            throw new DatabaseError(errorString, 'Question ID not found!')
         }
 
         for (const [key, value] of Object.entries(dataDict)) {
@@ -102,18 +107,19 @@ async function saveQuestion(i, dataDict) {
         
         const qs = await q.save()         // Returns a copy of the saved question
         if (!qs) {
-            throw new Error('save() method failed!')
+            throw new DatabaseError(errorString, 'save() method failed!')
         }
 
         console.log(`Saved question with ID ${i}`)
         return qs       
-    }
-    catch(err) {
-        dbError(err, `db/saveQuestion: Failed to save question with ID ${i}`)
+    } catch(err) {
+        newError(err, errorString)
     }
 }
 
 async function newID() {
+
+    const errorString = `db-function/newID: Failed to assign new ID`
     try {
         console.log("Querying database for new ID...")
 
@@ -128,12 +134,8 @@ async function newID() {
         return i
 
     } catch(err) {
-        dbError(err, `Failed to find new ID`)
+        newError(err, errorString)
     }
-}
-
-function dbError(err, errorMsg) {
-    throw new Error(`Database error: ${errorMsg}`, { cause: err } )
 }
 
 module.exports = {

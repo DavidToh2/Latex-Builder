@@ -1,61 +1,33 @@
-# Vue.js Front-End
+# Introduction
 
-## What's going on?
+This document serves to detail the features developed for the Latex Builder front-end webpage.
 
-- `App.vue` contains is the top level of stuff, observe that it calls on `<RouterView />`, the stuff from the views are rendered there based what the current URL end-point is
-- The `./router/index.ts` seems to define what views are rendered at specific URL end-points
-- uhh everything else should be decently obvious lah, the components are used in the views and in each other
+# Authentication
 
-## What to do?
+## User Store
 
-- Decide on the structure + styling of the pages
-- Get rid of the default styling
-- Implement the forms
-- Possibly implement auth and stuff like that next time
+The local user store stores user data, as well as authentication status, about the currently logged-in user.
 
-## Stuff Here by Default
+- To modify user data, use the member function `setUserData()`. 
+- To modify authentication status, use the member function `setAuthStatus()`.
 
-This template should help get you started developing with Vue 3 in Vite.
+**NOTE: Pinia Store data has not been refresh-proofed. Consider using localStorage or sessionStorage instead**
+https://github.com/prazdevs/pinia-plugin-persistedstate
 
-## Recommended IDE Setup
+## Authentication Checks (Frontend)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+When the user updates the page, whether by navigation or by reload, a **Navigation Guard** automatically sends a POST request to the backend to update the user authentication status in the User Store
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```
+router.beforeEach(async (to, from) => {
+	const userStore = useUserStore()
+	if (await isAuth()) {
+		userStore.setAuthStatus(true)
+	} else {
+		userStore.setAuthStatus(false)
+	}
+	return true
+})
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+This allows components to simply access the User Store to determine what to load, instead of having to individually make requests to the backend.

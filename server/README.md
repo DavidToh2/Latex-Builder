@@ -6,12 +6,14 @@ This document serves to detail the features developed for the Latex Builder serv
 - [Introduction to Express](#introduction-to-express)
 	- [Request and Response Format](#request-and-response-format)
 - [CORS](#cors)
+	- [Networking Procedure](#networking-procedure)
 - [Error Handling](#error-handling)
 	- [Local Error Handlers](#local-error-handlers)
 	- [Global Error Handlers](#global-error-handlers)
 - [Authentication and Login Systems](#authentication-and-login-systems)
-	- [Session Storage](#session-storage)
-	- [Authentication Check](#authentication-check)
+	- [Session Store](#session-store)
+	- [Logging In](#logging-in)
+	- [Authentication Check (Backend)](#authentication-check-backend)
 - [Scripting Latex](#scripting-latex)
 
 # Introduction to Express
@@ -26,69 +28,128 @@ The `next()` callback passes control onto the next triggered middleware.
 
 ## Request and Response Format
 
-Requests are formatted using `post.ts`, which implements the functions `post()`, `postJSON()` and `postForm()` in the front-end. All requests are sent using the format
+Requests are formatted using `post.ts`, which implements the functions `post()`, `postJSON()` and `postForm()` in the front-end. Front-end requests are made using the format
 ```
-request: {
+await fetch(url, {
 	method,
 	headers: {
-		content-type: 'text/html' OR 'application/json'
+		content-type: 'text/html' OR 'text-plain'
 	},
-	body: {
-		<content here>
-	}
-}
+	body: JSON.stringify(jsonObject)
+	// body includes 'fn' entry, describing purpose of request
+})
 ```
-Refer there for details.
+Routers should pass the request bodies wholesale to database functions.
 
-Responses should be formatted according to the following specifications:
+Responses should be formatted according to the following specifications, defined under the `ResponseBody` and `ResponseError` classes respectively:
 ```
 response: {
-	function: [what is the purpose of the request/response?],
+	fn: [what is the nature of the response?],
+	// Usually, this will be equal to req.body['fn'] or req.body['fn']-error.
 
-	// if success
+	status: [0 for success, 1 for user failure, -1 for server error]
+
+	// if success, body field will be present
 	body: {
 		[data here]
 	},
 
-	// if error
+	// if error, error field will be present
 	error: {
 		type: [user error or database error],
-		desc: [string describing error]
+		desc: [string describing error (high-level)],
+		cause: [string describing error (low-level)]
 	}
 }
 res.json(response)
 ```
+Responses should be formatted by the database functions, not the router functions.
+
+Responses will be passed verbatim from the higher-level post functions directly to the Vue components for preprocessing. Vue components can access the response state like so:
+```
+if (responsejson.status == -1) {
+	// Error occured
+	const error = responsejson.error
+
+} else if (responsejson.status == 1) {
+	// Failure
+
+} else {
+	// Success
+	const data = responsejson.body
+}
+```
 
 # CORS
 
+Cross-Origin Resource Sharing is a mechanism that prevents external webpages from accessing your website or server's resources. We need to configure CORS to allow our front-end to communicate with our server.
 
+In `app.js`,
+
+1. Set an array of allowed origins.
+2. Check if the request is coming from an allowed origin. If it is, set the `Access-Control-Allow-Origin`, `-Headers` and `-Methods` headers in your response object.
+3. The response can only be sent if the request parameters adhere to the restrictions imposed by the three headers above.
+
+## Networking Procedure
+
+We describe the procedure by which the front-end fetches a resource, or submits data, to the back-end.
+
+1. The front-end initiates a **pre-flight request** using the `OPTIONS` method.
+2. The back-end identifies the OPTIONS method as a pre-flight request, and sends back a `200 OK` response.
+3. The front-end sends the main resource request or submission using the `POST` method.
 
 # Error Handling
 
 There are four types of errors that the server should be able to catch:
 
-- **Network/Resource Errors**, caused by incorrect requests to unavailable routes, unavailable files/resources, or misconfigured CORS.
-  - Incorrect and unavailable routes should normally bypass all the available routes, and be directly caught by the *global error handler*.
-  - CORS errors need to be passed to the *global error handler*.
-- **Code Errors**, caused by mistakes in the code. These usually cause the server to crash, so should be okay.
-- **Database Errors**, caused by unexpected data behaviour (e.g. duplicate users, user not found, misconfigured `json` request/response).
-  - These should be passed on as *server errors, and NOT network/resource errors*! Their error responses will need to be implemented separately.
-- **User Errors**, caused by illegal user behaviour (e.g. login email has two '@'s, or mistakes in LaTeX).
-  - These should be passed on as *user errors, and NOT network/resource errors*! Their error responses will need to be implemented separately.
+| Error Type              | Example Causes                                                                                                                                                                                                     | Error Handler        | Rationale                                                                                                                                                                                                                                                             | HTML Code     | Response Status |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|-----------------|
+| Network/Resource Errors | Incorrect requests to **unavailable routes/files**, or **misconfigured CORS**                                                                                                                                      | Global Error Handler | <li>Network errors should immediately terminate the request chain and bypass all the available routes, so should be globally handled.</li> <li>Network errors should (obviously) return a HTTP Error.</li>                                                            | Network Error |                 |
+| Code Errors             | **Mistakes in source code**                                                                                                                                                                                        |                      |                                                                                                                                                                                                                                                                       |               |                 |
+| Database Errors         | <li>Errors caused by **Mongoose misbehaving**, such as insertion, search or deletion errors</li> <li>**Unexpected data behaviour**, such as misconfigured JSON or impossible scenarios (e.g. duplicate users)</li> | Local Error Handler  | <li>Details regarding database errors should be passed onto the end user, to inform them regarding the internal error. (May be changed in production)</li> <li>Database errors should return a HTTP Error, as the back-end has failed to function as expected.</li>   | 502           | -1              |
+| User Errors             | **Illegal user behaviour**, such as login email having two '@'s, user already signed up, mistakes in LaTeX                                                                                                         | Local Error Handler  | <li>Details regarding user errors should be passed onto the end user, so that they can amend the error.</li> <li>User errors are functionally identical to failed requests, and are part and parcel of normal app functions, so should return a normal response.</li> | 200 (OK)      | 1               |
+
+Error handlers are identified as using callback functions with these four variables:
+```
+router.use(function(err, req, res, next) {
+	// Error handler here
+})
+```
 
 ## Local Error Handlers
 
-Local error handlers are implemented at the bottom of every individual router
+Local error handlers are implemented at the bottom of every individual router.
+```
+router.use(function(err) {
+	// If user error, return normal response containing user error and failed response code
+	if (err instanceof UserError) {
+		const response = new ResponseBody()
+		response.status = 1
+		response.fn = `${req.body['fn']}-UserError`
+		response.body = [error here]
+	}
+
+	// If database error or unknown (runtime) error, return error
+	else {
+		const response = new ResponseError()
+		response.status = -1
+		response.fn = `${req.body['fn']}-Error`
+		response.error = [error here]
+	}
+})
+```
 
 ## Global Error Handlers
 
-Global error handlers are implemented at the bottom of the `app.js` file.
+Global error handlers are implemented at the bottom of the `app.js` file. They serve to catch network errors.
 
 # Authentication and Login Systems
 
-We use `express-session`, built-in middleware that implements a session management system. We use `connect-mongo` for the SessionStore, which will be attached to our main database.
+We use `express-session`, built-in middleware that implements a session management system, using a **Store**. We use `connect-mongo` for the SessionStore, which will be attached to our main database.
 
-## Session Storage
+JSON Web Tokens (JWTs) are a more modern form of session authentication that are arguably more secure, as the tokens are not stored on the server (i.e. are stateless) and can be encrypted and decrypted by the server as necessary.
+
+## Session Store
 
 The following cookies will be stored in the user's session storage:
 ```
@@ -103,7 +164,26 @@ Session data is stored in the server's SessionStore in this format. The session 
 
 The SessionStore is set up in `app.js`.
 
-## Authentication Check
+## Logging In
+
+Sessions are first initialised on login. The session token is regenerated, creating a new session token, and the user ID is directly stored in the session data.
+
+```
+const nU = await authenticateUser(userData)
+if (nU) {
+	response.status = 0
+	req.session.regenerate((err) => {if(err) next(err)})
+	req.session.uID = nU['id']
+}
+```
+
+Other user data, such as username and social info, are directly sent back via the response to be stored in the local UserStore. For more information, refer to the frontend documentation.
+```
+	response.body['username'] = nU['username']
+	response.body['socialInfo'] = nU['socialInfo']
+```
+
+## Authentication Check (Backend)
 
 We can access the SessionStore simply by invoking `req.session`. This will fetch our current user's session ID (stored in the user's session data), check it against our SessionStore, then (if present) fetch all other session data.
 
@@ -127,6 +207,8 @@ router.post(route1, <function to execute if unauthenticated>)
 [Documentation for `connect-mongo`](https://www.npmjs.com/package/connect-mongo)
 
 [How session tokens and session validation work (StackExchange)](https://security.stackexchange.com/questions/255762/is-this-a-right-technique-to-create-and-validate-session-tokens)
+
+[Express session middleware](https://stackoverflow.com/questions/73049959/express-session-middleware-to-check-authentication)
 
 [Using `express-session` and MongoDB to manage sessions](https://developer.okta.com/blog/2021/06/07/session-mgmt-node)
 

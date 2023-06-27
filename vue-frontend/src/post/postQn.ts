@@ -1,5 +1,4 @@
 
-import type { qn } from '@/types/Types'
 import { postForm, postJSON } from '@/post/post'
 import { BASE_URL } from '@/post/post'
 
@@ -16,7 +15,7 @@ import { BASE_URL } from '@/post/post'
 
 export async function questionGet(f : HTMLFormElement) {         // Submits search query and uses it to populate store
     const response = await postForm(f, `http://${BASE_URL}/database/get`, 'qn-get') as Response
-    const responsejson = await response.json() as qn[]
+    const responsejson = await response.json()
     return responsejson
 }
 

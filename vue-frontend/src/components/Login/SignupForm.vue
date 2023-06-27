@@ -8,7 +8,19 @@ async function signupUser() {
     const p2 = f.querySelector('input[name="password-2"]') as HTMLInputElement
     if (p1.value == p2.value) {
         const responsejson = await authSignup(f)
-        console.log(responsejson)
+        if (responsejson.status == -1) {
+            // Error occured
+            const error = responsejson.error
+            console.log(error)
+
+        } else if (responsejson.status == 1) {
+            // Failure
+
+        } else {
+            // Success
+            const data = responsejson.body
+            console.log(data)
+        }
     }
 }
 
@@ -17,7 +29,7 @@ async function signupUser() {
 <template>
     <form id="signup-form" method="post" @submit.prevent="signupUser">
         <label for="signup-user-input">Username</label>
-        <input id="signup-user-input" name="username" class="input-sm" pattern="[A-Za-z0-9\-\_]">
+        <input id="signup-user-input" name="username" class="input-sm" pattern="[\w\-_]+">
 
         <label for="signup-user-input">Email</label>
         <input id="signup-user-input" name="email" class="input-sm" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">

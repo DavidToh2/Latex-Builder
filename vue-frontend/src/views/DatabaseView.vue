@@ -22,10 +22,21 @@ onMounted(async () => { submitSearchEvent() })
 async function submitSearchEvent() {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
     const responsejson = await questionGet(f)
+    if (responsejson.status == -1) {
+        // Error occured
+        const error = responsejson.error
+        console.log(error)
 
-    QuestionStore.resetDatabase()
-    QuestionStore.populateDatabase(responsejson)
-    displayDatabase()
+    } else if (responsejson.status == 1) {
+        // Failure
+
+    } else {
+        // Success
+        const data = responsejson.body as qn[]
+        QuestionStore.resetDatabase()
+        QuestionStore.populateDatabase(data)
+        displayDatabase()
+    }
 }
 
 function displayDatabase() {            // Fetches data from store
@@ -46,10 +57,24 @@ function insertIntoOtherView(displayID : string) {
 
 async function submitDeleteEvent(displayID : string) {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
-    const responsejson = await questionDelete(f, displayID)
-    console.log(responsejson)
 
-    QuestionStore.deleteFromContribute(displayID)
+    // DELETE QUESTION
+
+    const responsejson = await questionDelete(f, displayID)
+    if (responsejson.status == -1) {
+        // Error occured
+        const error = responsejson.error
+        console.log(error)
+
+    } else if (responsejson.status == 1) {
+        // Failure
+
+    } else {
+        // Success
+        const data = responsejson.body
+        QuestionStore.deleteFromContribute(displayID)
+    }
+
     // Refresh the database
     submitSearchEvent()
 }

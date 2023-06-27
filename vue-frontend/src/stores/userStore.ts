@@ -8,7 +8,7 @@ import { emptyUserData } from '@/types/Types'
 export const useUserStore = defineStore('UserStore', () => {
 
     const user : userData = reactive(structuredClone(emptyUserData))
-    const authStatus = ref(true)
+    const authStatus = ref(false)
 
     function setUserData(data : userData) {
         Object.assign(user, data)

@@ -12,7 +12,7 @@ export async function post(s : string, url : string) {
     const response = await fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'text/html'
+            'Content-Type': 'text/plain'
         },
         body: s
     })
@@ -20,15 +20,16 @@ export async function post(s : string, url : string) {
         if (!response.ok) {
             throw new Error('Network response was not ok')
         }
-        return response
+        return response as Response
     })
-    .catch((error) => console.log('post.ts/post returned error ', error))
+    .catch((error) => console.log('post.ts/post returned error ', error)) as Response
 
     return response
 }
 
 export async function postJSON(j : {[key : string] : string | number | Date | null}, url : string) {
 
+    console.log(j)
     const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -40,11 +41,9 @@ export async function postJSON(j : {[key : string] : string | number | Date | nu
         if (!response.ok) {
             throw new Error('Network response was not ok')
         }
-        return response
+        return response as Response
     })
-    .catch((error) => console.log('post.ts/postJSON returned error ', error))
-    
-    // console.log(response)
+    .catch((error) => console.log('post.ts/postJSON returned error ', error)) as Response
     
     return response
 }

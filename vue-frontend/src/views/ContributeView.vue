@@ -160,16 +160,31 @@ async function changeOptionTab(s : string, n : number) {
             if ((active.category.length == 0) || (active.question.trim().length == 0)) {
                 alert("Your question is empty!")
             } else {
-                const response = await questionSave(mainForm, active.displayID) as qn[]
-                const dispID = response[0]['displayID']
-                if (active.displayID == '0') {
-                    removeFromContribute(active.displayID)
+                
+                // SAVE QUESTION
 
-                    response.forEach((q : qn) => {
-                        const d = q['displayID']
-                        QuestionStore.insertIntoContribute(d, q)
-                    })
-                    changeDisplayedQuestion(dispID)
+                const responsejson = await questionSave(mainForm, active.displayID)
+                if (responsejson.status == -1) {
+                    // Error occured
+                    const error = responsejson.error
+                    console.log(error)
+
+                } else if (responsejson.status == 1) {
+                    // Failure
+
+                } else {
+                    // Success
+                    const response = responsejson.body as qn[]
+                    const dispID = response[0]['displayID']
+                    if (active.displayID == '0') {
+                        removeFromContribute(active.displayID)
+
+                        response.forEach((q : qn) => {
+                            const d = q['displayID']
+                            QuestionStore.insertIntoContribute(d, q)
+                        })
+                        changeDisplayedQuestion(dispID)
+                    }
                 }
             }
             activeOptionID.value = 0
