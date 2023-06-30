@@ -4,7 +4,7 @@ This document serves to detail the features developed for the Latex Builder serv
 
 - [Introduction](#introduction)
 - [Introduction to Express](#introduction-to-express)
-	- [Request and Response Format](#request-and-response-format)
+	- [Response Format](#response-format)
 - [CORS](#cors)
 	- [Networking Procedure](#networking-procedure)
 - [Error Handling](#error-handling)
@@ -26,20 +26,9 @@ When a request is received, it will be passed through the chain of middlewares, 
 
 The `next()` callback passes control onto the next triggered middleware.
 
-## Request and Response Format
+## Response Format
 
-Requests are formatted using `post.ts`, which implements the functions `post()`, `postJSON()` and `postForm()` in the front-end. Front-end requests are made using the format
-```
-await fetch(url, {
-	method,
-	headers: {
-		content-type: 'text/html' OR 'text-plain'
-	},
-	body: JSON.stringify(jsonObject)
-	// body includes 'fn' entry, describing purpose of request
-})
-```
-Routers should pass the request bodies wholesale to database functions.
+The request format is documented in the front-end. Routers should pass the request bodies wholesale to database functions.
 
 Responses should be formatted according to the following specifications, defined under the `ResponseBody` and `ResponseError` classes respectively:
 ```
@@ -89,6 +78,7 @@ In `app.js`,
 1. Set an array of allowed origins.
 2. Check if the request is coming from an allowed origin. If it is, set the `Access-Control-Allow-Origin`, `-Headers` and `-Methods` headers in your response object.
 3. The response can only be sent if the request parameters adhere to the restrictions imposed by the three headers above.
+4. To allow session cookies to be received and set by the server, set the `Access-Control-Allow-Credentials` header as well.
 
 ## Networking Procedure
 
