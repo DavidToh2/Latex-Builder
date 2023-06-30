@@ -25,7 +25,7 @@ function newError(err, errorString) {
     } else if (err instanceof DatabaseError) {
         throw new DatabaseError(err.message, err.cause, err.status)
     } else {
-        throw new ServerError(errorString, err)
+        throw new ServerError(errorString, err.cause)
     }
 }
 

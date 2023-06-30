@@ -13,7 +13,7 @@ async function newUser(userdata) {
     // Called when user signs up.
     // Returns the user data if signup successful, otherwise throws error.
 
-    const errorString = 'db-auth/newUser: Failed to insert new user!'
+    const errorString = 'Failed to signup:'
 
     try {
         const new_username = userdata['username']
@@ -35,7 +35,7 @@ async function newUser(userdata) {
             username: new_username,
             salt: new_salt,
             hashedPassword: new_hashedpassword,
-            socialInfo: nU_social
+            socialData: nU_social
         }
 
         // User error: user already exists
@@ -62,7 +62,7 @@ async function findUserIDUsingUsername(username) {
     // Called when user signs up, to check for uniqueness.
     // Also called when userID is required.
 
-    const errorString = 'db-auth/findUserIDUsingUsername: Failed to find user ID!'
+    const errorString = 'db-auth/findUserIDUsingUsername: Failed to find user ID:'
 
     try {
         const u = {
@@ -88,7 +88,7 @@ async function findUserInfoUsingID(userID) {
 
     // Called to fetch user info using user ID.
 
-    const errorString = 'db-auth/findUserInfoUsingID: Failed to find user information!'
+    const errorString = 'db-auth/findUserInfoUsingID: Failed to find user information:'
 
     try {
         const u = {
@@ -118,15 +118,18 @@ async function authenticateUser(userdata) {
 
     // Called when user logs in.
 
-    const errorString = 'Failed to authenticate user!'
+    const errorString = 'Failed to authenticate user:'
 
     try {
         const password = userdata['password']
         if (!password) {
-            return 0
+            throw new UserError(errorString, 'Password empty!')
         }
 
         const userstring = userdata['username']
+        if (!userstring) {
+            throw new UserError(errorString, 'Username empty!')
+        }
         var u = {}
 
         if (userstring.match(/@/)) {
@@ -141,8 +144,8 @@ async function authenticateUser(userdata) {
 
         if (userArr.length > 1) {
             throw new DatabaseError(errorString, `authenticateUser() found multiple users for username ${username}!`)
-        } else if (!userArr) {
-            throw new DatabaseError(errorString, `User ${userstring} not found!`)
+        } else if (userArr.length == 0) {
+            throw new UserError(errorString, `Invalid credentials!`)
         }
 
         const user = userArr[0]
@@ -160,7 +163,7 @@ async function authenticateUser(userdata) {
         if (userValidated) {
             return user
         } else {
-            return 0
+            throw new UserError(errorString, 'Invalid credentials!')
         }
 
     } catch(err) {
@@ -169,13 +172,13 @@ async function authenticateUser(userdata) {
 }
 
 function hashPassword(pwd, salt) {
-    errorString = "Password hashing failed!"
+    const errorString = "Password hashing failed:"
     try {
         const hashedPasswordBlob = crypto.pbkdf2Sync(pwd, salt, 100000, 64, 'sha512')
         const hashedPassword = hashedPasswordBlob.toString('hex')
         return hashedPassword
     } catch(err) {
-        authError(errorString, err)
+        newError(err, errorString)
     }
 }
 

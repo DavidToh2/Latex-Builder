@@ -13,7 +13,7 @@ const Question = questionDB.model("questions", questionSchema);
 
 async function newQuestion(nQ) {
 
-    const errorString = "db/newQuestion: Failed to save!"
+    const errorString = "db/newQuestion: Failed to save question:"
 
     try {
         console.log("Setting new question...")
@@ -51,7 +51,7 @@ async function newQuestion(nQ) {
 
 async function getQuestions(dataDict) {
     
-    const errorString = 'db-function/getQuestions: Failed to find question!'
+    const errorString = 'db-function/getQuestions: Failed to find question:'
     try {
         console.log("Finding questions...")
         const qns = await Question.find(dataDict).lean()
@@ -89,7 +89,7 @@ async function deleteQuestion(i) {
 
 async function saveQuestion(i, dataDict) {
 
-    const errorString = `db-function/saveQuestion: Failed to save question with ID ${i}`
+    const errorString = `db-function/saveQuestion: Failed to save question with ID ${i}:`
 
     try {
         console.log(`Saving question with displayID ${i}`)
@@ -119,7 +119,7 @@ async function saveQuestion(i, dataDict) {
 
 async function newID() {
 
-    const errorString = `db-function/newID: Failed to assign new ID`
+    const errorString = `db-function/newID: Failed to assign new ID:`
     try {
         console.log("Querying database for new ID...")
 

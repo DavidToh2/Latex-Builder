@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { newUser, authenticateUser, findUserInfoUsingID } = require('./../db-auth')
 const { ResponseBody, ResponseError } = require('../express-classes/response')
-const { UserError } = require('../express-classes/error')
+const { UserError, DatabaseError, ServerError } = require('../express-classes/error')
 
 router.post('/signup', async function(req, res, next) {
 
@@ -33,22 +33,19 @@ router.post('/login', async function(req, res, next) {
     // All data will be stored in our sessionStore.
 
     try {
-        console.log('Login parameters:')
         const userData = req.body
-        console.log(userData)
 
         const nU = await authenticateUser(userData)
         const response = new ResponseBody(userData['fn'])
-        if (!nU) {
-            response.status = 1
-            response.body = {}
-        } else {
-            response.status = 0
-            req.session.regenerate((err) => {if(err) next(err)})
-            req.session.uID = nU['id']
-            response.body['username'] = nU['username']
-            response.body['socialInfo'] = nU['socialInfo']
+
+        response.status = 0
+        req.session.regenerate((err) => {if(err) next(err)})
+        req.session.uID = nU['id']
+        const u = {
+            username: nU['username'],
+            socialData: nU['socialData']
         }
+        response.body = u
 
         res.json(response)
     } catch(err) {
@@ -102,25 +99,35 @@ router.post('/get', isAuthenticated, async function(req, res, next) {
     }
 })
 
-        // Local error handler.
-        // Catches all errors from auth-router and db-auth
+// Application error handler.
+// Catches all errors from auth-router and db-auth
 
 router.use(function(err, req, res, next) {
+
+    console.log(err)
 
     if (err instanceof UserError) {
         const response = new ResponseBody()
         response.status = 1
         response.fn = `${req.body['fn']}-UserError`
-        response.body = err
-        console.log(response)
+        response.body = {
+            name: err.name,
+            message: err.message,
+            cause: err.cause,
+            status: err.status
+        }
 
         res.json(response)
     } else {
         const response = new ResponseError()
         response.status = -1
-        response.fn = `${req.body['fn']}-Error`
-        response.error = err
-        console.log(response)
+        response.fn = `${req.body['fn']}-ServerError`
+        response.error = {
+            name: err.name,
+            message: err.message,
+            cause: err.cause,
+            status: err.status
+        }
 
         res.status(502)
         res.json(response)

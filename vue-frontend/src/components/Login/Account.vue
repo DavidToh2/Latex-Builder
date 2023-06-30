@@ -16,6 +16,7 @@ async function logoutUser() {
     if (response.status == 0) {
         emits('logout')
         UserStore.clearUserData()
+        UserStore.setAuthStatus(false)
     }
 }
 
@@ -37,11 +38,18 @@ const emits = defineEmits<{
 <template>
     <div id="account-page-container">
 
-        <Title :title="'Welcome,' + userdata.username" />
+        <Title :title="'Welcome, ' + userdata.username+ '!'"/>
 
         <div id="account">
-            <div class="account-infobox">
-                Username: {{ userdata.username }}
+            <div id="account-infobox">
+                <div class="account-info-description">Username: </div>
+                <div class="account-info">{{ userdata.username }}</div>
+
+                <div class="account-info-description">Bio:</div>
+                <div class="account-info">{{ userdata.socialData.bio }}</div>
+
+                <div class="account-info-description">Email:</div>
+                <div class="account-info">{{ userdata.socialData.email }}</div>
             </div>
         </div>
 
@@ -56,8 +64,30 @@ const emits = defineEmits<{
 
 #account-page-container {
     width: 100%;
-    padding: 20px;
     font-size: var(--font-size);
+}
+
+#account {
+    border-top: 1px solid black;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#account-infobox {
+    width: 400px;
+    font-size: var(--font-size-lg2);
+
+    display: grid;
+    grid: auto / 200px 200px;
+    grid-column-gap: 20px;
+    grid-row-gap: 10px;
+}
+
+.account-info-description {
+    justify-self: end
 }
 
 #logout-button {

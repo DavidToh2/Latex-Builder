@@ -22,6 +22,7 @@ export async function authSignup(f : HTMLFormElement) {
 export async function authLogin(f : HTMLFormElement) {
     const response = await postForm(f, `http://${BASE_URL}/auth/login`, 'auth-login') as Response
     const responsejson = await response.json()
+    console.log(responsejson)
     return responsejson
 }
 export async function authLogout() {
@@ -38,9 +39,11 @@ export async function isAuth() {
     return authStatus
 }
 export async function authGetUserInfo() {
+    console.log("Getting user info...")
     var j = { fn: 'auth-get' }
     const response = await postJSON(j, `http://${BASE_URL}/auth/get`) as Response
     const responsejson = await response.json()
     const userInfo = responsejson.body as userData
+    console.log(userInfo)
     return userInfo
 }

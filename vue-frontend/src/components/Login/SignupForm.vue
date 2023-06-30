@@ -1,8 +1,10 @@
 <script setup lang="ts">
 
-import { authSignup } from '@/post/postAuth'
 import { ref, computed } from 'vue'
-import { useUserStore } from '@/stores/userStore'
+
+import { authSignup } from '@/post/postAuth'
+import type { ServerError } from '@/types/ErrorTypes'
+import { formatErrorMessage } from '@/types/ErrorTypes'
 
 async function signupUser() {
     const f = document.querySelector('form#signup-form') as HTMLFormElement
@@ -12,16 +14,21 @@ async function signupUser() {
         const responsejson = await authSignup(f)
         if (responsejson.status == -1) {
             // Error occured
-            const error = responsejson.error
-            console.log(error)
+
+            const error = responsejson.error as ServerError
+            const errorMsg = formatErrorMessage(error)
+            emits('signup-failure', errorMsg)
 
         } else if (responsejson.status == 1) {
             // Failure
 
+            const error = responsejson.body as ServerError
+            const errorMsg = error['message']
+            emits('signup-failure', errorMsg)
+
         } else {
             // Success
-            const data = responsejson.body
-            console.log(data)
+            emits('signup-success')
         }
     }
 }
@@ -32,11 +39,16 @@ const pwdInputType = computed<string>(() => {
     if (pwdDisplay.value) {return "text"} else {return "password"}
 })
 
+const emits = defineEmits<{
+    (e: 'signup-success'): void,
+    (e: 'signup-failure', error: string): void
+}>()
+
 
 </script>
 
 <template>
-    <form id="signup-form" method="post" @submit.prevent="signupUser">
+    <form id="signup-form" method="post" @submit.prevent="signupUser" autocomplete="off">
         <label for="signup-user-input">Username</label>
         <input id="signup-user-input" name="username" class="input-sm" pattern="[\w\-_]+">
 

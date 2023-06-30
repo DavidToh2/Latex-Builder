@@ -25,7 +25,7 @@
             Click to Open
         </div>
     </div>
-    <div class="hover-menu" v-show="isActive">
+    <div class="hover-window" v-show="isActive">
         <slot name="hover-content">
             <!-- Hover display content goes here -->
         </slot>
@@ -51,7 +51,7 @@
     width: 100%;
 }
 
-.hover-menu {
+.hover-window {
     position: fixed;
     top: 25%;
     left: 25%;

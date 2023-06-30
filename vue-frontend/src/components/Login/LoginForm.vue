@@ -1,8 +1,11 @@
 <script setup lang="ts">
 
+import { ref, computed } from 'vue'
+
 import { authLogin } from '@/post/postAuth'
 import type { userData } from '@/types/Types'
-import { ref, computed } from 'vue'
+import type { ServerError } from '@/types/ErrorTypes'
+import { formatErrorMessage } from '@/types/ErrorTypes'
 
 import { useUserStore } from '@/stores/userStore'
 const UserStore = useUserStore()
@@ -12,23 +15,32 @@ async function loginUser() {
     const responsejson = await authLogin(f)
     if (responsejson.status == -1) {
 	    // Error occured
-	    const error = responsejson.error
-        console.log(error)
+
+	    const error = responsejson.error as ServerError
+        const errorMsg = formatErrorMessage(error)
+        emits('login-failure', errorMsg)
+
     } else if (responsejson.status == 1) {
         // Failure
-        console.log("Login failed!")
+
+	    const error = responsejson.body as ServerError
+        const errorMsg = formatErrorMessage(error)
+        emits('login-failure', errorMsg)
+
     } else {
         // Success
+
         const data = responsejson.body as userData
         UserStore.setUserData(data)
         UserStore.setAuthStatus(true)
 
-        emits('login')
+        emits('login-success')
     }
 }
 
 const emits = defineEmits<{
-    (e: 'login'): void
+    (e: 'login-success'): void
+    (e: 'login-failure', error: string): void
 }>()
 
 const pwdDisplay = ref(false)
@@ -40,7 +52,7 @@ const pwdInputType = computed<string>(() => {
 </script>
 
 <template>
-    <form id="login-form" @submit.prevent="loginUser">
+    <form id="login-form" @submit.prevent="loginUser" autocomplete="off">
         <label for="login-user-input">Username or Email Address</label>
         <input id="login-user-input" name="username" class="input-sm">
         <label for="login-password-input">Password</label>

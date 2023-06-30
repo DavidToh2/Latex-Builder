@@ -42,9 +42,9 @@ const userSchema = new Schema( {
 
     // Social info
 
-    socialInfo: {
+    socialData: {
         type: userSocialDataSchema,
-        required: [true, 'Missing social info']
+        required: [true, 'Missing social data']
     }
 })
 

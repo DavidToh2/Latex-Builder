@@ -87,7 +87,7 @@ app.use(function (req, res, next) {
 // Network/Resource Error Handler
 app.use(function (err, req, res, next) {
 	// render the error page
-	console.log("Error caught by global handler")
+	console.log("Error caught by global handler:")
 	console.log(err.message)
 	console.log(err.cause)
 	res.status(err.status || 500);
