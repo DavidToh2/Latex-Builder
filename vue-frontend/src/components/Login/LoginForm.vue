@@ -1,6 +1,11 @@
 <script setup lang="ts">
 
 import { authLogin } from '@/post/postAuth'
+import type { userData } from '@/types/Types'
+import { ref, computed } from 'vue'
+
+import { useUserStore } from '@/stores/userStore'
+const UserStore = useUserStore()
 
 async function loginUser() {
     const f = document.querySelector('form#login-form') as HTMLFormElement
@@ -14,10 +19,23 @@ async function loginUser() {
         console.log("Login failed!")
     } else {
         // Success
-        const data = responsejson.body
-        console.log(data)
+        const data = responsejson.body as userData
+        UserStore.setUserData(data)
+        UserStore.setAuthStatus(true)
+
+        emits('login')
     }
 }
+
+const emits = defineEmits<{
+    (e: 'login'): void
+}>()
+
+const pwdDisplay = ref(false)
+
+const pwdInputType = computed<string>(() => {
+    if (pwdDisplay.value) {return "text"} else {return "password"}
+})
 
 </script>
 
@@ -26,7 +44,12 @@ async function loginUser() {
         <label for="login-user-input">Username or Email Address</label>
         <input id="login-user-input" name="username" class="input-sm">
         <label for="login-password-input">Password</label>
-        <input id="login-password-input" name="password" class="input-sm">
+        <input id="login-password-input" name="password" class="input-sm" :type="pwdInputType">
+
+        <div style="display: flex; flex-direction: row; gap: 10px;">
+            <label for="login-show-password" style="font-size: 12px">Show password:</label>
+            <input type="checkbox" v-model="pwdDisplay">
+        </div>
 
         <input id="login-submit" type="submit" class="btn" value="Sign in">
     </form>

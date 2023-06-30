@@ -44,15 +44,21 @@ const router = createRouter({
 	]
 })
 
-import { isAuth } from '@/post/postAuth'
+import { isAuth, authGetUserInfo } from '@/post/postAuth'
 import { useUserStore } from '@/stores/userStore'
 
 router.beforeEach(async (to, from) => {
 
 	const userStore = useUserStore()
 	if (await isAuth()) {
+		console.log("User authenticated")
 		userStore.setAuthStatus(true)
+		if (!userStore.getUserDataStatus()) {
+			const d = await authGetUserInfo()
+			userStore.setUserData(d)
+		}
 	} else {
+		console.log("User not authenticated")
 		userStore.setAuthStatus(false)
 	}
 	return true

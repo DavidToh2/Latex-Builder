@@ -46,7 +46,7 @@
 }
 
 .dropdown-description {
-    font-size: 18px;
+    font-size: var(--font-size-lg1);
 }
 
 .dropdown-search-container {

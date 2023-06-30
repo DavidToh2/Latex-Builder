@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
 
-const userSocialInfoSchema = new Schema( {
+const userSocialDataSchema = new Schema( {
 
     email: {
         type: String,
@@ -43,7 +43,7 @@ const userSchema = new Schema( {
     // Social info
 
     socialInfo: {
-        type: userSocialInfoSchema,
+        type: userSocialDataSchema,
         required: [true, 'Missing social info']
     }
 })

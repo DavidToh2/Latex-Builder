@@ -37,7 +37,7 @@ const sessionOptions = {
 	resave: true,
 	saveUninitialized: false,
 	cookie: {
-		secure: true,
+		secure: false,
 		httpOnly: true,
 		maxAge: 1000 * 60 * 60 * 24
 	},
@@ -62,6 +62,7 @@ app.use('/*', (req, res, next) => {
 		res.header("Access-Control-Allow-Origin", origin)
 		res.header("Access-Control-Allow-Headers", "Content-Type")
 		res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
+		res.header("Access-Control-Allow-Credentials", true)
 	}
 	if (req.method == "OPTIONS") {
 		return res.status(200).end()

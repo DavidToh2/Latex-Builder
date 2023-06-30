@@ -5,7 +5,6 @@ import SearchTable from '@/components/SearchTable/SearchTable.vue'
 import Tab from '@/components/Tab/Tab.vue';
 
 import { ref, reactive, onMounted } from 'vue'
-import pdf from 'vue-pdf-embed'
 
 import type { qn, qns } from '@/types/Types'
 import { useQuestionStore } from '@/stores/questionStore';

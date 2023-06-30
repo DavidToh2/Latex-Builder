@@ -174,15 +174,12 @@ async function changeOptionTab(s : string, n : number) {
 
                 } else {
                     // Success
-                    const response = responsejson.body as qn[]
-                    const dispID = response[0]['displayID']
+                    const savedQn = responsejson.body as qn
+                    const dispID = savedQn['displayID']
                     if (active.displayID == '0') {
                         removeFromContribute(active.displayID)
 
-                        response.forEach((q : qn) => {
-                            const d = q['displayID']
-                            QuestionStore.insertIntoContribute(d, q)
-                        })
+                        QuestionStore.insertIntoContribute(dispID, savedQn)
                         changeDisplayedQuestion(dispID)
                     }
                 }

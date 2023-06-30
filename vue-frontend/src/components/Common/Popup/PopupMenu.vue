@@ -21,7 +21,7 @@
         <div class="hover-description">
             {{ props.description }}
         </div>
-        <div class="hover-button" @click="switchActive(true)">
+        <div class="btn-light hover-button" @click="switchActive(true)">
             Click to Open
         </div>
     </div>
@@ -44,15 +44,11 @@
 }
 
 .hover-description {
-    font-size: 21px;
+    font-size: var(--font-size-lg2);
 }
 
 .hover-button {
-    background-color: #aaccbb;
     width: 100%;
-    padding: 5px;
-    text-align: center;
-    cursor: pointer;
 }
 
 .hover-menu {

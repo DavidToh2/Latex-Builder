@@ -14,7 +14,8 @@ export async function post(s : string, url : string) {
         headers: {
             'Content-Type': 'text/plain'
         },
-        body: s
+        body: s,
+        credentials: 'include'
     })
     .then((response) => {
         if (!response.ok) {
@@ -29,13 +30,13 @@ export async function post(s : string, url : string) {
 
 export async function postJSON(j : {[key : string] : string | number | Date | null}, url : string) {
 
-    console.log(j)
     const response = await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(j)
+        body: JSON.stringify(j),
+        credentials: 'include'
     })
     .then((response) => {
         if (!response.ok) {
@@ -80,8 +81,6 @@ export async function postForm(f : HTMLFormElement, url : string, descriptor : s
     
         reqBody['solution'] = ''        // Temporary patch
     }
-
-    console.log("Sending...")
     
     const response = await postJSON(reqBody, url)
     return response

@@ -16,7 +16,7 @@ const props = defineProps<{
 .title {
     width: 100%;
     height: 70px;
-    font-size: var(--font-size-lg3);
+    font-size: var(--font-size-title1);
     padding-left: 35px;
     flex-shrink: 0;
 }

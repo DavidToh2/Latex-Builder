@@ -18,6 +18,40 @@
 	border-radius: 6px;
 }
 
+.textbox {
+	display: flex;
+	align-items: center;
+}
+
+.btn {
+	border: 1px solid var(--colour-border-dark);
+	background-color: var(--colour-theme);
+	padding: 5px 12px;
+	border-radius: 6px;
+	font-size: var(--font-size);
+	color: white;
+	cursor: pointer;
+	text-align: center;
+}
+
+.btn-textlink {
+	display: inline;
+	background-color: var(--colour-background);
+	color: var(--colour-text-link);
+	text-decoration: underline;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn-light {
+	background-color: var(--colour-lighttheme-light);
+    padding: 5px 12px;
+	border-radius: 6px;
+	font-size: var(--font-size);
+    text-align: center;
+    cursor: pointer;
+}
+
 @media (min-width: 1024px) {
 
 	#app {
@@ -28,20 +62,6 @@
 		"a a" 64px
 		"b c" / 50% 50%;
 		grid-row-gap: 0;
-	}
-
-	.textbox {
-		display: flex;
-		align-items: center;
-	}
-
-	.btn {
-		border: 1px solid var(--colour-border-dark);
-		background-color: var(--colour-theme);
-		padding: 5px 12px;
-		border-radius: 6px;
-		font-size: 14px;
-		color: white;
 	}
 
 	.tooltip::after {

@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import Input from './Input.vue';
-import HoverMenu from './HoverMenu.vue';
+import PopupMenu from '../Common/Popup/PopupMenu.vue';
 </script>
 
 <template>
     <div class="worksheet-filters-row">
         <div class="worksheet-filters">
-            <HoverMenu description="Custom Packages">
+            <PopupMenu description="Custom Packages">
                 <template v-slot:hover-content>
                     <div>
                         This is a test
                     </div>
                 </template>
-            </HoverMenu>
+            </PopupMenu>
         </div>
         <div class="worksheet-filters">
             <Input description="Title" internalName="title" />
@@ -20,13 +20,13 @@ import HoverMenu from './HoverMenu.vue';
             <Input description="Date" internalName="date" />
         </div>
         <div class="worksheet-filters">
-            <HoverMenu description="Document Layout">
+            <PopupMenu description="Document Layout">
                 <template v-slot:hover-content>
                     <div>
                         This is another test
                     </div>
                 </template>
-            </HoverMenu>
+            </PopupMenu>
         </div>
     </div>
 </template>

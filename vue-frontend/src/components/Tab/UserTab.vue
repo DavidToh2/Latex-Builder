@@ -78,7 +78,7 @@
     gap: 7px;
 }
 .tab-question-text {
-    font-size: 22px;
+    font-size: var(--font-size-lg2);
 }
 .tab-question-text:hover {
     text-decoration: underline;
@@ -86,7 +86,7 @@
 }
 
 .tab-question-x {
-    font-size: 22px;
+    font-size: var(--font-size-lg2);
     font-weight: 800;
 }
 .tab-question-x:hover {

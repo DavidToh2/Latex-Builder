@@ -156,6 +156,7 @@
 }
 
 .dropdown-searchbar {
+    display: block;
     width: 100%;
     font-size: calc(v-bind(numberToPixels(fontSize - 2)));
 }

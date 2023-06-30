@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
 import { authSignup } from '@/post/postAuth'
+import { ref, computed } from 'vue'
+import { useUserStore } from '@/stores/userStore'
 
 async function signupUser() {
     const f = document.querySelector('form#signup-form') as HTMLFormElement
@@ -24,6 +26,13 @@ async function signupUser() {
     }
 }
 
+const pwdDisplay = ref(false)
+
+const pwdInputType = computed<string>(() => {
+    if (pwdDisplay.value) {return "text"} else {return "password"}
+})
+
+
 </script>
 
 <template>
@@ -34,11 +43,16 @@ async function signupUser() {
         <label for="signup-user-input">Email</label>
         <input id="signup-user-input" name="email" class="input-sm" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
 
-        <label for="signup-password-input" id="signup-password-input-prompt" class="tooltip">Password</label>
-        <input id="signup-password-input" name="password" class="input-sm" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+        <label for="signup-password-input" id="signup-password-input-prompt" class="tooltip" style="border-bottom: 2px dotted black">Password</label>
+        <input :type="pwdInputType" id="signup-password-input" name="password" class="input-sm" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
         
         <label for="signup-password-input">Retype password</label>
-        <input id="signup-password-input-2" name="password-2" class="input-sm" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+        <input :type="pwdInputType" id="signup-password-input-2" name="password-2" class="input-sm" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+
+        <div style="display: flex; flex-direction: row; gap: 10px;">
+            <label for="signup-show-password" style="font-size: 12px">Show password:</label>
+            <input type="checkbox" v-model="pwdDisplay">
+        </div>
 
         <input id="signup-submit" type="submit" class="btn" value="Sign up">
     </form>
@@ -56,6 +70,10 @@ async function signupUser() {
     gap: 15px;
     padding: 20px;
     width: 100%;
+}
+
+#signup-form > label {
+    width: fit-content;
 }
 
 #signup-password-input-prompt::after {

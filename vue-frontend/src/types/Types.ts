@@ -75,14 +75,14 @@ function syncQnWithFilters(q : qn, filters : qnFilters) {
 }
 
 
-interface userSocialData {
+export interface userSocialData {
     email: string,
     groups: string[],
     bio: string,
     joinDate: string
 }
 
-export interface userData{
+export interface userData {
     username: string
     socialData: userSocialData
 }
