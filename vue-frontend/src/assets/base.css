@@ -3,104 +3,112 @@
 @import url("https://fonts.googleapis.com/css?family=Gothic A1");
 
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
+	--vt-c-white: #ffffff;
+	--vt-c-white-soft: #f8f8f8;
+	--vt-c-white-mute: #f2f2f2;
 
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
+	--vt-c-lightgrey: #dddddd;
 
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+	--vt-c-black: #181818;
+	--vt-c-black-soft: #222222;
+	--vt-c-black-mute: #282828;
 
-  --vt-c-text-light-1: var(--vt-c-black);
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+ 	--vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+	--vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+	--vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+	--vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
 
-  --vt-c-text-blue: #0000ad;
+	--vt-c-text-light-1: var(--vt-c-black);
+	--vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+	--vt-c-text-dark-1: var(--vt-c-white);
+	--vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 
-  --vt-c-green-theme: #004607;
-  --vt-c-green-theme-ultradark: #002504;
-  --vt-c-green-theme-light: #00760c;
+	--vt-c-text-blue: #0000ad;
+	--vt-c-text-red: #800000;
 
-  --vt-c-green-lighttheme: #aaccbb;
-  --vt-c-green-lighttheme-dark: #8cb09e;
-  --vt-c-green-lighttheme-light: #b4d4c4;
+	--vt-c-green-theme: #004607;
+	--vt-c-green-theme-ultradark: #002504;
+	--vt-c-green-theme-light: #00760c;
+
+	--vt-c-green-lighttheme: #aaccbb;
+	--vt-c-green-lighttheme-dark: #8cb09e;
+	--vt-c-green-lighttheme-light: #b4d4c4;
 }
 
 :root {
-  --colour-background: var(--vt-c-white);
-  --colour-background-soft: var(--vt-c-white-soft);
-  --colour-background-mute: var(--vt-c-white-mute);
+	--colour-background: var(--vt-c-white);
+	--colour-background-soft: var(--vt-c-white-soft);
+	--colour-background-mute: var(--vt-c-white-mute);
 
-  --colour-theme: var(--vt-c-green-theme);
-  --colour-theme-hover: var(--vt-c-green-theme-ultradark);
-  --colour-theme-light: var(--vt-c-green-theme-light);
+	--colour-theme: var(--vt-c-green-theme);
+	--colour-theme-hover: var(--vt-c-green-theme-ultradark);
+	--colour-theme-light: var(--vt-c-green-theme-light);
 
-  --colour-lighttheme: var(--vt-c-green-lighttheme);
-  --colour-lighttheme-hover: var(--vt-c-green-lighttheme-dark);
-  --colour-lighttheme-light: var(--vt-c-green-lighttheme-light);
+	--colour-lighttheme: var(--vt-c-green-lighttheme);
+	--colour-lighttheme-hover: var(--vt-c-green-lighttheme-dark);
+	--colour-lighttheme-light: var(--vt-c-green-lighttheme-light);
 
-  --colour-border: var(--vt-c-divider-light-2);
-  --colour-border-hover: var(--vt-c-divider-light-1);
-  --colour-border-dark: var(--vt-c-divider-dark-1);
+	--colour-border: var(--vt-c-divider-light-2);
+	--colour-border-hover: var(--vt-c-divider-light-1);
+	--colour-border-dark: var(--vt-c-divider-dark-1);
 
-  --colour-heading: var(--vt-c-text-light-1);
-  --colour-text: var(--vt-c-text-light-1);
-  --colour-text-link: var(--vt-c-text-blue);
+	--colour-heading: var(--vt-c-text-light-1);
+	--colour-text: var(--vt-c-text-light-1);
+	--colour-text-link: var(--vt-c-text-blue);
+	--colour-text-error: var(--vt-c-text-red);
+
+	--colour-icon-dark: var(--vt-c-black);
+	--colour-icon-light: var(--vt-c-white);
 }
 
 @media (prefers-colour-scheme: dark) {
-  :root {
-    --colour-background: var(--vt-c-black);
-    --colour-background-soft: var(--vt-c-black-soft);
-    --colour-background-mute: var(--vt-c-black-mute);
+	:root {
+	--colour-background: var(--vt-c-black);
+	--colour-background-soft: var(--vt-c-black-soft);
+	--colour-background-mute: var(--vt-c-black-mute);
 
-    --colour-border: var(--vt-c-divider-dark-2);
-    --colour-border-hover: var(--vt-c-divider-dark-1);
-    --colour-border-dark: var(--vt-c-divider-light-1);
+	--colour-border: var(--vt-c-divider-dark-2);
+	--colour-border-hover: var(--vt-c-divider-dark-1);
+	--colour-border-dark: var(--vt-c-divider-light-1);
 
-    --colour-heading: var(--vt-c-text-dark-1);
-    --colour-text: var(--vt-c-text-dark-2);
-    --colour-text-link: var(--vt-c-text-blue);
-  }
+	--colour-heading: var(--vt-c-text-dark-1);
+	--colour-text: var(--vt-c-text-dark-2);
+	--colour-text-link: var(--vt-c-text-blue);
+	--colour-text-error: var(--vt-c-text-red);
+	}
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  position: relative;
-  font-weight: normal;
+	box-sizing: border-box;
+	margin: 0;
+	position: relative;
+	font-weight: normal;
 }
 
 :root {
-  --font-size-sm2: 12px;
-  --font-size-sm1: 14px;
-  --font-size: 16px;
-  --font-size-lg1: 18px;
-  --font-size-lg2: 21px;
-  --font-size-lg3: 25px;
-  --font-size-title1: 32px;
+	--font-size-sm2: 12px;
+	--font-size-sm1: 14px;
+	--font-size: 16px;
+	--font-size-lg1: 18px;
+	--font-size-lg2: 21px;
+	--font-size-lg3: 25px;
+	--font-size-title1: 32px;
 }
 
 
 body {
-  min-height: 100vh;
-  color: var(--colour-text);
-  background: var(--colour-background);
-  transition: color 0.5s, background-color 0.5s;
-  /* line-height: 1.6; */
-  font-family: 'Gothic A1', sans-serif;
-  --default-font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  font-size: var(--font-size);
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	min-height: 100vh;
+	color: var(--colour-text);
+	background: var(--colour-background);
+	transition: color 0.5s, background-color 0.5s;
+	/* line-height: 1.6; */
+	font-family: 'Gothic A1', sans-serif;
+	--default-font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+	Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+	font-size: var(--font-size);
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }

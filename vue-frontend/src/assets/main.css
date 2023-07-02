@@ -52,6 +52,33 @@
     cursor: pointer;
 }
 
+.icon-sm {
+	fill: var(--colour-icon-dark);
+	width: 24px;
+	height: 24px;
+	cursor: pointer;
+}
+
+.icon {
+	fill: var(--colour-icon-dark);
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+}
+
+.icon-lg {
+	fill: var(--colour-icon-dark);
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+}
+.icon-lg-l {
+	fill: var(--colour-icon-light);
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+}
+
 @media (min-width: 1024px) {
 
 	#app {
@@ -62,6 +89,16 @@
 		"a a" 64px
 		"b c" / 50% 50%;
 		grid-row-gap: 0;
+	}
+
+	.viewport {
+		width: 100%;
+		position: absolute;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		overflow-x: hidden;
+		overflow-y: scroll;
 	}
 
 	.tooltip::after {
