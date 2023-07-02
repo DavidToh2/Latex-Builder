@@ -19,7 +19,7 @@
 
         </slot>
         <div class="popup-close">
-            <img src="@/assets/logo.svg" class="popup-close-button" @click="$emit('close')">
+            <img src="@/assets/svg/cross.svg" class="popup-close-button icon-sm" @click="$emit('close')">
         </div>
     </div>
 </template>
@@ -30,12 +30,12 @@
     top: 150px;
     left: 40%;
     width: 20%;
-    height: 250px;
+    height: fit-content;
     background-color: var(--colour-background);
     z-index: 10;
     border: 3px solid var(--colour-border);
-    border-radius: 30px;
-    padding: 30px 30px;
+    border-radius: 12px;
+    padding: 24px;
 
     display: none;
 }

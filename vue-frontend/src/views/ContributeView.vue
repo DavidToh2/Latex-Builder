@@ -224,47 +224,48 @@ function dump() {
 </script>
 
 <template>
+    <div class="viewport">
+        <Title title="Contribute" />
 
-    <Title title="Contribute" />
-
-    <UserTab :tab-list="IDlist" :active-tab="active.displayID" 
-        @change-active-question="changeDisplayedQuestion" @remove-from-tab="removeFromContribute"
-    />
-
-    <form id="contribute-container" autocomplete="false">
-
-        <QuestionFilters func="contribute" :ss="activeFilters" @update="updateQuestionFilters"/>
-
-        <Tab :tab-left="contributeOptionsLeftTab" :tab-right="contributeOptionsRightTab" 
-            internal-name="questionOptions" :font-size=21 :active-i-d="activeOptionID"
-            @change-tab="changeOptionTab"
+        <UserTab :tab-list="IDlist" :active-tab="active.displayID" 
+            @change-active-question="changeDisplayedQuestion" @remove-from-tab="removeFromContribute"
         />
-        
-        <div id="question-container" :class="{ 'inactive-container': !activeOptions[0] }">
-            <div class="latex">
-                <textarea class="latex-text" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
-            </div>
-            <div class="latex-view" id="question-latex-view" @click="dump">
-            </div>
-        </div>
 
-        <div id="solution-container" :class="{ 'inactive-container': !activeOptions[1] }">
-            <div class="latex">
-                <textarea class="latex-text" name="solution" placeholder="Type solution here:" v-model="active.solution"></textarea>
+        <form id="contribute-container" autocomplete="false">
+
+            <QuestionFilters func="contribute" :ss="activeFilters" @update="updateQuestionFilters"/>
+
+            <Tab :tab-left="contributeOptionsLeftTab" :tab-right="contributeOptionsRightTab" 
+                internal-name="questionOptions" :font-size=21 :active-i-d="activeOptionID"
+                @change-tab="changeOptionTab"
+            />
+            
+            <div id="question-container" :class="{ 'inactive-container': !activeOptions[0] }">
+                <div class="latex">
+                    <textarea class="latex-text" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
+                </div>
+                <div class="latex-view" id="question-latex-view" @click="dump">
+                </div>
             </div>
-            <div class="latex-view" id="solution-latex-view" @click="dump">
+
+            <div id="solution-container" :class="{ 'inactive-container': !activeOptions[1] }">
+                <div class="latex">
+                    <textarea class="latex-text" name="solution" placeholder="Type solution here:" v-model="active.solution"></textarea>
+                </div>
+                <div class="latex-view" id="solution-latex-view" @click="dump">
+                </div>
             </div>
-        </div>
 
-        <div id="image-container" :class="{ 'inactive-container': !activeOptions[2] }">
-            Image container to be implemented!
-        </div>
+            <div id="image-container" :class="{ 'inactive-container': !activeOptions[2] }">
+                Image container to be implemented!
+            </div>
 
-        <div id="package-container" :class="{ 'inactive-container': !activeOptions[3] }">
-            Package container to be implemented!
-        </div>
+            <div id="package-container" :class="{ 'inactive-container': !activeOptions[3] }">
+                Package container to be implemented!
+            </div>
 
-    </form>
+        </form>
+    </div>
 </template>
 
 <style scoped>

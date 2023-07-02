@@ -30,7 +30,7 @@
             <!-- Hover display content goes here -->
         </slot>
         <div class="hover-close">
-            <img src="@/assets/rightarrow.png" class="hover-close-button" @click="switchActive(false)">
+            <img src="@/assets/svg/angle-right.svg" class="hover-close-button icon" @click="switchActive(false)">
         </div>
     </div>
 </template>

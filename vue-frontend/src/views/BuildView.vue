@@ -112,19 +112,21 @@ onMounted(() => {
 </script>
 
 <template>
-	<Title title="Worksheet Builder" />
-	<Tab 
-		:tab-left="buildOptionsLeftTab" :tab-right="buildOptionsRightTab" 
-		:font-size=22 internalName="buildOptions" :active-i-d="activeOptionID" @change-tab="changeOptionTab"
-	/>
-	<WorksheetFilters />
+	<div class="viewport">
+		<Title title="Worksheet Builder" />
+		<Tab 
+			:tab-left="buildOptionsLeftTab" :tab-right="buildOptionsRightTab" 
+			:font-size=22 internalName="buildOptions" :active-i-d="activeOptionID" @change-tab="changeOptionTab"
+		/>
+		<WorksheetFilters />
 
-	<div id="build-container" :class="{ 'inactive-container': !activeOptions[0] }">
-		<SearchTable internal-name="build-table" :qns="buildQns.qns" @delete="removeFromBuild" @up="questionUp" @down="questionDown"/>
-	</div>
+		<div id="build-container" :class="{ 'inactive-container': !activeOptions[0] }">
+			<SearchTable internal-name="build-table" :qns="buildQns.qns" @delete="removeFromBuild" @up="questionUp" @down="questionDown"/>
+		</div>
 
-	<div id="preview-container" :class="{ 'inactive-container': !activeOptions[1] }">
-		<div class="preview" id="preview">
+		<div id="preview-container" :class="{ 'inactive-container': !activeOptions[1] }">
+			<div class="preview" id="preview">
+			</div>
 		</div>
 	</div>
 </template>

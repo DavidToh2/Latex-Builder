@@ -47,10 +47,10 @@
         (e: 'update', values: string[], intName: string): void
     }>()
 
-    // When a user clicks on the input box, clear the searchText and let them type and search.
+    // When a user clicks on the input box, clear the searchText and const them type and search.
 
-    let initialiseSearch = (e : Event) => {
-        let t = e.target as HTMLInputElement
+    const initialiseSearch = (e : Event) => {
+        const t = e.target as HTMLInputElement
         search.searchText = ""
         t.value = ""
         searchAvailableSelections(e)
@@ -58,10 +58,10 @@
 
         // Whenever the input text is updated, get the list of matching available selections.
 
-    let searchAvailableSelections = (e : Event) => {
+    const searchAvailableSelections = (e : Event) => {
 
-        let t1 = e.target as HTMLInputElement
-        let t = t1.nextElementSibling as HTMLSelectElement
+        const t1 = e.target as HTMLInputElement
+        const t = t1.nextElementSibling as HTMLSelectElement
         search.searchText = t1.value        // The javascript searchText variable and HTML t1.value have to be manually synced up.
 
         // Search and display:
@@ -70,13 +70,13 @@
 
             child.classList.remove('dropdown-option-inactive')
 
-            let s : string = search.searchText
-            let s1 : string = child.innerHTML
-            let i : number = s.length
-            let j : number = s1.length
-            let r : boolean = false
+            const s : string = search.searchText
+            const s1 : string = child.innerHTML
+            const i : number = s.length
+            const j : number = s1.length
+            var r : boolean = false
 
-            for (let x=0; x<j-i; x++) {
+            for (var x=0; x<j-i; x++) {
                 if (s.substring(x, x+i).toLowerCase() == s1.substring(x, x+i).toLowerCase()) {
                     r = true
                 }
@@ -90,8 +90,8 @@
 
     // When a user clicks away from the input box, display their selected options.
 
-    let displayActiveSelections = () => {
-        let str = ''
+    const displayActiveSelections = () => {
+        var str = ''
         if (search.activeSelections.length > 0) {
             for (var item of search.activeSelections) {
                 str += item += ", "
@@ -103,7 +103,7 @@
 
     // Whenever the list of active selections is updated, send this information back to the parent using an emit.
 
-    let setActiveSelections = () => {
+    const setActiveSelections = () => {
         displayActiveSelections()
         emits('update', search.activeSelections, props.internalName)
     }

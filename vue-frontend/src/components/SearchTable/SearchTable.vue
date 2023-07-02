@@ -86,9 +86,13 @@
 }
 .search-table :deep(.search-options) {
     flex-basis: var(--search-options-width);
+}
+
+.search-table :deep(.option-icons) {
     display: flex;
     flex-direction: row;
     gap: 3px;
+    align-items: center;
 }
 
 </style>

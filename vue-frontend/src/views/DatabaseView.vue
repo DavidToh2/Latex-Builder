@@ -83,18 +83,22 @@ async function submitDeleteEvent(displayID : string) {
 </script>
 
 <template>
-    <Title title="Database" />
-    <form id="question-search-container" autocomplete="false" @submit.prevent="submitSearchEvent">
-        <QuestionFilters func="database" />
-        <div id="question-search-bar">
-            <textarea rows="1" id="question-search" name="question" placeholder="Search question text"></textarea>
-            <button type="submit" id="question-search-button">
-                <img src="@/assets/search.png" style="width: 25px; height: 25px;">
-            </button>
-        </div>
-    </form>
-    <div id="no-of-results">Number of results: {{ results.qns.length }}</div>
-    <SearchTable internal-name="database-table" :qns="results.qns" @delete="submitDeleteEvent" @insert="insertIntoOtherView" />
+    <div class="viewport">
+        <Title title="Database" />
+        <form id="question-search-container" autocomplete="false" @submit.prevent="submitSearchEvent">
+            <QuestionFilters func="database" />
+            <div id="question-search-bar">
+                <textarea rows="1" id="question-search" name="question" placeholder="Search question text"></textarea>
+                <button type="submit" id="question-search-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon-sm">
+                    <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
+                    </svg>
+                </button>
+            </div>
+        </form>
+        <div id="no-of-results">Number of results: {{ results.qns.length }}</div>
+        <SearchTable internal-name="database-table" :qns="results.qns" @delete="submitDeleteEvent" @insert="insertIntoOtherView" />
+    </div>
 </template>
 
 <style scoped>

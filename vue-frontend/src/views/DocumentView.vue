@@ -13,18 +13,17 @@ var openDocuments = reactive<string[]>(['Hi'])
 </script>
 
 <template>
-    <Title title="PDF Viewer" />
-
-    <div id="drive">
+    <div class="viewport">
+        <Title title="PDF Viewer" />
+        <div id="drive">
         
-    </div>
-
-    <UserTab :active-tab="activeDocument" :tab-list="openDocuments" />
-
-    <div id="document-viewer">
-        <pdf 
-            :source="activeDocument"
-        />
+        </div>
+        <UserTab :active-tab="activeDocument" :tab-list="openDocuments" />
+        <div id="document-viewer">
+            <pdf
+                :source="activeDocument"
+            />
+        </div>
     </div>
 
 </template>

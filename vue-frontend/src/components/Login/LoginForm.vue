@@ -10,6 +10,9 @@ import { formatErrorMessage } from '@/types/ErrorTypes'
 import { useUserStore } from '@/stores/userStore'
 const UserStore = useUserStore()
 
+const loginFail = ref(false)
+const loginFailMessage = ref('')
+
 async function loginUser() {
     const f = document.querySelector('form#login-form') as HTMLFormElement
     const responsejson = await authLogin(f)
@@ -18,17 +21,18 @@ async function loginUser() {
 
 	    const error = responsejson.error as ServerError
         const errorMsg = formatErrorMessage(error)
-        emits('login-failure', errorMsg)
+        emits('login-error', errorMsg)
 
     } else if (responsejson.status == 1) {
         // Failure
 
 	    const error = responsejson.body as ServerError
-        const errorMsg = formatErrorMessage(error)
-        emits('login-failure', errorMsg)
+        const errorMsg = error.cause
+        loginFailure(errorMsg)
 
     } else {
         // Success
+        loginFail.value = false
 
         const data = responsejson.body as userData
         UserStore.setUserData(data)
@@ -38,9 +42,14 @@ async function loginUser() {
     }
 }
 
+function loginFailure(msg : string) {
+    loginFail.value = true
+    loginFailMessage.value = msg
+}
+
 const emits = defineEmits<{
     (e: 'login-success'): void
-    (e: 'login-failure', error: string): void
+    (e: 'login-error', error: string): void
 }>()
 
 const pwdDisplay = ref(false)
@@ -53,6 +62,9 @@ const pwdInputType = computed<string>(() => {
 
 <template>
     <form id="login-form" @submit.prevent="loginUser" autocomplete="off">
+
+        <div id="login-error" v-if="loginFail">{{ loginFailMessage }}</div>
+
         <label for="login-user-input">Username or Email Address</label>
         <input id="login-user-input" name="username" class="input-sm">
         <label for="login-password-input">Password</label>
@@ -69,6 +81,10 @@ const pwdInputType = computed<string>(() => {
 </template>
 
 <style scoped>
+
+#login-error {
+    color: var(--colour-text-error);
+}
 
 #login-form {
     border: 1px solid var(--colour-border);

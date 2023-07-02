@@ -60,11 +60,14 @@
             </div>
         </div>
         <div class="search-options search-cell">
-            <img class="edit-button" src="@/assets/rightarrow.png" v-if="isDatabase" @click="insertQuestion(q.displayID)">
-            <img class="delete-button" src="@/assets/trash.png" @click="deleteQuestion(q.displayID)">
-            <div class="up-down-buttons" v-if="isBuild">
-                <img class="up-button" src="@/assets/uparrow.png" @click="questionUp(q.displayID)">
-                <img class="down-button" src="@/assets/downarrow.png" @click="questionDown(q.displayID)">
+            <div class="option-icons">
+                <img class="icon-sm" src="@/assets/svg/angle-left.svg">
+                <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteQuestion(q.displayID)">
+                <img class="icon-sm" src="@/assets/svg/angle-right.svg" v-if="isDatabase" @click="insertQuestion(q.displayID)">
+                <div class="up-down-buttons" v-if="isBuild">
+                    <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="questionUp(q.displayID)">
+                    <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="questionDown(q.displayID)">
+                </div>
             </div>
         </div>
     </div>
@@ -78,32 +81,9 @@
     flex-direction: row;
 }
 
-.edit-button {
-    width: 25px;
-    height: 25px;
-    cursor: pointer
-}
-
-.delete-button {
-    width: 25px;
-    height: 25px;
-    cursor: pointer
-}
-
 .up-down-buttons {
     display: flex;
     flex-direction: column;
-}
-
-.up-button {
-    width: 25px;
-    height: 15px;
-    cursor: pointer
-}
-.down-button {
-    width: 25px;
-    height: 15px;
-    cursor: pointer
 }
 
 </style>

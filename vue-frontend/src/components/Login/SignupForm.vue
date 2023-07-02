@@ -6,6 +6,9 @@ import { authSignup } from '@/post/postAuth'
 import type { ServerError } from '@/types/ErrorTypes'
 import { formatErrorMessage } from '@/types/ErrorTypes'
 
+const signupFail = ref(false)
+const signupFailMessage = ref('')
+
 async function signupUser() {
     const f = document.querySelector('form#signup-form') as HTMLFormElement
     const p1 = f.querySelector('input[name="password"]') as HTMLInputElement
@@ -17,31 +20,36 @@ async function signupUser() {
 
             const error = responsejson.error as ServerError
             const errorMsg = formatErrorMessage(error)
-            emits('signup-failure', errorMsg)
+            emits('signup-error', errorMsg)
 
         } else if (responsejson.status == 1) {
             // Failure
 
             const error = responsejson.body as ServerError
-            const errorMsg = error['message']
-            emits('signup-failure', errorMsg)
+            const errorMsg = error.cause
+            signupFailure(errorMsg)
 
         } else {
             // Success
+            signupFail.value = false
             emits('signup-success')
         }
     }
 }
 
-const pwdDisplay = ref(false)
+function signupFailure(msg : string) {
+    signupFail.value = true
+    signupFailMessage.value = msg
+}
 
+const pwdDisplay = ref(false)
 const pwdInputType = computed<string>(() => {
     if (pwdDisplay.value) {return "text"} else {return "password"}
 })
 
 const emits = defineEmits<{
     (e: 'signup-success'): void,
-    (e: 'signup-failure', error: string): void
+    (e: 'signup-error', error: string): void
 }>()
 
 
@@ -49,6 +57,9 @@ const emits = defineEmits<{
 
 <template>
     <form id="signup-form" method="post" @submit.prevent="signupUser" autocomplete="off">
+
+        <div id="signup-error" v-if="signupFail">{{ signupFailMessage }}</div>
+
         <label for="signup-user-input">Username</label>
         <input id="signup-user-input" name="username" class="input-sm" pattern="[\w\-_]+">
 
@@ -72,6 +83,10 @@ const emits = defineEmits<{
 </template>
 
 <style scoped>
+
+#signup-error {
+    color: var(--colour-text-error);
+}
 
 #signup-form {
     border: 1px solid var(--colour-border);
