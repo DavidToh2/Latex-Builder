@@ -38,12 +38,9 @@ watch(activeFilters, (newF, oldF) => {
 
 onActivated(() => {
     const ad = QuestionStore.getContributeActiveQnID()
-    console.log("Active qn ID:")
-    console.log(ad)
     const newQuestion = QuestionStore.getQnUsingID('contribute', ad.value) as qn
-    console.log("Retrieved former active qn:")
-    console.log(newQuestion)
     Object.assign(active, newQuestion)
+    updateContributeTab()
 })
 // QuestionStore.resetContribute()
 
@@ -61,55 +58,19 @@ function removeFromContribute(qnID : string) {
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ((name == 'insertFromDatabaseToContribute') || (name == 'insertIntoContribute')) {
+        if ((name == 'insertFromDatabaseToContribute') || (name == 'insertIntoContribute') || (name == 'deleteFromContribute')) {
             after((result) => {
                 if (result) {
-                    const newContributeIDList = QuestionStore.getContributeIDList() as string[]
-                    updateContributeTab(newContributeIDList, [...IDlist.value])
-                }
-            })
-        }
-        if (name == 'deleteFromContribute') {
-            after((result) => {
-                if (result) {
-                    const newContributeIDList = QuestionStore.getContributeIDList() as string[]
-                    updateContributeTab(newContributeIDList, [...IDlist.value])
+                    updateContributeTab()
                 }
             })
         }
     }
 )
 
-function updateContributeTab(updatedContribute : string[], prevContribute : string[]) {
-
-    // Three possible actions could have happened:
-    const ul = updatedContribute.length, pl = prevContribute.length
-
-    // New question added to contribute. Get new question ID, then add to tab
-    if (ul - pl == 1) {
-        var i = 0
-        while (i < pl && updatedContribute[i] == prevContribute[i]) {
-            i++
-        }
-        // The new question ID is at index i of updatedContribute.
-        const newQnID = updatedContribute[i]
-        IDlist.value.splice(i, 0, newQnID)
-    }
-
-    // Question removed from contribute. Remove from tab
-    if (pl - ul == 1) {
-        var i = 0
-        while (i < pl && updatedContribute[i] == prevContribute[i]) {
-            i++
-        }
-        // The deleted question ID is at index i of prevContribute.
-        IDlist.value.splice(i, 1)
-    }
-
-    // Contribute store cleared
-    if (ul == 0) {
-        IDlist.value = ['0']
-    }
+function updateContributeTab() {
+    const newContributeIDList = QuestionStore.getContributeIDList() as string[]
+    IDlist.value = newContributeIDList
 }
 
 function updateQuestionFilters(ss : qnFilters) {
@@ -229,12 +190,10 @@ async function changeOptionTab(s : string, n : number) {
 }
 
 function dump() {
-    
-    console.log([...QuestionStore.getContributeIDList()])
-    console.log({...QuestionStore.getContribute()})
-    console.log({...QuestionStore.getDatabase()})
+
+    console.log(QuestionStore.getContributeIDList())
     console.log(active)
-    console.log(activeFilters)
+    console.log(active.displayID)
     console.log(newQn)
 }
 

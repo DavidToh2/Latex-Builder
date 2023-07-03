@@ -56,6 +56,7 @@
 	--colour-text: var(--vt-c-text-light-1);
 	--colour-text-link: var(--vt-c-text-blue);
 	--colour-text-error: var(--vt-c-text-red);
+	--colour-text-light: var(--vt-c-text-dark-1);
 
 	--colour-icon-dark: var(--vt-c-black);
 	--colour-icon-light: var(--vt-c-white);

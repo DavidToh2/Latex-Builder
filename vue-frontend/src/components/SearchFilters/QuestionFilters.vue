@@ -180,8 +180,8 @@
 <style scoped>
 
 .question-filters-row {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid: auto / auto auto auto;
     padding: 10px;
     gap: 10px;
     width: 100%
@@ -189,7 +189,7 @@
 
 .question-filters {
     height: 100%;
-    width: calc((100% - 30px) / 3);
+    width: 100%;
     display: flex;
     justify-content: center;
     flex-direction: column;

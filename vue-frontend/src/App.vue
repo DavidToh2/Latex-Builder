@@ -14,11 +14,12 @@ import LatexView from '@/views/LatexView.vue'
 import AccountView from '@/views/AccountView.vue'
 
 import { RouterView } from 'vue-router'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import type { Component } from 'vue'
 
 import { useUserStore } from '@/stores/userStore'
-import { useQuestionStore } from './stores/questionStore'
+
+import { isAuth, authGetUserInfo } from '@/post/postAuth'
 
 const UserStore = useUserStore()
 
@@ -26,13 +27,23 @@ const currentLeftView = computed<string>(() => {return UserStore.getViewName('le
 const currentRightView = computed<string>(() => {return UserStore.getViewName('right')})
 const workspaceDisplayMode = ref(0) // 0 = none, 1 = left, 2 = right, or 3 = both sides
 
-const activeViews = computed<string[]>(() => {
-	return [currentLeftView.value, currentRightView.value]
-})
-
 const leftViews = ["HomeView", "DocsView"]
 const centerViews = ["ContributeView", "DatabaseView", "BuildView", "DocumentView", "DriveView", "LatexView"]
 const rightViews = ["AccountView"]
+const allViews = leftViews.concat(centerViews, rightViews)
+
+interface activeViewDict { [key : string] : boolean }
+const activeViews = computed<activeViewDict>(() => {
+	const d : activeViewDict = {}
+	for (var key in allViews) {
+		if (key == currentLeftView.value || key == currentRightView.value) {
+			d[key] = true
+		} else {
+			d[key] = false
+		}
+	}
+	return d
+})
 const views = {
 	HomeView,
 	DocsView,
@@ -47,11 +58,18 @@ const views = {
 	AccountView
 } as {[id: string] : Component}
 
+onMounted(async() => {
+	setAuthStatus()
+	if (centerViews.includes(currentLeftView.value)) { workspaceDisplayMode.value++ }
+	if (centerViews.includes(currentRightView.value)) { workspaceDisplayMode.value+= 2 }
+})
+
 UserStore.$onAction(
 	({name, store, args, after, onError}) => {
 		if (name == 'displayView') {
-			after((result) => {
+			after(async (result) => {
 				if (result) {
+					setAuthStatus()
 					const newView = UserStore.getNewView()
 					updateView(newView)
 				}
@@ -59,6 +77,20 @@ UserStore.$onAction(
 		}
 	}
 )
+
+async function setAuthStatus() {
+	if (await isAuth()) {
+		console.log("User authenticated")
+		UserStore.setAuthStatus(true)
+		if (!UserStore.getUserDataStatus()) {
+			const d = await authGetUserInfo()
+			UserStore.setUserData(d)
+		}
+	} else {
+		console.log("User not authenticated")
+		UserStore.setAuthStatus(false)
+	}
+}
 
 function updateView(newView : string) {
 
@@ -226,7 +258,7 @@ const transitionMode = computed<"default" | "out-in" | "in-out">(() => {
 
 
 #container-left {
-	border-right: 0px solid #888888;
+	border-right: 1px solid #888888;
 }
 
 .left-out-in-enter-active, 

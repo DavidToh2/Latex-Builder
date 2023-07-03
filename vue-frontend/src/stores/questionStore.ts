@@ -3,13 +3,17 @@ import { reactive, ref } from 'vue'
 import type { qn, qnFilters } from '@/types/Types'
 import { emptyQn, emptyFilters } from '@/types/Types'
 
-
+import type { worksheetElement } from '@/types/WorksheetTypes'
 
         // THE QUESTION STORE: stores all questions active or displayed in the user's current browsing session.
 
 interface qnStore {
     displayIDArray: string[],          // Used to speed up searching through indexes
     qnArray: qn[]
+}
+interface worksheetStore {
+    displayIDArray: string[],
+    wsArray: worksheetElement[]
 }
 
 const initStore : qnStore = {
@@ -20,16 +24,22 @@ const initContributeStore : qnStore = {
     displayIDArray: ['0'],
     qnArray: [{...emptyQn}]
 }
+const initWorksheetStore : worksheetStore = {
+    displayIDArray: [],
+    wsArray: []
+}
 
 export const useQuestionStore = defineStore('QuestionStore', () => {
 
     // STATES
     const database : qnStore = reactive(structuredClone(initStore))
     const contribute : qnStore = reactive(structuredClone(initContributeStore))
-    const build : qnStore = reactive(structuredClone(initStore))
+    const build : worksheetStore = reactive(structuredClone(initWorksheetStore))
     const allowedNames = ['database', 'build', 'contribute']
 
-    function extractIDFromQuestions(targetArray : qn[]) {
+            // Get display IDs from a list of qns / worksheet elements
+
+    function extractQuestionIDs(targetArray : qn[]) {
         var idArr : string[] = []
         for (var i=0; i<targetArray.length; i++) {
             idArr.push(targetArray[i].displayID)
@@ -37,29 +47,31 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         return idArr
     }
 
-    function getQnIndexUsingID(targetStore : qnStore, dispID : string) {
+    function extractWorksheetElementIDs(targetArray : worksheetElement[]) {
+        var idArr : string[] = []
+        for (var i=0; i<targetArray.length; i++) {
+            idArr.push(targetArray[i].body.displayID)
+        }
+        return idArr
+    }
+
+            // Get index of object in array, using its display ID
+
+    function getObjectIndexUsingID(targetStore : qnStore | worksheetStore, dispID : string) {
         const match = (element : string) => element == dispID
         const i = targetStore.displayIDArray.findIndex(match)       // Returns -1 on failure
         return i
     }
 
+            // Return question given its display ID
+
     function getQnUsingID(storeName : string, dispID : string) {
         if (allowedNames.includes(storeName)) {
-            var qnArr : qn[]
             var i : number
             switch(storeName) {
                 case 'database':
-                    qnArr = database.qnArray
-                    i = getQnIndexUsingID(database, dispID)
-                    if (i > -1) {
-                        return qnArr[i]
-                    } else {
-                        return false
-                    }
-                break
-                case 'build':
-                    qnArr = build.qnArray
-                    i = getQnIndexUsingID(build, dispID)
+                    var qnArr = database.qnArray as qn[]
+                    i = getObjectIndexUsingID(database, dispID)
                     if (i > -1) {
                         return qnArr[i]
                     } else {
@@ -67,8 +79,8 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
                     }
                 break
                 case 'contribute':
-                    qnArr = contribute.qnArray
-                    i = getQnIndexUsingID(contribute, dispID)
+                    var qnArr = contribute.qnArray as qn[]
+                    i = getObjectIndexUsingID(contribute, dispID)
                     if (i > -1) {
                         return qnArr[i]
                     } else {
@@ -79,13 +91,33 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         }
     }
 
+            // Return worksheet element given its display ID
+
+    function getElementUsingID(storeName : string, dispID : string) {
+        if (allowedNames.includes(storeName)) {
+            var i : number
+            switch(storeName) {
+                case 'build':
+                    var wsArr = build.wsArray as worksheetElement[]
+                    i = getObjectIndexUsingID(build, dispID)
+                    if (i > -1) {
+                        return wsArr[i].body
+                    } else {
+                        return false
+                    }
+                break
+            }
+        }
+    }
+
     // Updates changes to a question
+
     function updateQn(storeName: string, dispID: string, data: qn) {
         if (allowedNames.includes(storeName)) {
             var i : number
             switch(storeName) {
                 case 'database':
-                    i = getQnIndexUsingID(database, dispID)
+                    i = getObjectIndexUsingID(database, dispID)
                     if (i > -1) {
                         database.qnArray[i] = data
                         return true
@@ -93,19 +125,29 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
                         return false
                     }
                 break
-                case 'build':
-                    i = getQnIndexUsingID(build, dispID)
+                case 'contribute':
+                    i = getObjectIndexUsingID(contribute, dispID)
                     if (i > -1) {
-                        build.qnArray[i] = data
+                        contribute.qnArray[i] = data
                         return true
                     } else {
                         return false
                     }
                 break
-                case 'contribute':
-                    i = getQnIndexUsingID(contribute, dispID)
+            }
+        }
+    }
+
+    // Update changes to a worksheet element
+
+    function updateElement(storeName: string, dispID: string, data: worksheetElement) {
+        if (allowedNames.includes(storeName)) {
+            var i : number
+            switch(storeName) {
+                case 'build':
+                    i = getObjectIndexUsingID(build, dispID)
                     if (i > -1) {
-                        contribute.qnArray[i] = data
+                        build.wsArray[i] = data
                         return true
                     } else {
                         return false
@@ -124,7 +166,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         return contribute.qnArray
     }
     function getBuild() {
-        return build.qnArray
+        return build.wsArray
     }
     function getContributeIDList() {
         return contribute.displayIDArray
@@ -145,14 +187,14 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     }
     function resetBuild() {
         build.displayIDArray = []
-        build.qnArray = []
+        build.wsArray = []
     }
 
             // POPULATE THE DATABASE
 
     function populateDatabase(v : qn[]) {
         Object.assign(database.qnArray, v)
-        database.displayIDArray = extractIDFromQuestions(v)
+        database.displayIDArray = extractQuestionIDs(v)
     }
     function insertIntoDatabase(dispID : string, q : qn) {
         if (database.displayIDArray.includes(dispID)) {
@@ -164,7 +206,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         }
     }
     function deleteFromDatabase(dispID: string) {
-        const i = getQnIndexUsingID(contribute, dispID)
+        const i = getObjectIndexUsingID(contribute, dispID)
         if (i > -1) {
             database.displayIDArray.splice(i, 1)
             database.qnArray.splice(i, 1)
@@ -199,7 +241,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         }
     }
     function deleteFromContribute(dispID : string) {
-        const i = getQnIndexUsingID(contribute, dispID)
+        const i = getObjectIndexUsingID(contribute, dispID)
         if (i > -1) {
             contribute.displayIDArray.splice(i, 1)
             contribute.qnArray.splice(i, 1)
@@ -211,15 +253,19 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
 
             // POPULATE THE BUILD STORE
 
-    function insertFromDatabaseToBuild(dispID : string) {
+    function insertQnFromDatabaseToBuild(dispID : string) {
         if (getBuildIDList().includes(dispID)) {
             return false
         } else {
             const r = getQnUsingID('database', dispID)
             if (r) {
-                const q = r as qn
+                const q = {
+                    type: 'qn',
+                    body: r
+                } as worksheetElement
                 build.displayIDArray.push(dispID)
-                build.qnArray.push(q)
+                build.wsArray.push(q)
+
                 return true
             } else {
                 return false
@@ -227,11 +273,45 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         }
     }
     function deleteFromBuild(dispID : string) {
-        const i = getQnIndexUsingID(build, dispID)
+        const i = getObjectIndexUsingID(build, dispID)
         if (i > -1) {
             build.displayIDArray.splice(i, 1)
-            build.qnArray.splice(i, 1)
+            build.wsArray.splice(i, 1)
             return true
+        } else {
+            return false
+        }
+    }
+    function swapTwoElementsInBuild(dispID : string, direction : string) {
+        const i = getObjectIndexUsingID(build, dispID)
+        if (i > -1) {
+            if (direction == 'up') {
+                if (i > 0) {
+                    var x = build.wsArray[i-1]
+                    var xd = build.displayIDArray[i-1]
+                    build.wsArray.splice(i-1, 1)
+                    build.wsArray.splice(i, 0, x)
+                    build.displayIDArray.splice(i-1, 1)
+                    build.displayIDArray.splice(i, 0, xd)
+                } else {
+                    // do nothing if this element is already at the top of build
+                }
+                return true
+            } else if (direction == 'down'){
+                if (i < build.displayIDArray.length - 1) {
+                    var x = build.wsArray[i+1]
+                    var xd = build.displayIDArray[i+1]
+                    build.wsArray.splice(i+1, 1)
+                    build.wsArray.splice(i, 0, x)
+                    build.displayIDArray.splice(i+1, 1)
+                    build.displayIDArray.splice(i, 0, xd)
+                } else {
+                    // do nothing if this element is already at the bottom of build
+                }
+                return true
+            } else {
+                return false
+            }
         } else {
             return false
         }
@@ -256,16 +336,37 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     }
 
     return{ 
+        // Workspace view stores
+        database, contribute, build,
+        // Workspace view state variables
+        contributeActiveQnID, databaseFilters,
+        
+        // Question functions
         getQnUsingID, updateQn,
+        // Worksheet element functions
+        getElementUsingID, updateElement,
+
+        // Store getters
         getDatabase, getContribute, getBuild, 
+        // ID List getters
         getContributeIDList, getBuildIDList, 
+        // Store resetters
         resetDatabase, resetContribute, resetBuild, 
+
+        // Database store functions
         populateDatabase, insertIntoDatabase, deleteFromDatabase,
-        insertFromDatabaseToBuild, deleteFromBuild,
+        // Contribute store functions
         insertIntoContribute, insertFromDatabaseToContribute, deleteFromContribute,
+        // Build store functions
+        insertQnFromDatabaseToBuild, deleteFromBuild, swapTwoElementsInBuild,
 
         saveContributeActiveQnID, getContributeActiveQnID,
         saveDatabaseQuestionFilters, getDatabaseQuestionFilters
+    }
+},
+{
+    persist: {
+        storage: sessionStorage
     }
 })
 

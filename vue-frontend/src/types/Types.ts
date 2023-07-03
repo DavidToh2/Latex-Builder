@@ -74,7 +74,6 @@ function syncQnWithFilters(q : qn, filters : qnFilters) {
     q['sourceYear'] = f['sourceYear']
 }
 
-
 export interface userSocialData {
     email: string,
     groups: string[],

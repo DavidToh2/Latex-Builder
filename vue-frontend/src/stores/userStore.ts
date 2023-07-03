@@ -14,6 +14,7 @@ export const useUserStore = defineStore('UserStore', () => {
     function setUserData(data : userData) {
         dataStatus.value = true
         Object.assign(user, {...data})
+        console.log(user)
     }
     function getUserData() {
         return user
@@ -70,9 +71,14 @@ export const useUserStore = defineStore('UserStore', () => {
     }
 
     return {
+        user, dataStatus, authStatus,
+        leftView, rightView, newView,
         setUserData, getUserData, clearUserData, getUserDataStatus,
         setAuthStatus, getAuthStatus,
         setLeftView, setRightView, displayView, getNewView, getViewName, getViewSide
     }
     
+},
+{
+    persist: true
 })

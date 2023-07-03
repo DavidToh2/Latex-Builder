@@ -1,45 +1,43 @@
 <script setup lang="ts">
+
 import Title from '@/components/PageTitle.vue'
-import WorksheetFilters from '@/components/SearchFilters/WorksheetFilters.vue';
-import SearchTable from '@/components/SearchTable/SearchTable.vue'
 import Tab from '@/components/Tab/Tab.vue';
+
+import DisplayTable from '@/components/DisplayTable/DisplayTable.vue'
+import DisplayTableAddElement from '@/components/DisplayTable/DisplayTableAddElement.vue';
+
+import WorksheetFilters from '@/components/SearchFilters/WorksheetFilters.vue';
 
 import { ref, reactive, onMounted } from 'vue'
 
 import type { qn, qns } from '@/types/Types'
+import type { worksheetElement, ws } from '@/types/WorksheetTypes';
 import { useQuestionStore } from '@/stores/questionStore';
 
 const QuestionStore = useQuestionStore()
 
-const buildOptionsLeftTab = ['Selected Questions', 'Preview']
-const buildOptionsRightTab = ['Save to Drive', 'Download']
+const buildOptionsLeftTab = ['Selected Questions', 'Document Settings']
+const buildOptionsRightTab = ['Compile', 'Download']
 
-var activeOptions = reactive([true, false])
-var activeOptionID = ref<number>(0)
+const activeOptions = reactive([true, false])
+const activeOptionID = ref<number>(0)
 
 var buildQns : qns = reactive({
 	qns : []
 })
 
-function removeFromBuild(displayID : string) {
-	QuestionStore.deleteFromBuild(displayID)
-}
+const worksheet : ws = reactive({
+	elements : [],
+	config: ''
+})
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ((name == 'insertFromDatabaseToBuild') ) {
+        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'deleteFromBuild') || (name == 'swapTwoElementsInBuild') ) {
             after((result) => {
                 if (result) {
-                    const newBuildQnList = QuestionStore.getBuild() as qn[]
-                    buildQns.qns = newBuildQnList
-                }
-            })
-        }
-        if (name == 'deleteFromBuild') {
-            after((result) => {
-                if (result) {
-					const newBuildQnList = QuestionStore.getBuild() as qn[]
-                    buildQns.qns = newBuildQnList
+                    const newBuildQnList = QuestionStore.getBuild() as worksheetElement[]
+                    worksheet.elements = newBuildQnList
                 }
             })
         }
@@ -59,10 +57,10 @@ async function changeOptionTab(s : string, n : number) {
 		case 'Selected Questions':
 
 		break;
-		case 'Preview':
+		case 'Document Settings':
 
 		break;
-		case 'Save to Drive':
+		case 'Compile':
 
 		break;
 		case 'Download':
@@ -71,42 +69,20 @@ async function changeOptionTab(s : string, n : number) {
 	}
 
 	activeOptions[activeOptionID.value] = true
-
 }
 
-function questionUp(dispID : string) {
-	var i = 0
-	while (buildQns.qns[i].displayID != dispID) {
-		i++
-	}
-	if (i > 0) {
-		var t = buildQns.qns[i-1]
-		buildQns.qns[i-1] = buildQns.qns[i]
-		buildQns.qns[i] = t
-	}
+function elementUp(dispID : string) {
+	QuestionStore.swapTwoElementsInBuild(dispID, 'up')
 }
-function questionDown(dispID : string) {
-	var i = 0
-	while (buildQns.qns[i].displayID != dispID) {
-		i++
-	}
-	if (i < buildQns.qns.length - 1) {
-		var t = buildQns.qns[i+1]
-		buildQns.qns[i+1] = buildQns.qns[i]
-		buildQns.qns[i] = t
-	}
+function elementDown(dispID : string) {
+	QuestionStore.swapTwoElementsInBuild(dispID, 'down')
 }
-
-function build(type: string) {
-	var reqBody = {} as { [key : string] : string | number | Date | null }
-
-	for (const qn of buildQns.qns) {
-
-	}
+function removeFromBuild(displayID : string) {
+	QuestionStore.deleteFromBuild(displayID)
 }
 
 onMounted(() => {
-	buildQns.qns = QuestionStore.getBuild()
+	worksheet.elements = QuestionStore.getBuild()
 })
 
 </script>
@@ -118,13 +94,14 @@ onMounted(() => {
 			:tab-left="buildOptionsLeftTab" :tab-right="buildOptionsRightTab" 
 			:font-size=22 internalName="buildOptions" :active-i-d="activeOptionID" @change-tab="changeOptionTab"
 		/>
-		<WorksheetFilters />
 
 		<div id="build-container" :class="{ 'inactive-container': !activeOptions[0] }">
-			<SearchTable internal-name="build-table" :qns="buildQns.qns" @delete="removeFromBuild" @up="questionUp" @down="questionDown"/>
+			<DisplayTableAddElement />
+			<DisplayTable internal-name="build-table" :elements="worksheet.elements" @delete="removeFromBuild" @up="elementUp" @down="elementDown"/>
 		</div>
 
-		<div id="preview-container" :class="{ 'inactive-container': !activeOptions[1] }">
+		<div id="document-settings-container" :class="{ 'inactive-container': !activeOptions[1] }">
+			<WorksheetFilters />
 			<div class="preview" id="preview">
 			</div>
 		</div>
@@ -137,7 +114,7 @@ onMounted(() => {
 	width: 100%;
 }
 
-#preview-container {
+#document-settings-container {
 	width: 100%;
     padding: 0px 10px;
 }

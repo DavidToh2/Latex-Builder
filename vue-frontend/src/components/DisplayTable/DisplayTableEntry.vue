@@ -42,27 +42,27 @@
 </script>
 
 <template>
-    <div class="search-table-result-row">
-        <div class="search-id search-cell" style="padding: 8px 0px; text-align: center;">
+    <div class="display-table-entry-row">
+        <div class="display-table-id display-table-cell" style="padding: 8px 0px; text-align: center;">
             {{ q.displayID }}
         </div>
-        <div class="search-question search-cell">
+        <div class="display-table-question display-table-cell">
             {{ q.question }}
         </div>
-        <div class="search-topic search-cell">
+        <div class="display-table-topic display-table-cell">
             <p>{{ q.topic.join(', ') }}</p>
             <p>{{ q.subtopic.join(', ') }}</p>
         </div>
-        <div class="search-difficulty search-cell">
+        <div class="display-table-difficulty display-table-cell">
             <p v-for="i in q.difficulty">{{ i }}</p>
         </div>
-        <div class="search-source search-cell">
+        <div class="display-table-source display-table-cell">
             <div v-for="sn in q.sourceName">
                 <p>{{ sn }}</p>
                 <p>{{ q.sourceYear }}</p>
             </div>
         </div>
-        <div class="search-options search-cell">
+        <div class="display-table-options display-table-cell">
             <div class="option-icons">
                 <img class="icon-sm" src="@/assets/svg/angle-left.svg" v-if="isDatabase" @click="insertQuestion(q.displayID, 'left')">
                 <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteQuestion(q.displayID)">
@@ -77,12 +77,6 @@
 </template>
 
 <style scoped>
-
-.search-table-result-row {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-}
 
 .up-down-buttons {
     display: flex;

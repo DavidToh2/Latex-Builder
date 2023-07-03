@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
-import SearchTable from '@/components/SearchTable/SearchTable.vue'
+import DisplayTable from '@/components/DisplayTable/DisplayTable.vue'
 
 import type { qn, qns, qnFilters, qnFilterNames } from '@/types/Types'
 import { emptyFilters } from '@/types/Types'
@@ -59,7 +59,6 @@ async function submitSearchEvent() {
 
 function displayDatabase() {            // Fetches data from store
     results.qns = [...QuestionStore.getDatabase().slice().reverse()]
-    console.log(results.qns)
 }
 
 function insertIntoOtherView(displayID : string, direction : string) {
@@ -68,7 +67,7 @@ function insertIntoOtherView(displayID : string, direction : string) {
             QuestionStore.insertFromDatabaseToContribute(displayID)
         break;
         case 'right':
-            QuestionStore.insertFromDatabaseToBuild(displayID)
+            QuestionStore.insertQnFromDatabaseToBuild(displayID)
         break;
     }
 }
@@ -115,7 +114,7 @@ async function submitDeleteEvent(displayID : string) {
             </div>
         </form>
         <div id="no-of-results">Number of results: {{ results.qns.length }}</div>
-        <SearchTable internal-name="database-table" :qns="results.qns" @delete="submitDeleteEvent" @insert="insertIntoOtherView" />
+        <DisplayTable internal-name="database-table" :qns="results.qns" @delete="submitDeleteEvent" @insert="insertIntoOtherView" />
     </div>
 </template>
 
@@ -132,11 +131,15 @@ async function submitDeleteEvent(displayID : string) {
 
 #question-search-bar {
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
 }
 
 #question-search {
     width: 80%;
-    margin: 0 2% 0 6%;
     border: 1px solid #000000;
     padding: 8px 4px;
     border-radius: 8px;
