@@ -3,21 +3,39 @@ import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
 import SearchTable from '@/components/SearchTable/SearchTable.vue'
 
-import type { qn, qns } from '@/types/Types'
+import type { qn, qns, qnFilters, qnFilterNames } from '@/types/Types'
+import { emptyFilters } from '@/types/Types'
 import { useQuestionStore } from '@/stores/questionStore'
 import { questionGet, questionDelete } from '@/post/postQn'
+import { getFormData } from '@/aux'
 
-import { reactive, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
+import { reactive, onActivated, onDeactivated } from 'vue'
 
 const QuestionStore = useQuestionStore()
 var results : qns = reactive({
     qns: []
 })
 
-onMounted(async () => { submitSearchEvent() })
+// onMounted(async () => { submitSearchEvent() })
+
+onActivated(() => { 
+    Object.assign(searchParameters, QuestionStore.getDatabaseQuestionFilters())
+    displayDatabase() 
+})
+onDeactivated(() => { 
+    QuestionStore.saveDatabaseQuestionFilters(searchParameters) 
+})
+
+const searchParameters = reactive({...emptyFilters})
+function updateSearchParameters(ss : qnFilters) {
+    const qF = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
+    for (const key of qF) {
+        var k = key as qnFilterNames
+        searchParameters[k] = ss[k]
+    }
+    searchParameters['sourceYear'] = ss['sourceYear']
+}
+
 
 async function submitSearchEvent() {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
@@ -44,13 +62,13 @@ function displayDatabase() {            // Fetches data from store
     console.log(results.qns)
 }
 
-function insertIntoOtherView(displayID : string) {
-    switch(route.name) {
-        case 'build':
-            QuestionStore.insertFromDatabaseToBuild(displayID)
-        break;
-        case 'contribute':
+function insertIntoOtherView(displayID : string, direction : string) {
+    switch(direction) {
+        case 'left':
             QuestionStore.insertFromDatabaseToContribute(displayID)
+        break;
+        case 'right':
+            QuestionStore.insertFromDatabaseToBuild(displayID)
         break;
     }
 }
@@ -86,7 +104,7 @@ async function submitDeleteEvent(displayID : string) {
     <div class="viewport">
         <Title title="Database" />
         <form id="question-search-container" autocomplete="false" @submit.prevent="submitSearchEvent">
-            <QuestionFilters func="database" />
+            <QuestionFilters :ss="searchParameters" func="database" @update="updateSearchParameters"/>
             <div id="question-search-bar">
                 <textarea rows="1" id="question-search" name="question" placeholder="Search question text"></textarea>
                 <button type="submit" id="question-search-button">

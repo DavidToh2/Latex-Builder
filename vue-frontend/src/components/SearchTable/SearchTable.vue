@@ -10,8 +10,8 @@
     const props = defineProps<Props> ()
 
     const emits = defineEmits<{
+        (e: 'insert', displayID: string, direction: string): void
         (e: 'delete', displayID: string): void
-        (e: 'insert', displayID: string): void
         (e: 'up', displayID: string): void
         (e: 'down', displayID: string): void
     }>()
@@ -19,8 +19,8 @@
     async function deleteQuestionFromDatabase(displayID: string) {
         emits('delete', displayID)
     }
-    function insertQuestion(displayID : string) {
-        emits('insert', displayID)
+    function insertQuestion(displayID : string, direction : string) {
+        emits('insert', displayID, direction)
     }
     function questionUp(dispID : string) {
         emits('up', dispID)
@@ -93,6 +93,7 @@
     flex-direction: row;
     gap: 3px;
     align-items: center;
+    justify-content: center;
 }
 
 </style>

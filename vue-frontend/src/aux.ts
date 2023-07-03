@@ -11,4 +11,28 @@ function pixelsToNumber(s : string) {
     return parseInt(n)
 }
 
-export {numberToPixels, pixelsToNumber}
+function getFormData(f : HTMLFormElement) {
+    const formc = f.elements as HTMLFormControlsCollection
+    const form = Array.from(formc) as HTMLTextAreaElement[]
+    var data = {} as { [key : string] : string | number | Date | null }
+
+    for (const element of form) {
+
+        const eName = element.name
+        if (eName) {
+            const eValue = element.value
+            if (eValue) {
+                data[eName] = eValue
+            } else {
+                
+            }
+        }
+    }
+
+    return data
+}
+
+export { 
+    numberToPixels, pixelsToNumber,
+    getFormData
+}

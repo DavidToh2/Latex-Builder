@@ -3,6 +3,9 @@
     import { computed } from 'vue'
     import type { qn } from '@/types/Types';
 
+    import { useUserStore } from '@/stores/userStore';
+    const UserStore = useUserStore()
+
     export interface Props {
         q : qn,
         internalName: string   
@@ -10,14 +13,14 @@
     const props = defineProps<Props>()
 
     const emits = defineEmits<{
-        (e: 'insert', displayID: string): void
+        (e: 'insert', displayID: string, direction: string): void
         (e: 'delete', displayID: string): void
         (e: 'up', displayID: string): void
         (e: 'down', displayID: string): void
     }>()
 
-    function insertQuestion(dispID : string) {
-        emits('insert', dispID)
+    function insertQuestion(dispID : string, direction : string) {
+        emits('insert', dispID, direction)
     }
     function deleteQuestion(dispID : string) {
         emits('delete', dispID)
@@ -61,9 +64,9 @@
         </div>
         <div class="search-options search-cell">
             <div class="option-icons">
-                <img class="icon-sm" src="@/assets/svg/angle-left.svg">
+                <img class="icon-sm" src="@/assets/svg/angle-left.svg" v-if="isDatabase" @click="insertQuestion(q.displayID, 'left')">
                 <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteQuestion(q.displayID)">
-                <img class="icon-sm" src="@/assets/svg/angle-right.svg" v-if="isDatabase" @click="insertQuestion(q.displayID)">
+                <img class="icon-sm" src="@/assets/svg/angle-right.svg" v-if="isDatabase" @click="insertQuestion(q.displayID, 'right')">
                 <div class="up-down-buttons" v-if="isBuild">
                     <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="questionUp(q.displayID)">
                     <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="questionDown(q.displayID)">

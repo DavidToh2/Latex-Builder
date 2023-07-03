@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { reactive } from 'vue'
-import type { qn } from '@/types/Types'
-import { emptyQn } from '@/types/Types'
+import { reactive, ref } from 'vue'
+import type { qn, qnFilters } from '@/types/Types'
+import { emptyQn, emptyFilters } from '@/types/Types'
 
 
 
@@ -235,7 +235,24 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         } else {
             return false
         }
-        
+    }
+
+                // COMPONENT STATE FUNCTIONS
+    
+    const contributeActiveQnID = ref('')
+    const databaseFilters : qnFilters = reactive(structuredClone(emptyFilters))
+    
+    function saveContributeActiveQnID(ad : string) {
+        contributeActiveQnID.value = ad
+    }
+    function getContributeActiveQnID() {
+        return contributeActiveQnID
+    }
+    function saveDatabaseQuestionFilters(f : qnFilters) {
+        Object.assign(databaseFilters, f)
+    }
+    function getDatabaseQuestionFilters() {
+        return databaseFilters
     }
 
     return{ 
@@ -245,7 +262,10 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         resetDatabase, resetContribute, resetBuild, 
         populateDatabase, insertIntoDatabase, deleteFromDatabase,
         insertFromDatabaseToBuild, deleteFromBuild,
-        insertIntoContribute, insertFromDatabaseToContribute, deleteFromContribute
+        insertIntoContribute, insertFromDatabaseToContribute, deleteFromContribute,
+
+        saveContributeActiveQnID, getContributeActiveQnID,
+        saveDatabaseQuestionFilters, getDatabaseQuestionFilters
     }
 })
 

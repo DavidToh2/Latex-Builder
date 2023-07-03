@@ -8,7 +8,7 @@ import type { qn, qnFilters, qnFilterNames } from '@/types/Types'
 import { emptyQn, emptyFilters, syncFiltersWithQn, syncQnWithFilters } from '@/types/Types'
 import { useQuestionStore } from '@/stores/questionStore'
 import { questionSave, questionDelete } from '@/post/postQn';
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, onActivated, onDeactivated } from 'vue'
 
 const contributeOptionsLeftTab = ['Question', 'Solution', 'Images', 'Packages']
 const contributeOptionsRightTab = ['Save', 'Save As', 'Delete']
@@ -20,20 +20,32 @@ var activeOptions = reactive([true, false, false, false])
 var activeOptionID = ref<number>(0)
 var IDlist = ref<string[]>(['0'])
 
+const QuestionStore = useQuestionStore()
+
             // Sync active and activeFilters:
 
 watch(active, (newA, oldA) => {
+    saveActiveQn()
     syncFiltersWithQn(activeFilters, newA)
 }, {deep: true})
 
 watch(activeFilters, (newF, oldF) => {
     syncQnWithFilters(active, newF)
+    saveActiveQn()
 }, {deep: true})
 
+            // On component state change:
 
-
-const QuestionStore = useQuestionStore()
-QuestionStore.resetContribute()
+onActivated(() => {
+    const ad = QuestionStore.getContributeActiveQnID()
+    console.log("Active qn ID:")
+    console.log(ad)
+    const newQuestion = QuestionStore.getQnUsingID('contribute', ad.value) as qn
+    console.log("Retrieved former active qn:")
+    console.log(newQuestion)
+    Object.assign(active, newQuestion)
+})
+// QuestionStore.resetContribute()
 
             // Whenever the CONTRIBUTE store is updated...
 
@@ -109,6 +121,11 @@ function updateQuestionFilters(ss : qnFilters) {
     activeFilters['sourceYear'] = ss['sourceYear']
 }
 
+function saveActiveQn() {
+    QuestionStore.updateQn('contribute', active.displayID, active)
+    QuestionStore.saveContributeActiveQnID(active.displayID)
+}
+
 function changeDisplayedQuestion(newQnID : string) {
 
     const a = {...active} as qn
@@ -174,7 +191,7 @@ async function changeOptionTab(s : string, n : number) {
 
                 } else {
                     // Success
-                    const savedQn = responsejson.body as qn
+                    const savedQn = responsejson.body[0] as qn
                     const dispID = savedQn['displayID']
                     if (active.displayID == '0') {
                         removeFromContribute(active.displayID)

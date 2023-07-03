@@ -1,4 +1,4 @@
-
+import { getFormData } from "@/aux"
 const URL_DEV = 'localhost:3000'
 const URL_PROD = import.meta.env.VUE_APP_URL_PRODUCTION as string
 export var BASE_URL : string
@@ -56,22 +56,8 @@ export async function postJSON(j : {[key : string] : string | number | Date | nu
 */
 
 export async function postForm(f : HTMLFormElement, url : string, descriptor : string) {
-    const formc = f.elements as HTMLFormControlsCollection
-    const form = Array.from(formc) as HTMLTextAreaElement[]
-    var reqBody = {} as { [key : string] : string | number | Date | null }
 
-    for (const element of form) {
-
-        const eName = element.name
-        if (eName) {
-            const eValue = element.value
-            if (eValue) {
-                reqBody[eName] = eValue
-            } else {
-                
-            }
-        }
-    }
+    var reqBody = getFormData(f) as { [key : string] : string | number | Date | null }
 
     reqBody['fn'] = descriptor
 

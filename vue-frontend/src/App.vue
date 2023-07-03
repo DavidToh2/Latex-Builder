@@ -14,17 +14,20 @@ import LatexView from '@/views/LatexView.vue'
 import AccountView from '@/views/AccountView.vue'
 
 import { RouterView } from 'vue-router'
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue'
 import type { Component } from 'vue'
 
-const currentLeftView = ref('HomeView')
-const currentRightView = ref('AccountView')
+import { useUserStore } from '@/stores/userStore'
+import { useQuestionStore } from './stores/questionStore'
+
+const UserStore = useUserStore()
+
+const currentLeftView = computed<string>(() => {return UserStore.getViewName('left')})
+const currentRightView = computed<string>(() => {return UserStore.getViewName('right')})
 const workspaceDisplayMode = ref(0) // 0 = none, 1 = left, 2 = right, or 3 = both sides
 
 const activeViews = computed<string[]>(() => {
-	const l = currentLeftView.value
-	const r = currentRightView.value
-	return [l, r]
+	return [currentLeftView.value, currentRightView.value]
 })
 
 const leftViews = ["HomeView", "DocsView"]
@@ -44,9 +47,22 @@ const views = {
 	AccountView
 } as {[id: string] : Component}
 
+UserStore.$onAction(
+	({name, store, args, after, onError}) => {
+		if (name == 'displayView') {
+			after((result) => {
+				if (result) {
+					const newView = UserStore.getNewView()
+					updateView(newView)
+				}
+			})
+		}
+	}
+)
+
 function updateView(newView : string) {
 
-	console.log(`Previous display mode: ${workspaceDisplayMode.value}`)
+	// console.log(`Previous display mode: ${workspaceDisplayMode.value}`)
 
 	// Opening AccountView: always open on right side
 	// Apply right-out-in transition
@@ -55,7 +71,7 @@ function updateView(newView : string) {
 			workspaceDisplayMode.value -= 2
 		}
 		transitionType.value = 'right-out-in'
-		currentRightView.value = newView
+		UserStore.setRightView(newView)
 	}
 
 	// Opening HomeView or DocsView: always open on left side
@@ -65,7 +81,7 @@ function updateView(newView : string) {
 			workspaceDisplayMode.value -= 1
 		}
 		transitionType.value = 'left-out-in'
-		currentLeftView.value = newView
+		UserStore.setLeftView(newView)
 	}
 
 	// Opening workspace view.
@@ -79,16 +95,16 @@ function updateView(newView : string) {
 
 			// If left side displaying docs, keep that
 			if (workspaceDisplayMode.value == 0) {
-				currentRightView.value = newView
+				UserStore.setRightView(newView)
 			// If left side is also workspace, then just open workspace on both sides
 			} else if (workspaceDisplayMode.value == 1) {
 				const i = centerViews.indexOf(newView)
 				if (i == 0) {
-					currentRightView.value = centerViews[1]
-					currentLeftView.value = centerViews[0]
+					UserStore.setRightView(centerViews[1])
+					UserStore.setLeftView(centerViews[0])
 				} else {
-					currentRightView.value = centerViews[i]
-					currentLeftView.value = centerViews[i-1]
+					UserStore.setRightView(centerViews[i])
+					UserStore.setLeftView(centerViews[i-1])
 				}
 			}
 
@@ -105,12 +121,12 @@ function updateView(newView : string) {
 				if (i == 0) {
 					// Apply right scroll transition to both sides
 					transitionType.value = 'right-scroll'
-					currentLeftView.value = centerViews[0]
-					currentRightView.value = centerViews[1]
+					UserStore.setLeftView(centerViews[0])
+					UserStore.setRightView(centerViews[1])
 				} else {
 					// Apply left-out-in transition
 					transitionType.value = 'left-out-in'
-					currentLeftView.value = centerViews[i-1]
+					UserStore.setLeftView(centerViews[i-1])
 				}
 			// Switch workspace viewport
 			} else {
@@ -121,7 +137,7 @@ function updateView(newView : string) {
 				} else if (j > i) {
 					transitionType.value = 'right-scroll'
 				}
-				currentRightView.value = newView
+				UserStore.setRightView(newView)
 			}
 		}
 
@@ -132,18 +148,18 @@ function updateView(newView : string) {
 			if (j < i) {
 				// Apply left scroll transition
 				transitionType.value = 'left-scroll'
-				currentLeftView.value = centerViews[j]
-				currentRightView.value = centerViews[j+1]
+				UserStore.setLeftView(centerViews[j])
+				UserStore.setRightView(centerViews[j+1])
 			} else if (j > i+1) {
 				// Apply right scroll transition
 				transitionType.value = 'right-scroll'
-				currentLeftView.value = centerViews[j-1]
-				currentRightView.value = centerViews[j]
+				UserStore.setLeftView(centerViews[j-1])
+				UserStore.setRightView(centerViews[j])
 			}
 		}
 	}
 
-	console.log(`Current display mode: ${workspaceDisplayMode.value}`)
+	// console.log(`Current display mode: ${workspaceDisplayMode.value}`)
 }
 
 const transitionType = ref('left-out-in')
@@ -171,6 +187,7 @@ const transitionMode = computed<"default" | "out-in" | "in-out">(() => {
 			</KeepAlive>
 		</Transition>
 	</div>
+
 	<div class="container-main" id="container-right">
 		<Transition :name="transitionType" :mode="transitionMode">
 			<KeepAlive>

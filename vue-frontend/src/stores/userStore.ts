@@ -33,9 +33,46 @@ export const useUserStore = defineStore('UserStore', () => {
         return authStatus.value
     }
 
+    const leftView = ref('HomeView')
+    const rightView = ref('AccountView')
+    const newView = ref('')
+
+    function setLeftView(newView : string) {
+        leftView.value = newView
+    }
+    function setRightView(newView : string) {
+        rightView.value = newView
+    }
+    function displayView(v: string) {
+        newView.value = v
+        return true
+    }
+    function getNewView() {
+        return newView.value
+    }
+    function getViewName(side : string) {
+        if (side == 'left') {
+            return leftView.value
+        } else if (side == 'right') {
+            return rightView.value
+        } else {
+            return 'none'
+        }
+    }
+    function getViewSide(v : string) {
+        if (v == leftView.value) {
+            return 'left'
+        } else if (v = rightView.value) {
+            return 'right'
+        } else {
+            return 'none'
+        }
+    }
+
     return {
         setUserData, getUserData, clearUserData, getUserDataStatus,
-        setAuthStatus, getAuthStatus
+        setAuthStatus, getAuthStatus,
+        setLeftView, setRightView, displayView, getNewView, getViewName, getViewSide
     }
     
 })

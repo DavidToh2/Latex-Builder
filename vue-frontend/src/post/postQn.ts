@@ -1,6 +1,7 @@
 
 import { postForm, postJSON } from '@/post/post'
 import { BASE_URL } from '@/post/post'
+import type { qnFilters } from '@/types/Types'
 
 /*
         DATABASE FUNCTIONS
@@ -11,7 +12,6 @@ import { BASE_URL } from '@/post/post'
             - Returns 
         questionSave(): Save question edits to the database. This includes both new and existing questions
 */
-
 
 export async function questionGet(f : HTMLFormElement) {         // Submits search query and uses it to populate store
     const response = await postForm(f, `http://${BASE_URL}/database/get`, 'qn-get') as Response
