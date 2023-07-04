@@ -176,7 +176,9 @@ onMounted(() => {
 		const bc = document.querySelector('#build-container') as HTMLDivElement
 		const bcrect = bc.getBoundingClientRect()
 		if ((event.clientX < bcrect.left) || (event.clientX > bcrect.right) || (event.clientY < bcrect.top) || (event.clientY > bcrect.bottom)) {
-			worksheet.elements.splice(i, 1)
+			if (i != -1) {
+				worksheet.elements.splice(i, 1)
+			}
 
 		// Otherwise, insert the element
 		} else {

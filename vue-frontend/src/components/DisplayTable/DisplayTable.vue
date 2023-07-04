@@ -12,6 +12,7 @@
         internalName: string
         elements?: worksheetElement[]
         qns?: qn[]
+
         isDragging?: boolean
     }
     const props = defineProps<Props> ()
@@ -21,8 +22,9 @@
         (e: 'delete', displayID: string): void
         (e: 'up', displayID: string): void
         (e: 'down', displayID: string): void
-        (e: 'startDrag'): void
         (e: 'swap', index1: number, index2: number): void
+        (e: 'startDrag'): void
+        (e: 'endDrag'): void
     }>()
 
             // Object emit functions
@@ -53,6 +55,9 @@
         targetElement.elementIndex = i;
         (e.dataTransfer as DataTransfer).setData('type', 'qn')
         emits('startDrag')
+
+        const c = e.currentTarget as HTMLDivElement
+        c.classList.add("display-table-entry-row-dragged")
     }
     function identifyCurrentElement(e : DragEvent, i : number)  {
         targetElement.elementIndex = i
@@ -91,6 +96,9 @@
             }
         }
     })
+    function endElementDrag(e : DragEvent) {
+        emits('endDrag')
+    }
 
     // Reset drop parameters once drop is finished
     onUpdated(() => {
@@ -116,17 +124,20 @@
             <div class="display-table-results" v-for="(item, index) in elements">
                 <DisplayTableEntry v-if="item.type == 'qn'" :internalName="props.internalName + '-qn'" :q="(item.body as qn)" 
                     @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"
-                    draggable="true" class="draggable" @dragstart="startElementDrag($event, index)"
+                    draggable="true" class="draggable" @dragstart="startElementDrag($event, index)" @dragend="endElementDrag"
+                    :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}"
                     @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
 
                 <DisplayTableAddPlaceholder v-else-if="(item.type == 'placeholder') && isDragging" 
-                    :internalName="props.internalName + '-placeholder'" :text="(item.body as placeholder).text" 
+                    :internalName="props.internalName + '-placeholder'" :text="(item.body as placeholder).text"
+                    :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}" 
                     @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
 
                 <DisplayTableElement v-else-if="latexTypeStrings.includes(item.type)"
                     :internalName="props.internalName + '-element'" :content="(item.body as latexTypes)" :type="(item.type as latexTypeNames)" 
                     @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"
-                    draggable="true" class="draggable" @dragstart="startElementDrag($event, index)"
+                    draggable="true" class="draggable" @dragstart="startElementDrag($event, index)" @dragend="endElementDrag"
+                    :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}"
                     @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
             </div>
         </div>
@@ -162,10 +173,15 @@
     flex-direction: row;
 }
 
+.display-table :deep(.display-table-entry-row-dragged) {
+    font-weight: bold;
+}
+
 .display-table :deep(.display-table-cell) {
     padding: 10px 8px;
     flex-shrink: 0;
     flex-grow: 0;
+    font-weight: inherit;
 }
 
 .display-table :deep(.display-table-id) {
