@@ -1,16 +1,18 @@
 <script setup lang="ts">
     import DisplayTableHeader from "./DisplayTableHeader.vue"
     import DisplayTableEntry from "./DisplayTableEntry.vue"
-    import DisplayTableElementEnum from "./DisplayTableElementEnum.vue"
-    import DisplayTableElementHeading from "./DisplayTableElementHeading.vue"
     import DisplayTableElement from "./DisplayTableElement.vue"
+    import DisplayTableAddPlaceholder from "./DisplayTableAddPlaceholder.vue"
     import type { qn } from '@/types/Types'
-    import type { worksheetElement, latex, latexHeading, latexEnum } from "@/types/WorksheetTypes"
+    import type { worksheetElement, latex, latexHeading, latexEnum, latexTypes, latexTypeNames, placeholder } from "@/types/WorksheetTypes"
+    import { latexTypeStrings } from "@/types/WorksheetTypes"
+    import { watch, ref, reactive, onUpdated } from "vue"
 
     export interface Props {
         internalName: string
         elements?: worksheetElement[]
         qns?: qn[]
+        isDragging?: boolean
     }
     const props = defineProps<Props> ()
 
@@ -19,7 +21,11 @@
         (e: 'delete', displayID: string): void
         (e: 'up', displayID: string): void
         (e: 'down', displayID: string): void
+        (e: 'startDrag'): void
+        (e: 'swap', index1: number, index2: number): void
     }>()
+
+            // Object emit functions
 
     async function deleteObject(displayID: string) {
         emits('delete', displayID)
@@ -34,6 +40,67 @@
         emits('down', displayID)
     }
 
+            // Drag and drop functions
+
+    const droppedElementIndex = ref(0)
+    const targetElement = reactive({
+        elementIndex: 0,
+        aboveMouse: false
+    })
+
+    function startElementDrag(e : DragEvent, i : number) {
+        droppedElementIndex.value = i
+        targetElement.elementIndex = i;
+        (e.dataTransfer as DataTransfer).setData('type', 'qn')
+        emits('startDrag')
+    }
+    function identifyCurrentElement(e : DragEvent, i : number)  {
+        targetElement.elementIndex = i
+        targetElement.aboveMouse = false
+        // console.log(`Current element index: ${targetElement.elementIndex}`)
+    }
+    function detectElementAboveMouse(e : DragEvent) {
+        const element = e.currentTarget as HTMLElement
+        const rect = element.getBoundingClientRect()
+        if ((rect.top + rect.height / 2) < e.clientY) {
+            targetElement.aboveMouse = true
+        } else {
+            targetElement.aboveMouse = false
+        }
+        // console.log(`Element above mouse: ${targetElement.aboveMouse}`)
+    }
+
+    watch(() => targetElement.aboveMouse, (newAbove) => {
+        const t = targetElement.elementIndex
+        const d = droppedElementIndex.value
+        // console.log(`Original indices: target element is ${t}, dropped element is ${d}`)
+        if (t != d) {
+            // If droppedElement above targetElement above mouse
+            if (newAbove && (t > d)) {
+                targetElement.elementIndex = d
+                droppedElementIndex.value = t
+                // Swap droppedElement and targetElement
+                emits('swap', d, t)
+            }
+            // If mouse above targetElement above droppedElement
+            if (!newAbove && (t < d)) {
+                targetElement.elementIndex = d
+                droppedElementIndex.value = t
+                // Swap targetElement and droppedElement
+                emits('swap', d, t)
+            }
+        }
+    })
+
+    // Reset drop parameters once drop is finished
+    onUpdated(() => {
+        if (!props.isDragging) {
+            targetElement.aboveMouse = false
+            targetElement.elementIndex = 0
+            droppedElementIndex.value = 0
+        }
+    })
+
 </script>
 
 <template>
@@ -41,13 +108,26 @@
         <DisplayTableHeader />
         <div v-if="internalName == 'database-table'">
             <div class="display-table-results" v-for="item in qns">
-                <DisplayTableEntry :internalName="props.internalName + '-qn'" :q="item" @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"/>
+                <DisplayTableEntry :internalName="props.internalName + '-qn'" :q="item" 
+                    @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"/>
             </div>
         </div>
         <div v-if="internalName == 'build-table'">
-            <div class="display-table-results" v-for="item in elements">
-                <DisplayTableEntry v-if="item.type == 'qn'" :internalName="props.internalName + '-qn'" :q="(item.body as qn)" @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"/>
-                <DisplayTableElement v-else :internalName="props.internalName + '-element'" :content="(item.body as latex | latexEnum | latexHeading)" @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"/>
+            <div class="display-table-results" v-for="(item, index) in elements">
+                <DisplayTableEntry v-if="item.type == 'qn'" :internalName="props.internalName + '-qn'" :q="(item.body as qn)" 
+                    @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"
+                    draggable="true" class="draggable" @dragstart="startElementDrag($event, index)"
+                    @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
+
+                <DisplayTableAddPlaceholder v-else-if="(item.type == 'placeholder') && isDragging" 
+                    :internalName="props.internalName + '-placeholder'" :text="(item.body as placeholder).text" 
+                    @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
+
+                <DisplayTableElement v-else-if="latexTypeStrings.includes(item.type)"
+                    :internalName="props.internalName + '-element'" :content="(item.body as latexTypes)" :type="(item.type as latexTypeNames)" 
+                    @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"
+                    draggable="true" class="draggable" @dragstart="startElementDrag($event, index)"
+                    @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
             </div>
         </div>
     </div>
@@ -118,6 +198,12 @@
     gap: 3px;
     align-items: center;
     justify-content: center;
+}
+
+.display-table :deep(.up-down-buttons) {
+    display: flex;
+    flex-direction: column;
+    height: 40px;
 }
 
 </style>

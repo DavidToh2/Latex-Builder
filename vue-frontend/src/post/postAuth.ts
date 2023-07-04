@@ -1,5 +1,5 @@
-import { postForm, postJSON } from '@/post/post'
-import { BASE_URL } from '@/post/post'
+import { postForm, postJSON } from './post'
+import { BASE_URL } from './post'
 import type { userData } from '@/types/Types'
 
 /*
@@ -15,25 +15,25 @@ import type { userData } from '@/types/Types'
 
 
 export async function authSignup(f : HTMLFormElement) {
-    const response = await postForm(f, `http://${BASE_URL}/auth/signup`, 'auth-signup') as Response
+    const response = await postForm(f, `${BASE_URL}/auth/signup`, 'auth-signup') as Response
     const responsejson = await response.json()
     return responsejson
 }
 export async function authLogin(f : HTMLFormElement) {
-    const response = await postForm(f, `http://${BASE_URL}/auth/login`, 'auth-login') as Response
+    const response = await postForm(f, `${BASE_URL}/auth/login`, 'auth-login') as Response
     const responsejson = await response.json()
     console.log(responsejson)
     return responsejson
 }
 export async function authLogout() {
     var j = { fn: 'auth-logout' }
-    const response = await postJSON(j, `http://${BASE_URL}/auth/logout`) as Response
+    const response = await postJSON(j, `${BASE_URL}/auth/logout`) as Response
     const responsejson = await response.json()
     return responsejson
 }
 export async function isAuth() {
     var j = { fn: 'auth-check' }
-    const response = await postJSON(j, `http://${BASE_URL}/auth/check`) as Response
+    const response = await postJSON(j, `${BASE_URL}/auth/check`) as Response
     const responsejson = await response.json()
     const authStatus = responsejson['isAuth'] as Number
     return authStatus

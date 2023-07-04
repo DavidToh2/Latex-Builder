@@ -79,6 +79,10 @@
 	cursor: pointer;
 }
 
+.draggable {
+    cursor: move;
+}
+
 @media (min-width: 1024px) {
 
 	#app {

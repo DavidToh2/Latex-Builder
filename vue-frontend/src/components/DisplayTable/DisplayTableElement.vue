@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { latex, latexEnum, latexHeading } from '@/types/WorksheetTypes';
+import { latexTypeStrings } from '@/types/WorksheetTypes';
 import { computed } from 'vue';
 
     const props = defineProps<{
+        type: 'latex' | 'latexEnum' | 'latexHeading',
         content: latex | latexEnum | latexHeading,
         internalName: string
     }>()
@@ -14,38 +16,40 @@ import { computed } from 'vue';
         (e: 'down', displayID: string): void
     }>()
 
-    function insertQuestion(dispID : string, direction : string) {
-        emits('insert', dispID, direction)
-    }
-    function deleteQuestion(dispID : string) {
+    function deleteElement(dispID : string) {
         emits('delete', dispID)
     }
-    function questionUp(dispID : string) {
+    function elementUp(dispID : string) {
         emits('up', dispID)
     }
-    function questionDown(dispID : string) {
+    function elementDown(dispID : string) {
         emits('down', dispID)
     }
-    
-    const isBuild = computed<boolean>(() => {
-        return (props.internalName == 'build-table-qn')
-    })
 
 </script>
 <template>
     <div class="display-table-entry-row">
         <div class="display-table-id display-table-cell" style="padding: 8px 0px; text-align: center;">
-            {{ content.displayID }}
+            
         </div>
         <div class="display-table-element display-table-cell">  
             <!-- content here -->
+            <template v-if="type == 'latex'">
+                Raw Latex
+            </template>
+            <template v-else-if="type == 'latexHeading'">
+                Header
+            </template>
+            <template v-else-if="type == 'latexEnum'">
+                List
+            </template>
         </div>
         <div class="display-table-options display-table-cell">
             <div class="option-icons">
-                <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteQuestion(content.displayID)">
-                <div class="up-down-buttons" v-if="isBuild">
-                    <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="questionUp(content.displayID)">
-                    <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="questionDown(content.displayID)">
+                <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteElement(content.displayID)">
+                <div class="up-down-buttons">
+                    <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="elementUp(content.displayID)">
+                    <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="elementDown(content.displayID)">
                 </div>
             </div>
         </div>

@@ -10,9 +10,11 @@ import WorksheetFilters from '@/components/SearchFilters/WorksheetFilters.vue';
 
 import { ref, reactive, onMounted } from 'vue'
 
-import type { qn, qns } from '@/types/Types'
 import type { worksheetElement, ws } from '@/types/WorksheetTypes';
+import { emptyWorksheetConfig, latexTypeStrings } from '@/types/WorksheetTypes'
 import { useQuestionStore } from '@/stores/questionStore';
+
+import { buildWorksheet } from '@/post/postFile';
 
 const QuestionStore = useQuestionStore()
 
@@ -22,13 +24,9 @@ const buildOptionsRightTab = ['Compile', 'Download']
 const activeOptions = reactive([true, false])
 const activeOptionID = ref<number>(0)
 
-var buildQns : qns = reactive({
-	qns : []
-})
-
 const worksheet : ws = reactive({
-	elements : [],
-	config: ''
+	elements: [],
+	config: emptyWorksheetConfig
 })
 
 QuestionStore.$onAction(
@@ -58,13 +56,13 @@ async function changeOptionTab(s : string, n : number) {
 
 		break;
 		case 'Document Settings':
-
+			console.log(QuestionStore.getBuild())
 		break;
 		case 'Compile':
 
 		break;
 		case 'Download':
-
+			const response = await buildWorksheet(worksheet)
 		break;
 	}
 
@@ -81,8 +79,110 @@ function removeFromBuild(displayID : string) {
 	QuestionStore.deleteFromBuild(displayID)
 }
 
+const isDragging = ref(false)
+function startDrag() {
+	isDragging.value = true
+}
+function startPlaceholderDrag(elementType : string) {
+	isDragging.value = true
+	const p : worksheetElement = {
+		type: "placeholder",
+		body: {
+			text: elementType
+		}
+	}
+	worksheet.elements.unshift(p)
+}
+function swapTwoElements(a: number, b: number) {
+	// console.log("Swapping two elements...")
+	const c = worksheet.elements[a]
+	worksheet.elements[a] = worksheet.elements[b]
+	worksheet.elements[b] = c
+}
+
+function addElement(e : DragEvent, i : number) {
+	const elementType = (e.dataTransfer as DataTransfer).getData('type')
+	// console.log(`Dropping element of type ${elementType} at position ${i}`)
+	if (latexTypeStrings.includes(elementType)) {
+		var n : worksheetElement
+		switch(elementType) {
+			case 'latex':
+				const li = worksheet.config.latexElements.latexCount
+				n = {
+					type: "latex",
+					body: {
+						displayID: `latex${li}`,
+						text: ''
+					}
+				}
+				worksheet.config.latexElements.latexCount++
+				break
+			case 'latexHeading':
+				const lhi = worksheet.config.latexElements.latexHeadingCount
+				n = {
+					type: "latexHeading",
+					body: {
+						displayID: `latexHeading${lhi}`,
+						type: 'section',
+						text: ''
+					}
+				}
+				worksheet.config.latexElements.latexHeadingCount++
+				break
+			case 'latexEnum':
+				const lei = worksheet.config.latexElements.latexEnumCount
+				n = {
+					type: "latexEnum",
+					body: {
+						displayID: `latexEnum${lei}`,
+						type: 'numeric',
+						template: '(*)'
+					}
+				}
+				worksheet.config.latexElements.latexEnumCount++
+				break
+			default:
+				n = {
+					type: "latex",
+					body: {
+						displayID: `latexPlaceholder`,
+						type: 'numeric',
+						template: '(*)'
+					}
+				}
+				break
+		}
+		worksheet.elements.splice(i, 1)
+		QuestionStore.insertElementIntoBuild(n, i)
+	}
+}
+
 onMounted(() => {
-	worksheet.elements = QuestionStore.getBuild()
+	console.log("Mounting...")
+
+	// NOTE: the Build Store is passed by reference to worksheet.elements.
+
+	Object.assign(worksheet.elements, QuestionStore.getBuild())
+
+	document.addEventListener('dragover', function(event) {
+		event.preventDefault()
+	})
+	document.addEventListener('drop', function(event : DragEvent) {
+		event.preventDefault()
+		isDragging.value = false
+		const i = worksheet.elements.findIndex(element => (element.type == 'placeholder'))
+
+		// If user mouse is outside the build DisplayTable, simply remove the placeholder
+		const bc = document.querySelector('#build-container') as HTMLDivElement
+		const bcrect = bc.getBoundingClientRect()
+		if ((event.clientX < bcrect.left) || (event.clientX > bcrect.right) || (event.clientY < bcrect.top) || (event.clientY > bcrect.bottom)) {
+			worksheet.elements.splice(i, 1)
+
+		// Otherwise, insert the element
+		} else {
+			addElement(event, i)
+		}
+	})
 })
 
 </script>
@@ -96,8 +196,12 @@ onMounted(() => {
 		/>
 
 		<div id="build-container" :class="{ 'inactive-container': !activeOptions[0] }">
-			<DisplayTableAddElement />
-			<DisplayTable internal-name="build-table" :elements="worksheet.elements" @delete="removeFromBuild" @up="elementUp" @down="elementDown"/>
+			<DisplayTableAddElement 
+				@start-drag="startPlaceholderDrag"/>
+			<DisplayTable internal-name="build-table" :elements="worksheet.elements" 
+				@delete="removeFromBuild" @up="elementUp" @down="elementDown"
+				:is-dragging="isDragging" @swap="swapTwoElements" @start-drag="startDrag"
+				/>
 		</div>
 
 		<div id="document-settings-container" :class="{ 'inactive-container': !activeOptions[1] }">

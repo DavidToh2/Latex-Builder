@@ -1,5 +1,5 @@
 import { getFormData } from "@/aux"
-const URL_DEV = 'localhost:3000'
+const URL_DEV = 'http://localhost:3000'
 const URL_PROD = import.meta.env.VUE_APP_URL_PRODUCTION as string
 export var BASE_URL : string
 if (import.meta.env.MODE == 'development') {
@@ -28,7 +28,7 @@ export async function post(s : string, url : string) {
     return response
 }
 
-export async function postJSON(j : {[key : string] : string | number | Date | null}, url : string) {
+export async function postJSON(j : {[key : string] : any}, url : string) {
 
     const response = await fetch(url, {
         method: 'POST',

@@ -78,9 +78,5 @@
 
 <style scoped>
 
-.up-down-buttons {
-    display: flex;
-    flex-direction: column;
-}
 
 </style>

@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 import type { qn, qnFilters } from '@/types/Types'
+import type { latex, latexEnum, latexHeading, latexTypes, worksheetElement } from '@/types/WorksheetTypes'
 import { emptyQn, emptyFilters } from '@/types/Types'
 
-import type { worksheetElement } from '@/types/WorksheetTypes'
+import { latexTypeStrings } from '@/types/WorksheetTypes' 
 
         // THE QUESTION STORE: stores all questions active or displayed in the user's current browsing session.
 
@@ -50,7 +51,12 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     function extractWorksheetElementIDs(targetArray : worksheetElement[]) {
         var idArr : string[] = []
         for (var i=0; i<targetArray.length; i++) {
-            idArr.push(targetArray[i].body.displayID)
+            const b = targetArray[i].body
+            const bt = typeof(b)
+            if (['qn', 'latex', 'latexHeading', 'latexEnum'].includes(bt)) {
+                const c = b as qn | latexTypes
+                idArr.push(c.displayID)
+            }
         }
         return idArr
     }
@@ -253,6 +259,16 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
 
             // POPULATE THE BUILD STORE
 
+    function insertElementIntoBuild(e : worksheetElement, i : number) {
+        if (latexTypeStrings.includes(e.type)) {
+            build.displayIDArray.splice(i, 0, (e.body as latexTypes).displayID)
+            build.wsArray.splice(i, 0, e)
+            return true
+        } else {
+            return false
+        }
+    }
+
     function insertQnFromDatabaseToBuild(dispID : string) {
         if (getBuildIDList().includes(dispID)) {
             return false
@@ -358,15 +374,15 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         // Contribute store functions
         insertIntoContribute, insertFromDatabaseToContribute, deleteFromContribute,
         // Build store functions
-        insertQnFromDatabaseToBuild, deleteFromBuild, swapTwoElementsInBuild,
+        insertElementIntoBuild, insertQnFromDatabaseToBuild, deleteFromBuild, swapTwoElementsInBuild,
 
         saveContributeActiveQnID, getContributeActiveQnID,
         saveDatabaseQuestionFilters, getDatabaseQuestionFilters
     }
 },
 {
-    persist: {
-        storage: sessionStorage
-    }
+    // persist: {
+    //     storage: sessionStorage
+    // }
 })
 

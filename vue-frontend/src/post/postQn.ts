@@ -1,7 +1,6 @@
 
 import { postForm, postJSON } from '@/post/post'
 import { BASE_URL } from '@/post/post'
-import type { qnFilters } from '@/types/Types'
 
 /*
         DATABASE FUNCTIONS
@@ -14,13 +13,13 @@ import type { qnFilters } from '@/types/Types'
 */
 
 export async function questionGet(f : HTMLFormElement) {         // Submits search query and uses it to populate store
-    const response = await postForm(f, `http://${BASE_URL}/database/get`, 'qn-get') as Response
+    const response = await postForm(f, `${BASE_URL}/database/get`, 'qn-get') as Response
     const responsejson = await response.json()
     return responsejson
 }
 
 export async function questionDelete(f : HTMLFormElement, displayID : string) {
-    const response = await postForm(f, `http://${BASE_URL}/database/delete/${displayID}`, 'qn-delete') as Response
+    const response = await postForm(f, `${BASE_URL}/database/delete/${displayID}`, 'qn-delete') as Response
     const responsejson = await response.json()
     return responsejson
 }
@@ -28,12 +27,12 @@ export async function questionDelete(f : HTMLFormElement, displayID : string) {
 export async function questionSave(f : HTMLFormElement, displayID : string) {
     // If the question is a new question:
     if (displayID == '0') {
-        const response = await postForm(f, `http://${BASE_URL}/database/set/new`, 'qn-setNew') as Response
+        const response = await postForm(f, `${BASE_URL}/database/set/new`, 'qn-setNew') as Response
         const responsejson = await response.json()
         return responsejson
     // If the question is an existing question:
     } else {
-        var response = await postForm(f, `http://${BASE_URL}/database/set/update/${displayID}`, 'qn-setUpdate') as Response
+        var response = await postForm(f, `${BASE_URL}/database/set/update/${displayID}`, 'qn-setUpdate') as Response
         const responsejson = await response.json()
         return responsejson
     }
