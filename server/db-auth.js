@@ -1,4 +1,4 @@
-const async = require('async')
+
 const { mongoose } = require('./db-connection')
 const { userSchema } = require('./models/user')
 const crypto = require('crypto')
