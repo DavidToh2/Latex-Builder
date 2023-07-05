@@ -21,6 +21,20 @@ function fileUpload() {
 
 }
 
+function documentOutput(documentClass, packages, setup, title, author, date, body) {
+    const s = documentClass + '\n\n' + packages + '\n\n' + setup + '\n\n'
+    + `\\title\{${title}\}` + `\\author\{${author}\}` + `\\date\{${date}\}` + '\n\n'
+    + "\\begin\{document\}" + "\\maketitle" + '\n\n'
+    + `${body}` + '\n\n'
+    + `\\end\{document\}`
+
+    return s
+}
+
+async function buildDocument(data, reqSource, templateName = "default") {
+
+}
+
 function latexCompile(fileName) {
 
     filePath = `${fileroot}/${fileName}`

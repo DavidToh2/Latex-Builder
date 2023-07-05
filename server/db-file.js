@@ -12,15 +12,23 @@ async function addTemplate(data) {
     const errorString = "Failed to add new document template!"
     try {
         const t = await DocumentTemplates.insertMany([data])
+        return t
     } catch(err) {
         newError(err, errorString)
     }
 }
 
-async function buildDocument(data, templateName = "default") {
+async function getTemplate(data) {
 
-}
-
-function documentOutput(documentClass, packages, setup, title, author, date, body) {
-    
+    const errorString = "Failed to get new document template!"
+    try {
+        const t = await DocumentTemplates.find(data).lean()
+        if (t.length == 0) {
+            throw new UserError(errorString, 'Failed to find template!')
+        } else {
+            return t[0]
+        }
+    } catch(err) {
+        newError(err, errorString)
+    }
 }

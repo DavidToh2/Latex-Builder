@@ -268,7 +268,7 @@ document.addEventListener('keydown', function(event) {
 	width: 100%;
 	height: calc(100vh - 64px);
 	overflow-x: hidden;
-	overflow-y: hidden;
+	overflow-y: scroll;
 }
 
 

@@ -6,7 +6,7 @@
     import type { qn } from '@/types/Types'
     import type { worksheetElement, latex, latexHeading, latexEnum, latexTypes, latexTypeNames, placeholder } from "@/types/WorksheetTypes"
     import { latexTypeStrings } from "@/types/WorksheetTypes"
-    import { watch, ref, reactive, onUpdated } from "vue"
+    import { ref, reactive, onUpdated } from "vue"
 
     export interface Props {
         internalName: string
@@ -20,8 +20,8 @@
     const emits = defineEmits<{
         (e: 'insert', displayID: string, direction: string): void
         (e: 'delete', displayID: string): void
-        (e: 'up', displayID: string): void
-        (e: 'down', displayID: string): void
+        (e: 'up', i : number): void
+        (e: 'down', i : number): void
         (e: 'swap', index1: number, index2: number): void
         (e: 'startDrag'): void
         (e: 'endDrag'): void
@@ -35,11 +35,11 @@
     function insertObject(displayID : string, direction : string) {
         emits('insert', displayID, direction)
     }
-    function objectUp(displayID : string) {
-        emits('up', displayID)
+    function objectUp(i : number) {
+        emits('up', i)
     }
-    function objectDown(displayID : string) {
-        emits('down', displayID)
+    function objectDown(i : number) {
+        emits('down', i)
     }
 
             // Drag and drop functions
@@ -66,36 +66,41 @@
     }
     function detectElementAboveMouse(e : DragEvent) {
         const element = e.currentTarget as HTMLElement
+
+        const currentAboveMouseStatus = targetElement.aboveMouse
         const rect = element.getBoundingClientRect()
-        if ((rect.top + rect.height / 2) < e.clientY) {
+        if ((rect.top + 2 * rect.height / 3) < e.clientY) {
             targetElement.aboveMouse = true
-        } else {
+            // console.log(`Element above mouse: ${targetElement.aboveMouse}`)
+        } else if ((rect.top + rect.height / 3) > e.clientY) {
             targetElement.aboveMouse = false
+            // console.log(`Element above mouse: ${targetElement.aboveMouse}`)
         }
-        // console.log(`Element above mouse: ${targetElement.aboveMouse}`)
+        const newAboveMouseStatus = targetElement.aboveMouse
+
+        if (currentAboveMouseStatus != newAboveMouseStatus) {
+            const t = targetElement.elementIndex
+            const d = droppedElementIndex.value
+            // console.log(`Original indices: target element is ${t}, dropped element is ${d}`)
+            if (t != d) {
+                // If droppedElement above targetElement above mouse
+                if (newAboveMouseStatus && (t > d)) {
+                    targetElement.elementIndex = d
+                    droppedElementIndex.value = t
+                    // Swap droppedElement and targetElement
+                    emits('swap', d, t)
+                }
+                // If mouse above targetElement above droppedElement
+                if (!newAboveMouseStatus && (t < d)) {
+                    targetElement.elementIndex = d
+                    droppedElementIndex.value = t
+                    // Swap targetElement and droppedElement
+                    emits('swap', d, t)
+                }
+            }
+        }
     }
 
-    watch(() => targetElement.aboveMouse, (newAbove) => {
-        const t = targetElement.elementIndex
-        const d = droppedElementIndex.value
-        // console.log(`Original indices: target element is ${t}, dropped element is ${d}`)
-        if (t != d) {
-            // If droppedElement above targetElement above mouse
-            if (newAbove && (t > d)) {
-                targetElement.elementIndex = d
-                droppedElementIndex.value = t
-                // Swap droppedElement and targetElement
-                emits('swap', d, t)
-            }
-            // If mouse above targetElement above droppedElement
-            if (!newAbove && (t < d)) {
-                targetElement.elementIndex = d
-                droppedElementIndex.value = t
-                // Swap targetElement and droppedElement
-                emits('swap', d, t)
-            }
-        }
-    })
     function endElementDrag(e : DragEvent) {
         emits('endDrag')
     }
@@ -115,15 +120,15 @@
     <div class="display-table">
         <DisplayTableHeader />
         <div v-if="internalName == 'database-table'">
-            <div class="display-table-results" v-for="item in qns">
+            <div class="display-table-results" v-for="(item, index) in qns">
                 <DisplayTableEntry :internalName="props.internalName + '-qn'" :q="item" 
-                    @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"/>
+                    @insert="insertObject" @delete="deleteObject" @up="objectUp(index)" @down="objectDown(index)"/>
             </div>
         </div>
         <div v-if="internalName == 'build-table'">
             <div class="display-table-results" v-for="(item, index) in elements">
                 <DisplayTableEntry v-if="item.type == 'qn'" :internalName="props.internalName + '-qn'" :q="(item.body as qn)" 
-                    @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"
+                    @insert="insertObject" @delete="deleteObject" @up="objectUp(index)" @down="objectDown(index)"
                     draggable="true" class="draggable" @dragstart="startElementDrag($event, index)" @dragend="endElementDrag"
                     :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}"
                     @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
@@ -135,7 +140,7 @@
 
                 <DisplayTableElement v-else-if="latexTypeStrings.includes(item.type)"
                     :internalName="props.internalName + '-element'" :content="(item.body as latexTypes)" :type="(item.type as latexTypeNames)" 
-                    @insert="insertObject" @delete="deleteObject" @up="objectUp" @down="objectDown"
+                    @insert="insertObject" @delete="deleteObject" @up="objectUp(index)" @down="objectDown(index)"
                     draggable="true" class="draggable" @dragstart="startElementDrag($event, index)" @dragend="endElementDrag"
                     :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}"
                     @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>

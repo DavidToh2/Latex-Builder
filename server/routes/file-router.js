@@ -42,7 +42,7 @@ router.get('/get/:fileName', function(req, res, next) {
 
 // Compile a build into a latex document
 
-router.get('/compile/:fileName', function(req, res, next) {
+router.post('/compile/', function(req, res, next) {
     try {    
         const fileName = req.params.fileName
         console.log(`Compiling file ${fileName}...`)
@@ -60,5 +60,12 @@ router.get('/compile/:fileName', function(req, res, next) {
     }
 })
 
+router.post('/template/add/', function(req, res, next) {
+    try {
+
+    } catch(err) {
+        next(err)
+    }
+})
 
 module.exports = router

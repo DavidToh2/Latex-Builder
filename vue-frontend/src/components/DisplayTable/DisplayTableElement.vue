@@ -12,18 +12,18 @@ import { computed } from 'vue';
     const emits = defineEmits<{
         (e: 'insert', displayID: string, direction: string): void
         (e: 'delete', displayID: string): void
-        (e: 'up', displayID: string): void
-        (e: 'down', displayID: string): void
+        (e: 'up'): void
+        (e: 'down'): void
     }>()
 
     function deleteElement(dispID : string) {
         emits('delete', dispID)
     }
-    function elementUp(dispID : string) {
-        emits('up', dispID)
+    function elementUp() {
+        emits('up')
     }
-    function elementDown(dispID : string) {
-        emits('down', dispID)
+    function elementDown() {
+        emits('down')
     }
 
 </script>
@@ -48,8 +48,8 @@ import { computed } from 'vue';
             <div class="option-icons">
                 <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteElement(content.displayID)">
                 <div class="up-down-buttons">
-                    <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="elementUp(content.displayID)">
-                    <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="elementDown(content.displayID)">
+                    <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="elementUp">
+                    <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="elementDown">
                 </div>
             </div>
         </div>

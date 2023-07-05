@@ -1,6 +1,7 @@
 import type { qn } from "./Types"
 
 export interface placeholder {
+    displayID: 'placeholder',
     text: string
 }
 export interface latexHeading {

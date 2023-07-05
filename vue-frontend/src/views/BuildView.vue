@@ -8,7 +8,7 @@ import DisplayTableAddElement from '@/components/DisplayTable/DisplayTableAddEle
 
 import WorksheetFilters from '@/components/SearchFilters/WorksheetFilters.vue';
 
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 
 import type { worksheetElement, ws } from '@/types/WorksheetTypes';
 import { emptyWorksheetConfig, latexTypeStrings } from '@/types/WorksheetTypes'
@@ -31,7 +31,7 @@ const worksheet : ws = reactive({
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'deleteFromBuild') || (name == 'swapTwoElementsInBuild') ) {
+        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'insertElementIntoBuild') || (name == 'deleteFromBuild') || (name == 'swapTwoElementsInBuild') ) {
             after((result) => {
                 if (result) {
                     const newBuildQnList = QuestionStore.getBuild() as worksheetElement[]
@@ -57,6 +57,7 @@ async function changeOptionTab(s : string, n : number) {
 		break;
 		case 'Document Settings':
 			console.log(QuestionStore.getBuild())
+			console.log(QuestionStore.getBuildIDList())
 		break;
 		case 'Compile':
 
@@ -69,13 +70,18 @@ async function changeOptionTab(s : string, n : number) {
 	activeOptions[activeOptionID.value] = true
 }
 
-function elementUp(dispID : string) {
-	QuestionStore.swapTwoElementsInBuild(dispID, 'up')
+function elementUp(i : number) {
+	if (i > 0) {
+		QuestionStore.swapTwoElementsInBuild(i, i-1)
+	}
 }
-function elementDown(dispID : string) {
-	QuestionStore.swapTwoElementsInBuild(dispID, 'down')
+function elementDown(i : number) {
+	if (i < worksheet.elements.length - 1) {
+		QuestionStore.swapTwoElementsInBuild(i, i+1)
+	}
 }
 function removeFromBuild(displayID : string) {
+	// console.log(`Deleting the following item from build: ${displayID}`)
 	QuestionStore.deleteFromBuild(displayID)
 }
 
@@ -88,16 +94,16 @@ function startPlaceholderDrag(elementType : string) {
 	const p : worksheetElement = {
 		type: "placeholder",
 		body: {
+			displayID: "placeholder",
 			text: elementType
 		}
 	}
-	worksheet.elements.unshift(p)
+	QuestionStore.insertElementIntoBuild(p, 0)
+	// console.log(QuestionStore.getBuild())
 }
 function swapTwoElements(a: number, b: number) {
 	// console.log("Swapping two elements...")
-	const c = worksheet.elements[a]
-	worksheet.elements[a] = worksheet.elements[b]
-	worksheet.elements[b] = c
+	QuestionStore.swapTwoElementsInBuild(a, b)
 }
 
 function addElement(e : DragEvent, i : number) {
@@ -152,7 +158,7 @@ function addElement(e : DragEvent, i : number) {
 				}
 				break
 		}
-		worksheet.elements.splice(i, 1)
+		QuestionStore.deleteFromBuild('placeholder')
 		QuestionStore.insertElementIntoBuild(n, i)
 	}
 }
@@ -187,6 +193,8 @@ onMounted(() => {
 	})
 })
 
+const buildIDArr = computed<string[]>(() => { return QuestionStore.getBuildIDList() })
+
 </script>
 
 <template>
@@ -196,6 +204,7 @@ onMounted(() => {
 			:tab-left="buildOptionsLeftTab" :tab-right="buildOptionsRightTab" 
 			:font-size=22 internalName="buildOptions" :active-i-d="activeOptionID" @change-tab="changeOptionTab"
 		/>
+		<!-- <div v-for="item in buildIDArr">{{ item }}</div> -->
 
 		<div id="build-container" :class="{ 'inactive-container': !activeOptions[0] }">
 			<DisplayTableAddElement 

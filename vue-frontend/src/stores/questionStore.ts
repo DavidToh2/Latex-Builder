@@ -260,7 +260,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
             // POPULATE THE BUILD STORE
 
     function insertElementIntoBuild(e : worksheetElement, i : number) {
-        if (latexTypeStrings.includes(e.type)) {
+        if (latexTypeStrings.includes(e.type) || e.type == 'placeholder') {
             build.displayIDArray.splice(i, 0, (e.body as latexTypes).displayID)
             build.wsArray.splice(i, 0, e)
             return true
@@ -290,6 +290,9 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     }
     function deleteFromBuild(dispID : string) {
         const i = getObjectIndexUsingID(build, dispID)
+        deleteIndexFromBuild(i)
+    }
+    function deleteIndexFromBuild(i : number) {
         if (i > -1) {
             build.displayIDArray.splice(i, 1)
             build.wsArray.splice(i, 1)
@@ -298,36 +301,20 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
             return false
         }
     }
-    function swapTwoElementsInBuild(dispID : string, direction : string) {
-        const i = getObjectIndexUsingID(build, dispID)
-        if (i > -1) {
-            if (direction == 'up') {
-                if (i > 0) {
-                    var x = build.wsArray[i-1]
-                    var xd = build.displayIDArray[i-1]
-                    build.wsArray.splice(i-1, 1)
-                    build.wsArray.splice(i, 0, x)
-                    build.displayIDArray.splice(i-1, 1)
-                    build.displayIDArray.splice(i, 0, xd)
-                } else {
-                    // do nothing if this element is already at the top of build
-                }
-                return true
-            } else if (direction == 'down'){
-                if (i < build.displayIDArray.length - 1) {
-                    var x = build.wsArray[i+1]
-                    var xd = build.displayIDArray[i+1]
-                    build.wsArray.splice(i+1, 1)
-                    build.wsArray.splice(i, 0, x)
-                    build.displayIDArray.splice(i+1, 1)
-                    build.displayIDArray.splice(i, 0, xd)
-                } else {
-                    // do nothing if this element is already at the bottom of build
-                }
-                return true
-            } else {
-                return false
-            }
+    function swapTwoElementsInBuild(i1 : number, i2 : number) {
+        if (i1 != i2) {
+
+            const e1 = build.wsArray[i1]
+            const id1 = build.displayIDArray[i1]
+            const e2 = build.wsArray[i2]
+            const id2 = build.displayIDArray[i2]
+
+            build.wsArray.splice(i1, 1, e2)
+            build.wsArray.splice(i2, 1, e1)
+            build.displayIDArray.splice(i1, 1, id2)
+            build.displayIDArray.splice(i2, 1, id1)
+
+            return true
         } else {
             return false
         }
@@ -374,7 +361,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         // Contribute store functions
         insertIntoContribute, insertFromDatabaseToContribute, deleteFromContribute,
         // Build store functions
-        insertElementIntoBuild, insertQnFromDatabaseToBuild, deleteFromBuild, swapTwoElementsInBuild,
+        insertElementIntoBuild, insertQnFromDatabaseToBuild, deleteFromBuild, deleteIndexFromBuild, swapTwoElementsInBuild,
 
         saveContributeActiveQnID, getContributeActiveQnID,
         saveDatabaseQuestionFilters, getDatabaseQuestionFilters
