@@ -60,10 +60,26 @@ async function changeOptionTab(s : string, n : number) {
 			console.log(QuestionStore.getBuildIDList())
 		break;
 		case 'Compile':
+			worksheet.elements = QuestionStore.getBuild()
 
+			// BUILD WORKSHEET
+
+			const responsejson = await buildWorksheet(worksheet)
+			if (responsejson.status == -1) {
+                    // Error occured
+                    const error = responsejson.error
+                    console.log(error)
+
+                } else if (responsejson.status == 1) {
+                    // Failure
+
+                } else {
+                    // Success
+                    
+                }
 		break;
 		case 'Download':
-			const response = await buildWorksheet(worksheet)
+			
 		break;
 	}
 
@@ -193,7 +209,7 @@ onMounted(() => {
 	})
 })
 
-const buildIDArr = computed<string[]>(() => { return QuestionStore.getBuildIDList() })
+// const buildIDArr = computed<string[]>(() => { return QuestionStore.getBuildIDList() })
 
 </script>
 

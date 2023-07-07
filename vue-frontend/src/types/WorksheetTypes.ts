@@ -33,6 +33,15 @@ export interface worksheetConfig {
         latexHeadingCount: number,
         latexEnumCount: number
     },
+    title: {
+        title: string,
+        author: string,
+        date: string
+    }
+    template: string,
+    packages: string[],
+    setup: string,
+
     options: string
 }
 
@@ -42,6 +51,15 @@ const emptyWorksheetConfig : worksheetConfig = {
         latexHeadingCount: 0,
         latexEnumCount: 0
     },
+    title: {
+        title: '',
+        author: '',
+        date: ''
+    },
+    template: 'default',
+    packages: <string[]> [],
+    setup: '',
+
     options: ''
 }
 

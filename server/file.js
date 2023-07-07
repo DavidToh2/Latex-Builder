@@ -3,6 +3,8 @@ const path = require('path')
 
 const { existsSync } = require('fs')
 
+const { getTemplate } = require('./db-file')
+
 const scriptroot = path.join(__dirname, 'scripts')
 const fileroot = path.join(__dirname, 'public/files')
 
@@ -30,8 +32,17 @@ function documentOutput(documentClass, packages, setup, title, author, date, bod
 
     return s
 }
+async function buildDocument(data) {
+    const config = data['config']
 
-async function buildDocument(data, reqSource, templateName = "default") {
+    const templateName = config['template']
+
+    const template = await getTemplate(templateName)
+
+    const documentTitle = config['title']
+    const title = documentTitle['title']
+    const author = documentTitle['author']
+    const date = documentTitle['date']
 
 }
 
@@ -81,5 +92,5 @@ function fileError(err, msg) {
 }
 
 module.exports = {
-    fileCreate, fileDelete, fileUpload, latexCompile
+    fileCreate, fileDelete, fileUpload, buildDocument, latexCompile
 }

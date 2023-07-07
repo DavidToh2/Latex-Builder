@@ -18,11 +18,14 @@ async function addTemplate(data) {
     }
 }
 
-async function getTemplate(data) {
+async function getTemplate(tName) {
 
     const errorString = "Failed to get new document template!"
     try {
-        const t = await DocumentTemplates.find(data).lean()
+        const d = {
+            templateName: tName
+        }
+        const t = await DocumentTemplates.find(d).lean()
         if (t.length == 0) {
             throw new UserError(errorString, 'Failed to find template!')
         } else {
@@ -31,4 +34,8 @@ async function getTemplate(data) {
     } catch(err) {
         newError(err, errorString)
     }
+}
+
+module.exports = {
+    addTemplate, getTemplate
 }

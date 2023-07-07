@@ -2,7 +2,8 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
 
-const Preamble = new Schema( {
+const TemplateSchema = new Schema( {
+    templateName: String,
     documentClass: {
         type: String,
         required: true
@@ -45,5 +46,6 @@ const DocumentSchema = new Schema( {
 })
 
 module.exports = { 
+    TemplateSchema: TemplateSchema,
     DocumentSchema: DocumentSchema
 }

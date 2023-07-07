@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const path = require('path')
-const { latexCompile } = require('../file')
+const { latexCompile, buildDocument } = require('../file')
 
 const sendFileOptions = {
     root: path.join(__dirname, '../public'),
@@ -42,16 +42,14 @@ router.get('/get/:fileName', function(req, res, next) {
 
 // Compile a build into a latex document
 
-router.post('/compile/', function(req, res, next) {
+router.post('/build/', function(req, res, next) {
     try {    
-        const fileName = req.params.fileName
-        console.log(`Compiling file ${fileName}...`)
-        const compileres = latexCompile(fileName)
+        const ws = req.body
+        console.log(`Compiling worksheet ${ws}...`)
+        const compileres = buildDocument(ws)
 
         if (compileres == 0) {
-            const filePath = `files/${fileName}/${fileName}.pdf`
-            console.log(`Sending file at ${filePath} to front-end...`)
-            res.sendFile(filePath, sendFileOptions)
+
         } else {
             throw new Error(`Invalid compile response: code ${compileres}`)
         }
