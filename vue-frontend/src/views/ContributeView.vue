@@ -320,11 +320,7 @@ function dump() {
     border-radius: 8px;
     border: 1px solid #000000;
     padding: 10px;
-
-    font-size: 14px;
-    font-family: 'Gothic AI', sans-serif;
-
-    overflow-y: scroll;
+    resize: none;
 }
 
 #question-save-button {

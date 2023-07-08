@@ -71,3 +71,25 @@ export async function postForm(f : HTMLFormElement, url : string, descriptor : s
     const response = await postJSON(reqBody, url)
     return response
 }
+
+export async function postGetFile(data : { [key : string] : string}, url : string) {
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/pdf'
+        },
+        body: JSON.stringify(data),
+        credentials: 'include'
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok')
+        }
+        return response as Response
+    })
+    .catch((error) => console.log('post.ts/postGetFile returned error ', error)) as Response
+
+    return response // Returns a blob
+}

@@ -1,58 +1,25 @@
 const express = require('express')
 const router = express.Router()
 const path = require('path')
-const { latexCompile, buildDocument } = require('../file')
-
-const sendFileOptions = {
-    root: path.join(__dirname, '../public'),
-    headers: {
-        'x-timestamp': Date.now()
-    }
-}
-
-
-router.use((req, res, next) => {                        // MIDDLEWARE FUNCTION GETS CALLED ON EVERY QUERY
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "*")
-    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
-    next()
-})
-
-// Upload a file
-
-router.post('/upload', function(req, res, next) {
-    
-})
-
-// Get the PDF file with "filename"
-
-router.get('/get/:fileName', function(req, res, next) {
-
-    try {
-        const fileName = req.params.fileName
-        const filePath = `files/${fileName}/${fileName}.pdf`
-        console.log(filePath)
-        res.sendFile(filePath, sendFileOptions)
-    } catch(err) {
-        next(err)
-    }
-    // https://expressjs.com/en/api.html#res.sendFile
-
-})
+const fs = require('fs')
+const { buildDocument } = require('../file')
+const { ResponseBody } = require('../express-classes/response')
+const { ServerError } = require('../express-classes/error')
 
 // Compile a build into a latex document
 
-router.post('/build/', function(req, res, next) {
+router.post('/build/', isAuthenticated, async function(req, res, next) {
     try {    
         const ws = req.body
-        console.log(`Compiling worksheet ${ws}...`)
-        const compileres = buildDocument(ws)
+        const uID = req.session.uID
+        console.log('Compiling worksheet...')
+        console.log(ws)
+        const compileres = await buildDocument(ws, uID)
 
-        if (compileres == 0) {
+        const response = new ResponseBody(ws['fn'])
+        response.status = compileres
 
-        } else {
-            throw new Error(`Invalid compile response: code ${compileres}`)
-        }
+        res.json(response)
     } catch(err) {
         next(err)
     }
@@ -65,5 +32,53 @@ router.post('/template/add/', function(req, res, next) {
         next(err)
     }
 })
+
+router.post('/get', isAuthenticated, function(req, res, next) {
+
+    // Note: the vue-pdf-embed component sends its own "GET" request that does not include session data.
+    // Hence, authentication via this route is not possible.
+    // Authenticate from the frontend instead.
+
+    const sendFileOptions = {
+        root: path.join(__dirname, '../public'),
+        headers: {
+            'x-timestamp': Date.now()
+        }
+    }
+
+    try {
+        var filePath
+        if (req.body.name == 'preview') {
+            filePath = `files/preview/preview.pdf`
+        } else {
+            const uID = req.session.uID
+            filePath = `files/${uID}/output.pdf`
+        }
+        console.log(filePath)
+
+        res.sendFile(filePath, sendFileOptions)
+
+        // https://expressjs.com/en/api.html#res.sendFile
+    } catch(err) {
+        next(err)
+    }
+})
+
+function isAuthenticated(req, res, next) {
+    if (req.session.uID) {
+        next()
+    } else {
+        next('route')
+    }
+    // next('route') tells the router to skip all the remaining route callbacks
+}
+
+function validateFilePresence(filePath) {
+    if (!fs.existsSync(filePath)) {
+        throw new ServerError("Failed to fetch PDF file!", `File ${filePath} does not exist on the system!`)
+    } else {
+        return true
+    }
+}
 
 module.exports = router

@@ -1,11 +1,22 @@
 const { mongoose } = require('./db-connection')
-const { DocumentSchema } = require('./models/document')
+const { TemplateSchema, DocumentSchema } = require('./models/document')
 
 const { UserError, DatabaseError, newError } = require('./express-classes/error')
 
-const documentDB = mongoose.connection.useDb('templates', { useCache: true })
+const templateDB = mongoose.connection.useDb('templates', { useCache: true })
+const documentDB = mongoose.connection.useDb('documents', { useCache: true })
 
-const DocumentTemplates = documentDB.model('templates', DocumentSchema)
+const DocumentTemplates = templateDB.model('templates', TemplateSchema)
+const Documents = documentDB.model('documents', DocumentSchema)
+
+// DocumentTemplates.insertMany(
+//     [{
+//         templateName: 'default',
+//         documentClass: '\\documentclass\{article\}',
+//         packages: ['matholympiad', 'graphicx'],
+//         setup: ''
+//     }]
+// )
 
 async function addTemplate(data) {
 

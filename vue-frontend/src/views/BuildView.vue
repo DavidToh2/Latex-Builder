@@ -47,43 +47,46 @@ async function changeOptionTab(s : string, n : number) {
     if (n == activeOptionID.value) {
         return
     }
-    activeOptionID.value = n
-
-	for (var i=0; i<4; i++) { activeOptions[i] = false }
+	if (n < 2) {
+		activeOptionID.value = n
+		for (var i=0; i<4; i++) { activeOptions[i] = false }
+		activeOptions[activeOptionID.value] = true
+	}
 
 	switch(s) {
-		case 'Selected Questions':
+		case buildOptionsLeftTab[0]:
 
 		break;
-		case 'Document Settings':
+		case buildOptionsLeftTab[1]:
 			console.log(QuestionStore.getBuild())
 			console.log(QuestionStore.getBuildIDList())
 		break;
-		case 'Compile':
+		case buildOptionsRightTab[0]:
 			worksheet.elements = QuestionStore.getBuild()
 
 			// BUILD WORKSHEET
 
 			const responsejson = await buildWorksheet(worksheet)
 			if (responsejson.status == -1) {
-                    // Error occured
-                    const error = responsejson.error
-                    console.log(error)
+				// Error occured
+				const error = responsejson.error
+				console.log(error)
 
-                } else if (responsejson.status == 1) {
-                    // Failure
+			} else if (responsejson.status == 1) {
+				// Failure: LaTeX compilation error
+				console.log("User error")
+				QuestionStore.resetDisplayPDFName()
 
-                } else {
-                    // Success
-                    
-                }
+			} else {
+				// Success
+				console.log("Success")
+				QuestionStore.setDisplayPDFName('output')
+			}
 		break;
-		case 'Download':
+		case buildOptionsRightTab[1]:
 			
 		break;
 	}
-
-	activeOptions[activeOptionID.value] = true
 }
 
 function elementUp(i : number) {
@@ -165,11 +168,10 @@ function addElement(e : DragEvent, i : number) {
 				break
 			default:
 				n = {
-					type: "latex",
+					type: "placeholder",
 					body: {
-						displayID: `latexPlaceholder`,
-						type: 'numeric',
-						template: '(*)'
+						displayID: `placeholderDefault`,
+						text: 'placeholder'
 					}
 				}
 				break
@@ -233,7 +235,14 @@ onMounted(() => {
 
 		<div id="document-settings-container" :class="{ 'inactive-container': !activeOptions[1] }">
 			<WorksheetFilters />
-			<div class="preview" id="preview">
+			<div class="latex">
+				<textarea class="latex-text" name="documentClass" placeholder="documentClass:"></textarea>
+				<textarea class="latex-text" name="packages" placeholder="Packages:"></textarea>
+				<textarea class="latex-text" name="setup" placeholder="Setup:"></textarea>
+				<textarea class="latex-text" name="title" placeholder="Title:"></textarea>
+				<textarea class="latex-text" name="beginDocument" placeholder="Begin document:"></textarea>
+				<textarea class="latex-text" name="body" placeholder="Type LaTeX here:"></textarea>
+				<textarea class="latex-text" name="endDocument" placeholder="End document:"></textarea>
 			</div>
 		</div>
 	</div>
@@ -260,5 +269,19 @@ onMounted(() => {
     border: 1px solid #000000;
 
     overflow-y: scroll;
+}
+
+.latex {
+	border: 1px solid black;
+	padding: 7px;
+	border-radius: 6px;
+}
+
+.latex-text {
+	width: 100%;
+	height: fit-content;
+	border: 0;
+	padding: 0px;
+	resize: none;
 }
 </style>

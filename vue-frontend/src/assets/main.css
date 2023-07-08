@@ -23,6 +23,14 @@
 	align-items: center;
 }
 
+.latex-text {
+	font-family: var(--code-font-family);
+	font-size: var(--font-size-sm1);
+	tab-size: 4;
+
+    overflow-y: scroll;
+}
+
 .btn {
 	border: 1px solid var(--colour-border-dark);
 	background-color: var(--colour-theme);

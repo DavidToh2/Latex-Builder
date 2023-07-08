@@ -9,7 +9,7 @@ const TemplateSchema = new Schema( {
         required: true
     },
     packages: {
-        type: String,
+        type: [String],
         required: true
     },
     setup: {
@@ -33,7 +33,7 @@ const DocumentSchema = new Schema( {
     name: String,
 
     preamble: {
-        type: Preamble,
+        type: TemplateSchema,
         required: true
     },
     title: {

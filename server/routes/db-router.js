@@ -100,41 +100,6 @@ router.post('/delete/:displayID', async function(req, res, next) {
     }
 })
 
-// Application error handler.
-// Catches all errors from auth-router and db-auth
-
-router.use(function(err, req, res, next) {
-
-    console.log(err)
-
-    if (err instanceof UserError) {
-        const response = new ResponseBody()
-        response.status = 1
-        response.fn = `${req.body['fn']}-UserError`
-        response.body = {
-            name: err.name,
-            message: err.message,
-            cause: err.cause,
-            status: err.status
-        }
-
-        res.json(response)
-    } else {
-        const response = new ResponseError()
-        response.status = -1
-        response.fn = `${req.body['fn']}-ServerError`
-        response.error = {
-            name: err.name,
-            message: err.message,
-            cause: err.cause,
-            status: err.status
-        }
-
-        res.status(502)
-        res.json(response)
-    }
-})
-
 function parseWebToServer(reqData) {
     for (const f of stringToArrayFields) {
         if (reqData.hasOwnProperty(f)) {

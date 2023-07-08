@@ -16,7 +16,9 @@ const { mongoose } = require('./db-connection')
 
 const dbrouter = require('./routes/db-router')
 const filerouter = require('./routes/file-router')
-const authrouter = require('./routes/auth-router')
+const authrouter = require('./routes/auth-router');
+const { UserError, DatabaseError, ServerError } = require('./express-classes/error');
+const { ResponseBody, ResponseError } = require('./express-classes/response');
 
 		// Initialise the app
 
@@ -78,6 +80,38 @@ app.use('/file', filerouter)
 app.use('/auth', authrouter)
 
 		// Error handlers
+
+app.use(function(err, req, res, next) {
+
+	console.log(err)
+
+	if (err instanceof UserError) {
+		const response = new ResponseBody()
+		response.status = 1
+		response.fn = `${req.body['fn']}-UserError`
+		response.body = {
+			name: err.name,
+			message: err.message,
+			cause: err.cause,
+			status: err.status
+		}
+
+		res.json(response)
+	} else if (err instanceof DatabaseError || err instanceof ServerError) {
+		const response = new ResponseError()
+		response.status = -1
+		response.fn = `${req.body['fn']}-ServerError`
+		response.error = {
+			name: err.name,
+			message: err.message,
+			cause: err.cause,
+			status: err.status
+		}
+
+		res.status(502)
+		res.json(response)
+	}
+})
 
 // Catch 404 and forward to error handler
 app.use(function (req, res, next) {

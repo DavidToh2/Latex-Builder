@@ -1,14 +1,58 @@
 <script setup lang="ts">
 
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import Title from '@/components/PageTitle.vue'
-import UserTab from '@/components/Tab/UserTab.vue'
+import Tab from '@/components/Tab/Tab.vue'
 import pdf from 'vue-pdf-embed'
+import { useQuestionStore } from '@/stores/questionStore'
+import { getPDF } from '@/post/postFile'
 
-var activeDoc = ref('https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf')
+const activeTabID = ref(0)
+const documentTab = ['Document', 'Console Output']
 
-var activeDocument = ref('http://localhost:3000/file/get/document1')
-var openDocuments = reactive<string[]>(['Hi'])
+const blobURL = ref('')
+
+const QuestionStore = useQuestionStore()
+
+onMounted(async () => {
+    const pdfName = ''
+    const x = await displayPDF(pdfName)
+    pdfDisplayWidth.value = getPDFDisplayWidth()
+})
+
+QuestionStore.$onAction(
+    ({name, store, args, after, onError }) => {
+        if ( (name == 'setDisplayPDFName') || (name == 'resetDisplayPDFName') ) {
+            after(async (result) => {
+                if (result) {
+                    const pdfName = QuestionStore.getDisplayPDFName()
+                    console.log(pdfName)
+                    const x = await displayPDF(pdfName)
+                }
+            })
+        }
+    }
+)
+
+async function displayPDF(pdfName : string) {
+    try {
+        const pdfBlob = await getPDF(pdfName)
+        blobURL.value = URL.createObjectURL(pdfBlob)
+        console.log(`Displaying PDF ${pdfName}`)
+        return true
+    } catch(err) {
+        console.log(err)
+        return false
+    }
+}
+
+const pdfDisplayWidth = ref(300)
+
+function getPDFDisplayWidth() {
+    const d = document.querySelector('#document-viewer') as HTMLDivElement
+    const rect = d.getBoundingClientRect()
+    return (rect.right - rect.left)
+}
 
 </script>
 
@@ -18,10 +62,12 @@ var openDocuments = reactive<string[]>(['Hi'])
         <div id="drive">
         
         </div>
-        <UserTab :active-tab="activeDocument" :tab-list="openDocuments" />
+        <Tab internal-name="DocumentViewTab" :tab-left=documentTab :active-i-d=activeTabID :tab-right="[]" />
         <div id="document-viewer">
             <pdf
-                :source="activeDocument"
+                :source="blobURL"
+                :width="pdfDisplayWidth + 'px'"
+                :scale="3"
             />
         </div>
     </div>
@@ -32,6 +78,7 @@ var openDocuments = reactive<string[]>(['Hi'])
 
 #document-viewer {
     border: 0px solid black;
+    width: 90%;
 }
 
 .vue-pdf-embed > div {

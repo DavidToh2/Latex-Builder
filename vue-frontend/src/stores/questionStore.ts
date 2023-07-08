@@ -338,7 +338,23 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         return databaseFilters
     }
 
-    return{ 
+                // PDF DISPLAY
+
+    const displayPDFName = ref('')
+
+    function setDisplayPDFName(f : string) { 
+        displayPDFName.value = f
+        return true
+    }
+    function getDisplayPDFName() { 
+        return displayPDFName.value
+    }
+    function resetDisplayPDFName() {
+        displayPDFName.value = ''
+        return true
+    }
+
+    return { 
         // Workspace view stores
         database, contribute, build,
         // Workspace view state variables
@@ -363,8 +379,13 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         // Build store functions
         insertElementIntoBuild, insertQnFromDatabaseToBuild, deleteFromBuild, deleteIndexFromBuild, swapTwoElementsInBuild,
 
+
+        // Component state functions
         saveContributeActiveQnID, getContributeActiveQnID,
-        saveDatabaseQuestionFilters, getDatabaseQuestionFilters
+        saveDatabaseQuestionFilters, getDatabaseQuestionFilters,
+
+        // Display PDF state
+        setDisplayPDFName, getDisplayPDFName, resetDisplayPDFName
     }
 },
 {

@@ -7,7 +7,7 @@
         internalName: string
         tabLeft: string[]
         tabRight: string[]
-        fontSize: number
+        fontSize?: number
         activeID: number
     }
     const props = withDefaults(defineProps<Props>(), {
