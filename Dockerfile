@@ -24,3 +24,11 @@ RUN wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
     && rm -rf texlive-install 
 
 RUN adduser --system --home /app node
+
+RUN tlmgr install enumitem \
+    && tlmgr install gensymb \
+    && tlmgr install multirow \
+    && tlmgr install caption \
+    && tlmgr install mathtools
+
+RUN tlmgr info --only-installed --data name > latex-packages.txt
