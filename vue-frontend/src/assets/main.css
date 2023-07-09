@@ -60,6 +60,16 @@
     cursor: pointer;
 }
 
+.btn-nobg {
+	background-color: var(--colour-background);
+    padding: 5px 12px;
+	border-radius: 6px;
+	border: 1px solid var(--colour-border-dark);
+	font-size: var(--font-size);
+    text-align: center;
+    cursor: pointer;
+}
+
 .icon-sm {
 	fill: var(--colour-icon-dark);
 	width: 20px;
@@ -89,6 +99,30 @@
 
 .draggable {
     cursor: move;
+}
+
+.entry {
+    width: max-content;
+    background-color: var(--colour-background);
+    padding: 4px 8px 4px 8px;
+	border: 1px solid var(--colour-border-dark);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+	gap: 10px;
+}
+.entry-green {
+	background-color: var(--colour-lighttheme-limegreen);
+	border: 0;
+}
+.entry-red {
+    background-color: var(--colour-lighttheme-red);
+	border: 0;
+}
+.entry-yellow {
+    background-color: var(--colour-lighttheme-yellow);
+	border: 0;
 }
 
 @media (min-width: 1024px) {

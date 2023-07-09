@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { newUser, authenticateUser, findUserInfoUsingID } = require('./../db-auth')
+const { newUser, authenticateUser, findUserInfoUsingID, findUserIDUsingUsername } = require('./../db-auth')
 const { ResponseBody, ResponseError } = require('../express-classes/response')
 const { UserError, DatabaseError, ServerError } = require('../express-classes/error')
 
@@ -91,8 +91,64 @@ router.post('/get', isAuthenticated, async function(req, res, next) {
         const u = await findUserInfoUsingID(uID)
 
         const response = new ResponseBody(req.body['fn'])
+        response.status = 0
         response.body = u
 
+        res.json(response)
+    } catch(err) {
+        next(err)
+    }
+})
+
+router.post('/search/user', isAuthenticated, async function(req, res, next) {
+
+    // Determine whether user with name is present.
+
+    try {
+        const data = req.body
+        const u = data['username']
+
+        const up = await findUserIDUsingUsername(u)
+
+        const response = new ResponseBody(data['fn'])
+        if (up) {
+            response.status = 0
+            response.body = {
+                "userPresent": true
+            }
+        } else {
+            response.status = 1
+            response.body = {
+                "userPresent": false
+            }
+        }
+        res.json(response)
+    } catch(err) {
+        next(err)
+    }
+})
+router.post('/search/group', isAuthenticated, async function(req, res, next) {
+
+    // Determine whether group with name is present.
+
+    try {
+        const data = req.body
+        const u = data['groupname']
+
+        const up = await findUserIDUsingUsername(u)
+
+        const response = new ResponseBody(data['fn'])
+        if (up) {
+            response.status = 0
+            response.body = {
+                "groupPresent": true
+            }
+        } else {
+            response.status = 1
+            response.body = {
+                "groupPresent": false
+            }
+        }
         res.json(response)
     } catch(err) {
         next(err)

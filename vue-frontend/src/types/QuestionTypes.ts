@@ -1,3 +1,6 @@
+import type { userPerms } from "./UserTypes"
+import { emptyUserPerms } from "./UserTypes"
+
 export interface qnFilters {
     category: string[]
     topic: string[]
@@ -20,6 +23,7 @@ export interface qn extends qnFilters {
     solutionImages: string[]
 
     lastModified: string
+    userPerms: userPerms
 }
 
 export interface qns {
@@ -47,12 +51,15 @@ const emptyQn = {
     difficulty: [],
     sourceName: [],
     sourceYear: 0,
+    tags: [],
 
     images: [],
     solution: '',
     solutionImages: [],
+
     lastModified: '',
-    tags: []
+    userPerms: emptyUserPerms
+    
 } as qn
 
 function syncFiltersWithQn(filters : qnFilters, q : qn) {
@@ -74,29 +81,5 @@ function syncQnWithFilters(q : qn, filters : qnFilters) {
     q['sourceYear'] = f['sourceYear']
 }
 
-export interface userSocialData {
-    email: string,
-    groups: string[],
-    bio: string,
-    joinDate: string
-}
 
-export interface userData {
-    username: string
-    socialData: userSocialData
-}
-
-const emptyUserSocialData = {
-    email: '',
-    groups: <string[]>[],
-    bio: '',
-    joinDate: ''
-}
-
-const emptyUserData = {
-    username: '',
-    socialData: emptyUserSocialData
-} as userData
-
-
-export { emptyFilters, emptyQn, syncFiltersWithQn, syncQnWithFilters, emptyUserData }
+export { emptyFilters, emptyQn, syncFiltersWithQn, syncQnWithFilters }

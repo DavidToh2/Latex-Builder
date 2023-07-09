@@ -34,7 +34,9 @@ function pageStatusLogin() {
 }
 
 function pageStatusSignupToggle() {
-    popup("Signup successful!")
+    if (isSigningUp.value) {
+        popup("Signup successful!")
+    }
     
     console.log("pageStatusSignupToggle")
     const t : boolean = isSigningUp.value
@@ -75,9 +77,7 @@ function pageStatusLogout() {
             </div>
 
             <Popup :isActive="displayPopup" @close="closePopup">
-                <template #popup-content>
-                    <span v-html="popupMessage"></span>
-                </template>
+                <span v-html="popupMessage"></span>
             </Popup>
 
         </div>

@@ -15,7 +15,7 @@
 </script>
 <template>
     <div class="popup-window" :class="{ 'popup-window-active': isActive }">
-        <slot name="popup-content">
+        <slot>
 
         </slot>
         <div class="popup-close">

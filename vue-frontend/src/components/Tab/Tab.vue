@@ -66,7 +66,7 @@
         <div class="options-tab" v-for="i in r" :class="{'options-active': a[l+i-1]}"
             @click="changeActiveTab(l+i-1)">{{ tabRight[i-1] }}
         </div>
-        <div class="options-tab" @click="debug">Hi</div>
+        <!-- <div class="options-tab" @click="debug">Hi</div> -->
     </div>
 </template>
 

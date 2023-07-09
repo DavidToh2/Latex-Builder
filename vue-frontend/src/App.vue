@@ -13,7 +13,6 @@ import LatexView from '@/views/LatexView.vue'
 
 import AccountView from '@/views/AccountView.vue'
 
-import { RouterView } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import type { Component } from 'vue'
 

@@ -84,6 +84,33 @@ async function findUserIDUsingUsername(username) {
     }
 }
 
+async function findUsernameUsingID(userID) {
+
+    // Called when user signs up, to check for uniqueness.
+    // Also called when userID is required.
+
+    const errorString = 'db-auth/findUsernameUsingID: Failed to find username:'
+
+    try {
+        const u = {
+            id: userID
+        }
+
+        const userArr = await Users.find(u).lean()
+
+        if (userArr.length > 1) {
+            throw new DatabaseError(errorString, `findUser() found multiple users for username ${username}!`)
+        } else if (userArr.length == 0) {
+            return 0
+        } else {
+            return userArr[0]['username']
+        }
+
+    } catch(err) {
+        newError(err, errorString)
+    }
+}
+
 async function findUserInfoUsingID(userID) {
 
     // Called to fetch user info using user ID.
@@ -104,7 +131,9 @@ async function findUserInfoUsingID(userID) {
         } else {
             const r = {
                 username: userArr[0]['username'],
-                socialInfo: userArr[0]['socialInfo']
+                socialInfo: userArr[0]['socialInfo'],
+                accountStatus: userArr[0]['accountStatus'],
+                questions: userArr[0]['questions']
             }
             return r
         }
@@ -171,6 +200,35 @@ async function authenticateUser(userdata) {
     }
 }
 
+async function setUserQuestions(userID, fn, qnID) {
+    const errorString = 'Failed to set user\'s personal question array!'
+    try {
+        if (fn == 'add') {
+            const result = await Users.findOneAndUpdate(
+                { id: userID }, 
+                { $push: { questions: qnID } }
+            )
+            if (result.length > 0) {
+                return true
+            } else {
+                return false
+            }
+        } else if (fn == 'remove') {
+            const result = await Users.findOneAndUpdate(
+                { id: userID }, 
+                { $pullAll: { questions: qnID } }
+            )
+            if (result.length > 0) {
+                return true
+            } else {
+                return false
+            }
+        }
+    } catch(err) {
+        newError(err, errorString)
+    }
+}
+
 function hashPassword(pwd, salt) {
     const errorString = "Password hashing failed:"
     try {
@@ -183,5 +241,9 @@ function hashPassword(pwd, salt) {
 }
 
 module.exports = {
-    newUser, findUserInfoUsingID, findUserIDUsingUsername, authenticateUser
+    newUser, 
+    findUserInfoUsingID, findUsernameUsingID, findUserIDUsingUsername, 
+    authenticateUser,
+
+    setUserQuestions
 }

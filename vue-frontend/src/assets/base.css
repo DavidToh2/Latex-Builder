@@ -33,6 +33,10 @@
 	--vt-c-green-lighttheme: #aaccbb;
 	--vt-c-green-lighttheme-dark: #8cb09e;
 	--vt-c-green-lighttheme-light: #b4d4c4;
+
+	--vt-c-red-lighttheme: #ffc9c9;
+	--vt-c-yellow-lighttheme: #fcfbb6;
+	--vt-c-limegreen-lighttheme: #bbf6ae;
 }
 
 :root {
@@ -47,6 +51,10 @@
 	--colour-lighttheme: var(--vt-c-green-lighttheme);
 	--colour-lighttheme-hover: var(--vt-c-green-lighttheme-dark);
 	--colour-lighttheme-light: var(--vt-c-green-lighttheme-light);
+
+	--colour-lighttheme-red: var(--vt-c-red-lighttheme);
+	--colour-lighttheme-yellow: var(--vt-c-yellow-lighttheme);
+	--colour-lighttheme-limegreen: var(--vt-c-limegreen-lighttheme);
 
 	--colour-border: var(--vt-c-divider-light-2);
 	--colour-border-hover: var(--vt-c-divider-light-1);

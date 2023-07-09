@@ -3,7 +3,7 @@
     import DisplayTableEntry from "./DisplayTableEntry.vue"
     import DisplayTableElement from "./DisplayTableElement.vue"
     import DisplayTableAddPlaceholder from "./DisplayTableAddPlaceholder.vue"
-    import type { qn } from '@/types/Types'
+    import type { qn } from '@/types/QuestionTypes'
     import type { worksheetElement, latex, latexHeading, latexEnum, latexTypes, latexTypeNames, placeholder } from "@/types/WorksheetTypes"
     import { latexTypeStrings } from "@/types/WorksheetTypes"
     import { ref, reactive, onUpdated } from "vue"

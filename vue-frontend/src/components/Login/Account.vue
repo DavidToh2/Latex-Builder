@@ -3,8 +3,8 @@
 import { reactive, onMounted, computed } from 'vue';
 
 import { useUserStore } from '@/stores/userStore';
-import type { userData } from '@/types/Types';
-import { emptyUserData } from '@/types/Types';
+import type { userData } from '@/types/UserTypes';
+import { emptyUserData } from '@/types/UserTypes';
 import Title from '../PageTitle.vue';
 
 import { authLogout } from '@/post/postAuth'

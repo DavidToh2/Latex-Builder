@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
-import type { userData } from '@/types/Types'
-import { emptyUserData } from '@/types/Types'
+import type { userData } from '@/types/UserTypes'
+import { emptyUserData } from '@/types/UserTypes'
 
 // THE USER STORE: stores information about the current user.
 

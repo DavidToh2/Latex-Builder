@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
-import type { qn, qnFilters } from '@/types/Types'
+import type { qn, qnFilters } from '@/types/QuestionTypes'
 import type { latex, latexEnum, latexHeading, latexTypes, worksheetElement } from '@/types/WorksheetTypes'
-import { emptyQn, emptyFilters } from '@/types/Types'
+import { emptyQn, emptyFilters } from '@/types/QuestionTypes'
 
 import { latexTypeStrings } from '@/types/WorksheetTypes' 
 

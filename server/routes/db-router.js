@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { newQuestion, getQuestions, deleteQuestion, saveQuestion } = require('./../db-function')
+const { newQuestion, getQuestions, deleteQuestion, saveQuestion } = require('../db-question')
 const { ResponseBody, ResponseError } = require('../express-classes/response')
 const { UserError, DatabaseError, ServerError } = require('../express-classes/error')
 
@@ -14,7 +14,12 @@ router.post('/get', async function(req, res, next) {                  // FIND / 
         const reqData = parseWebToServer(req.body)
         console.log(reqData)
 
-        const fQ = await getQuestions(reqData)
+        var user = 'public'
+        if (req.session.uID) {
+            user = req.session.uID
+        }
+
+        const fQ = await getQuestions(reqData, user)
 
         const response = new ResponseBody(reqData['fn'])
         if (fQ.length == 0) {
@@ -44,9 +49,9 @@ router.post('/set/new', async function(req, res, next) {              // SET NEW
         const reqData = parseWebToServer(req.body)
         console.log(reqData)
 
-        const nQ = await newQuestion(reqData)
-
         const response = new ResponseBody(reqData['fn'])
+
+        const nQ = await newQuestion(reqData)
         response.status = 0
         response.body = nQ
         console.log(response)
@@ -55,6 +60,10 @@ router.post('/set/new', async function(req, res, next) {              // SET NEW
     } catch(err) {
         next(err)
     }
+})
+router.post('/set/new', function(req, res, next) {
+    const err = new UserError("Not logged in!", "You must be logged in to create questions!")
+    next(err)
 })
 
 router.post('/set/update/:displayID', async function(req, res, next) {           // UPDATE EXISTING QUESTION

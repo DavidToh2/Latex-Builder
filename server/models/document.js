@@ -1,6 +1,38 @@
 const mongoose = require('mongoose')
+const { userPerms } = require('./user')
+const { worksheetElementSchema } = require('./question')
 
 const Schema = mongoose.Schema
+
+const Title = new Schema( {
+    title: String,
+    author: String,
+    date: String
+})
+
+const PageDimensions = new Schema( {
+    top: String,
+    left: String,
+    bottom: String,
+    right: String
+})
+const PageMarginSettings = new Schema( {
+    left: String,
+    middle: String,
+    right: String,
+    alternate: Boolean,
+    design: String
+})
+const PageNumberSettings = new Schema( {
+    display: "header" | "footer" | "none",
+    position: "left" | "middle" | "right"
+})
+const Page = new Schema( {
+    dimensions: PageDimensions,
+    header: PageMarginSettings,
+    footer: PageMarginSettings,
+    pageNumber: PageNumberSettings
+})
 
 const TemplateSchema = new Schema( {
     templateName: String,
@@ -8,40 +40,32 @@ const TemplateSchema = new Schema( {
         type: String,
         required: true
     },
-    packages: {
-        type: [String],
-        required: true
-    },
-    setup: {
+    packages: [String],
+    setup: String,
+    page: Page,
+    preamble: String
+})
+
+const DocumentSchema = new Schema( {
+    documentName: {
         type: String,
         required: true
-    }
-})
-const Title = new Schema( {
-    title: {
-        type: String
     },
-    author: {
-        type: String
-    },
-    date: {
-        type: String
-    }
-})
-const DocumentSchema = new Schema( {
-
-    name: String,
-
-    preamble: {
-        type: TemplateSchema,
-        required: true
-    },
+    template: String,
     title: {
         type: Title,
         required: true
     },
+    packages: [String],
+    setup: String,
+    page: Page,
     body: {
-        type: String
+        type: [worksheetElementSchema],
+        required: true
+    },
+    userPerms: {
+        type: userPerms,
+        required: true
     }
 })
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
     import { computed } from 'vue'
-    import type { qn } from '@/types/Types';
+    import type { qn } from '@/types/QuestionTypes';
 
     import { useUserStore } from '@/stores/userStore';
     const UserStore = useUserStore()

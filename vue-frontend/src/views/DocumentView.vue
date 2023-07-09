@@ -66,7 +66,7 @@ function getPDFDisplayWidth() {
         <div id="document-viewer">
             <pdf
                 :source="blobURL"
-                :width="pdfDisplayWidth + 'px'"
+                :width="pdfDisplayWidth"
                 :scale="3"
             />
         </div>

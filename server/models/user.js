@@ -8,15 +8,9 @@ const userSocialDataSchema = new Schema( {
         type: String,
         required: [true, 'Missing email']
     },
-    groups: {
-        type: [String]
-    },
-    bio: {
-        type: String
-    },
-    joinDate: {
-        type: Date
-    }
+    groups: [String],
+    bio: String,
+    joinDate: Date
 })
 
 const userSchema = new Schema( {
@@ -39,15 +33,38 @@ const userSchema = new Schema( {
         type: String,
         required: true
     },
+    accountStatus: {
+        type: String,
+        enum: ['admin', 'active', 'limited', 'inactive', 'guest'],
+        required: true
+    },
 
     // Social info
 
     socialData: {
         type: userSocialDataSchema,
         required: [true, 'Missing social data']
+    },
+    questions: [String]
+})
+
+const userPerms = new Schema( {
+    owner: {
+        type: String,
+        required: [true, 'Question is missing owner']
+    },
+    canModifyUsers: [String],
+    canModifyGroups: [String],
+    canReadUsers: [String],
+    canReadGroups: [String],
+    canAccessPublic: {
+        type: String,
+        required: true,
+        enum: ['false', 'read', 'modify']
     }
 })
 
 module.exports = {
-    userSchema: userSchema
+    userSchema: userSchema,
+    userPerms: userPerms
 }

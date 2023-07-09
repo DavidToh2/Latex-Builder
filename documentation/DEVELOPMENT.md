@@ -69,10 +69,9 @@ Other references:
 
 ## Building the Base Image: Configuring the User
 
-We create a new user `node`, with home directory `/app`, and set it as the owner of the `/app` directory. 
+We create a new user `node`, with home directory `/app`.
 ```
 RUN adduser --system --home /app node
-RUN chown -R node /app
 ```
 This user does not have sudo privileges, and `node` will run as this user.
 
@@ -90,12 +89,15 @@ COPY . .
 ```
 RUN mv /app/startup_scripts/* /etc/my_init.d
 RUN chmod +x /etc/my_init.d/*
+RUN chown -R node /app
 ```
 The **phusion/Baseimage** image will perform the following, in sequence, on startup:
 - Runs all system startup files, which are stored in `/etc/my_init.d`
 - Starts all runit services.
 - Runs the specified command in `CMD`.
 - When the specified command exits, stops all runit services.
+
+We also set `node` as the owner of the `/app` directory. 
 
 ## Building latexquestionbank: Startup
 ```

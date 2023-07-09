@@ -61,16 +61,16 @@ const emits = defineEmits<{
         <div id="signup-error" v-if="signupFail">{{ signupFailMessage }}</div>
 
         <label for="signup-user-input">Username</label>
-        <input id="signup-user-input" name="username" class="input-sm" pattern="[\w\-_]+">
+        <input id="signup-user-input" name="username" class="input-sm" pattern="[\w\-_]+" autocomplete="off">
 
         <label for="signup-user-input">Email</label>
-        <input id="signup-user-input" name="email" class="input-sm" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+        <input id="signup-user-input" name="email" class="input-sm" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" autocomplete="off">
 
         <label for="signup-password-input" id="signup-password-input-prompt" class="tooltip" style="border-bottom: 2px dotted black">Password</label>
-        <input :type="pwdInputType" id="signup-password-input" name="password" class="input-sm" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+        <input :type="pwdInputType" id="signup-password-input" name="password" class="input-sm" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" autocomplete="off">
         
         <label for="signup-password-input">Retype password</label>
-        <input :type="pwdInputType" id="signup-password-input-2" name="password-2" class="input-sm" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+        <input :type="pwdInputType" id="signup-password-input-2" name="password-2" class="input-sm" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" autocomplete="off">
 
         <div style="display: flex; flex-direction: row; gap: 10px;">
             <label for="signup-show-password" style="font-size: 12px">Show password:</label>

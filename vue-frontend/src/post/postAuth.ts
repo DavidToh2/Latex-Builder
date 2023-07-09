@@ -1,6 +1,6 @@
 import { postForm, postJSON } from './post'
 import { BASE_URL } from './post'
-import type { userData } from '@/types/Types'
+import type { userData } from '@/types/UserTypes'
 
 /*
         AUTHENTICATION FUNCTIONS
@@ -39,11 +39,22 @@ export async function isAuth() {
     return authStatus
 }
 export async function authGetUserInfo() {
-    console.log("Getting user info...")
     var j = { fn: 'auth-get' }
-    const response = await postJSON(j, `http://${BASE_URL}/auth/get`) as Response
+    const response = await postJSON(j, `${BASE_URL}/auth/get`) as Response
     const responsejson = await response.json()
     const userInfo = responsejson.body as userData
     console.log(userInfo)
     return userInfo
+}
+export async function searchUser(u : string) {
+    var j = { fn: 'check-user', username: u }
+    const response = await postJSON(j, `${BASE_URL}/auth/search/user`)
+    const responsejson = await response.json()
+    return responsejson
+}
+export async function searchGroup(u : string) {
+    var j = { fn: 'check-group', groupname: u }
+    const response = await postJSON(j, `${BASE_URL}/auth/search/group`)
+    const responsejson = await response.json()
+    return responsejson
 }

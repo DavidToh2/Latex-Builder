@@ -3,15 +3,18 @@ import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
 import UserTab from '@/components/Tab/UserTab.vue'
 import Tab from '@/components/Tab/Tab.vue'
+import UserPerms from '@/components/UserPerms/UserPerms.vue'
+import Popup from '@/components/Common/Popup/Popup.vue'
 
-import type { qn, qnFilters, qnFilterNames } from '@/types/Types'
-import { emptyQn, emptyFilters, syncFiltersWithQn, syncQnWithFilters } from '@/types/Types'
+import type { qn, qnFilters, qnFilterNames } from '@/types/QuestionTypes'
+import { emptyQn, emptyFilters, syncFiltersWithQn, syncQnWithFilters } from '@/types/QuestionTypes'
 import { useQuestionStore } from '@/stores/questionStore'
+import { useUserStore } from '@/stores/userStore'
 import { questionSave, questionDelete } from '@/post/postQn';
 import { reactive, ref, watch, onActivated, onDeactivated } from 'vue'
 
-const contributeOptionsLeftTab = ['Question', 'Solution', 'Images', 'Packages']
-const contributeOptionsRightTab = ['Save', 'Save As', 'Delete']
+const contributeOptionsLeftTab = ['Question', 'Solution', 'Images', 'Contributors']
+const contributeOptionsRightTab = ['Save', 'Delete']
 
 var active : qn = reactive({...emptyQn})
 var newQn : qn = reactive({...emptyQn})
@@ -21,6 +24,10 @@ var activeOptionID = ref<number>(0)
 var IDlist = ref<string[]>(['0'])
 
 const QuestionStore = useQuestionStore()
+const UserStore = useUserStore()
+
+const popupActive = ref(false)
+const popupText = ref('')
 
             // Sync active and activeFilters:
 
@@ -42,7 +49,6 @@ onActivated(() => {
     Object.assign(active, newQuestion)
     updateContributeTab()
 })
-// QuestionStore.resetContribute()
 
             // Whenever the CONTRIBUTE store is updated...
 
@@ -82,10 +88,14 @@ function updateQuestionFilters(ss : qnFilters) {
     activeFilters['sourceYear'] = ss['sourceYear']
 }
 
+        // Used to sync active and activeFilters
+
 function saveActiveQn() {
     QuestionStore.updateQn('contribute', active.displayID, active)
     QuestionStore.saveContributeActiveQnID(active.displayID)
 }
+
+        // When displayed question is changed...
 
 function changeDisplayedQuestion(newQnID : string) {
 
@@ -109,6 +119,8 @@ function changeDisplayedQuestion(newQnID : string) {
 
 }
 
+        // When displayed tab is changed, or tab option (SAVE / DELETE) is selected...
+
 async function changeOptionTab(s : string, n : number) {
 
     const mainForm = document.getElementById('contribute-container') as HTMLFormElement
@@ -130,14 +142,20 @@ async function changeOptionTab(s : string, n : number) {
         case 'Images':
 
         break;
-        case 'Packages':
+        case 'Contributors':
 
         break;
 
         case 'Save':
-            if ((active.category.length == 0) || (active.question.trim().length == 0)) {
-                alert("Your question is empty!")
+            if (!UserStore.getAuthStatus()) {
+                openPopup("You need to be logged in to contribute questions!")
+
+            } else if (!checkForEmptyFields(active)) {
+                openPopup("Please check that all necessary fields of your question have been filled up")
+
             } else {
+
+
                 
                 // SAVE QUESTION
 
@@ -166,12 +184,6 @@ async function changeOptionTab(s : string, n : number) {
 
         break;
 
-        case 'Save As':
-            alert('Save As to be implemented!')
-
-            activeOptionID.value = 0
-        break;
-
         case 'Delete':
             if (active.displayID == '0') {
                 removeFromContribute(active.displayID)
@@ -187,6 +199,75 @@ async function changeOptionTab(s : string, n : number) {
     }
 
     activeOptions[activeOptionID.value] = true
+}
+
+function checkForEmptyFields(q : qn) {
+    var ready = true
+    if (
+        q.question.trim().length == 0 ||
+        q.category.length == 0 ||
+        q.topic.length == 0 ||
+        q.subtopic.length == 0
+    ) {
+        ready = false
+    }
+    return ready
+}
+
+function openPopup(m : string) {
+    popupText.value = m
+    popupActive.value = true
+}
+function closePopup() {
+    popupActive.value = false
+}
+
+        // When user perms are changed...
+
+function setModifyUserOfActive(u : string, action : string) {
+    if (action == 'add') {
+        active.userPerms.canModifyUsers.push(u)
+    } else if (action == 'remove') {
+        const k = active.userPerms.canModifyUsers.indexOf(u)
+        active.userPerms.canModifyUsers.splice(k, 1)
+    }
+}
+function setReadUserOfActive(u : string, action : string) {
+    if (action == 'add') {
+        active.userPerms.canReadUsers.push(u)
+    } else if (action == 'remove') {
+        const k = active.userPerms.canReadUsers.indexOf(u)
+        active.userPerms.canReadUsers.splice(k, 1)
+    }
+}
+function setModifyGroupOfActive(g : string, action : string) {
+    const c = active.userPerms.canModifyGroups
+    const k = c.indexOf(g)
+    console.log(`Index of ${g} is ${k}`)
+    if ((action == 'add') && (k < 0)) {
+        active.userPerms.canModifyGroups.push(g)
+        console.log('pushing')
+    } else if ((action == 'remove') && (k >= 0)) {
+        active.userPerms.canModifyGroups.splice(k, 1)
+    }
+    console.log(active.userPerms)
+}
+function setReadGroupOfActive(g : string, action : string) {
+    const c = active.userPerms.canReadGroups
+    const k = c.indexOf(g)
+    if ((action == 'add') && (k < 0)) {
+        active.userPerms.canReadGroups.push(g)
+    } else if ((action == 'remove') && (k >= 0)) {
+        active.userPerms.canReadGroups.splice(k, 1)
+    }
+}
+function setPublic(perms : string) {
+    if (['none', 'read', 'modify'].indexOf(perms) < 0) {
+        return false
+    } else {
+        active.userPerms.canAccessPublic = perms as "none" | "read" | "modify"
+        return true
+    }
 }
 
 function dump() {
@@ -236,11 +317,23 @@ function dump() {
                 Image container to be implemented!
             </div>
 
-            <div id="package-container" :class="{ 'inactive-container': !activeOptions[3] }">
-                Package container to be implemented!
+            <div id="user-container" :class="{ 'inactive-container': !activeOptions[3] }">
+                <UserPerms 
+                    :owner="active.userPerms.owner" 
+                    :can-modify-users="active.userPerms.canModifyUsers" :can-read-users="active.userPerms.canReadUsers"
+                    :can-modify-groups="active.userPerms.canModifyGroups" :can-read-groups="active.userPerms.canReadGroups"
+                    :can-access-public="active.userPerms.canAccessPublic"
+                    @set-modify-user="setModifyUserOfActive" @set-read-user="setReadUserOfActive"
+                    @set-modify-group="setModifyGroupOfActive" @set-read-group="setReadGroupOfActive"
+                    @set-public="setPublic"
+                />
             </div>
 
         </form>
+
+        <Popup :is-active="popupActive" @close="closePopup">
+            <span v-html="popupText"></span>
+        </Popup>
     </div>
 </template>
 
@@ -292,7 +385,7 @@ function dump() {
 #image-container {
     width: 100%;
 }
-#package-container {
+#user-container {
     width: 100%;
 }
 .inactive-container {

@@ -1,0 +1,43 @@
+export interface userSocialData {
+    email: string,
+    groups: string[],
+    bio: string,
+    joinDate: string
+}
+
+export interface userData {
+    username: string
+    socialData: userSocialData
+}
+
+const emptyUserSocialData = {
+    email: '',
+    groups: <string[]>[],
+    bio: '',
+    joinDate: ''
+}
+
+const emptyUserData = {
+    username: '',
+    socialData: emptyUserSocialData
+} as userData
+
+export interface userPerms {
+    owner: string,
+    canModifyUsers: string[],
+    canModifyGroups: string[],
+    canReadUsers: string[],
+    canReadGroups: string[],
+    canAccessPublic: 'none' | 'read' | 'modify'
+}
+
+const emptyUserPerms = {
+    owner: '',
+    canModifyUsers: <string[]>[],
+    canModifyGroups: <string[]>[],
+    canReadUsers: <string[]>[],
+    canReadGroups: <string[]>[],
+    canAccessPublic: 'none'
+} as userPerms
+
+export { emptyUserData, emptyUserPerms }

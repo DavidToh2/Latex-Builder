@@ -4,8 +4,8 @@
     import DropdownSearch from '@/components/SearchFilters/DropdownSearch.vue'
     import Input from '@/components/SearchFilters/Input.vue'
     import paramdir from '@/assets/dropdown.json'
-    import type { qnFilters, qnFilterNames } from '@/types/Types'
-    import { emptyFilters } from '@/types/Types'
+    import type { qnFilters, qnFilterNames } from '@/types/QuestionTypes'
+    import { emptyFilters } from '@/types/QuestionTypes'
 
     export interface Props {
         func: string

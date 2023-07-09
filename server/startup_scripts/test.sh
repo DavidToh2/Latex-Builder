@@ -1,4 +1,5 @@
 #!/bin/sh
 whoami
-pwd
-ls -l /app
+echo "Active directory: $PWD"
+echo "Installed LaTeX packages:"
+cat /latex-packages.txt

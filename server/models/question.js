@@ -1,20 +1,8 @@
 const mongoose = require('mongoose')
+const { userPerms } = require('./user')
 
 const Schema = mongoose.Schema
-
-const question_userPerms = new Schema( {
-    owner: {
-        type: String,
-        required: [true, 'Question is missing owner']
-    },
-    contributingUsers: {
-        type: [String]
-    },
-    contributingGroups: {
-        type: [String]
-    }
-})
-
+ 
 const questionSchema = new Schema( {
 
     id: {
@@ -37,47 +25,85 @@ const questionSchema = new Schema( {
         required: [true, 'Missing topic data!']
     },
     subtopic: {
-        type: [String]
+        type: [String],
+        required: [true, 'Missing subtopic data!']
     },
     difficulty: {
-        type: [String],
-        required: [true, 'Missing difficulty!']
+        type: [String]
     },
     sourceName: {
-        type: [String],
-        uppercase: true
+        type: [String]
     },
     sourceYear: {
         type: Number,
         min: 1800
     },
     // Question filters: tags
-    tags: {
-        type: [String]
-    },
+    tags: [String],
 
     // Images
     images: [String],
 
     // Solution and Images
 
-    solution: {
-        type: String
-    },
-    solutionImages: [String],
+    solution: String,
+    solutionImages: [[String]],
 
     // User permission and modification data
 
-    lastModified: {
-        type: Date
-    },
+    lastModified: Date,
     userPerms: {
-        type: question_userPerms
+        type: userPerms,
+        required: true
     }
 }
 )
 
+const latexSchema = new Schema( {
+    id: String,
+    text: String
+})
+const latexHeadingSchema = new Schema( {
+    id: String,
+    type: {
+        type: String,
+        enum: ['section', 'subsection', 'subsubsection'],
+        required: true
+    },
+    text: String
+})
+const latexEnumSchema = new Schema( {
+    id: String,
+    behaviour: {
+        type: String,
+        enum: ['start', 'end'],
+        required: true
+    },
+    type: {
+        type: String,
+        enum: ['numeric', 'alphabetic', 'roman', 'bullet', 'dash']
+    },
+    template: String,
+    options: String
+})
+const qnRefSchema = new Schema( {
+    id: String,
+    displayOptions: [String]
+})
+
+const worksheetElementSchema = new Schema( {
+    type: {
+        type: String,
+        enum: ['qn', 'latex', 'latexHeading', 'latexEnum']
+    },
+    qn: qnRefSchema,
+    latex: latexSchema,
+    latexHeading: latexHeadingSchema,
+    latexEnum: latexEnumSchema
+})
+
 module.exports = {
-    questionSchema: questionSchema
+    questionSchema: questionSchema,
+    worksheetElementSchema: worksheetElementSchema
 }
 
