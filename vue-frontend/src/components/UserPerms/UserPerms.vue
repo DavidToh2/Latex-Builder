@@ -3,7 +3,6 @@
 import UserSearch from '@/components/Common/UserSearch.vue'
 import Entry from '../Common/Entry.vue'
 import { ref, reactive, computed } from 'vue'
-import { searchUser, searchGroup } from '@/post/postAuth'
 
 interface Props {
     owner: string,
@@ -11,7 +10,7 @@ interface Props {
     canModifyGroups: string[],
     canReadUsers: string[],
     canReadGroups: string[],
-    canAccessPublic: "none" | "read" | "modify"
+    canAccessPublic: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -29,90 +28,57 @@ function closePopup(t : number) {
         // Change user perms:
 
 async function addModifyUser(u : string) {
-    const s = await userSearch(u)
-    if (s) {
-        emits('setModifyUser', u, 'add')
-    } else {
-        arePopupsActive[0] = true
-    }
+    setPerms('modifyUsers', u, 'add')
 }
 function removeModifyUser(u : string) {
-    emits('setModifyUser', u, 'remove')
+    setPerms('modifyUsers', u, 'remove')
 }
 async function addReadUser(u : string) {
-    const s = await userSearch(u)
-    if (s) {
-        emits('setReadUser', u, 'add')
-    } else {
-        arePopupsActive[2] = true
-    }
+    setPerms('readUsers', u, 'add')
 }
 function removeReadUser(u : string) {
-    emits('setReadUser', u, 'remove')
-}
-async function userSearch(u : string) {
-    const rj = await searchUser(u)
-    return rj.body.userPresent
+    setPerms('readUsers', u, 'remove')
 }
 
         // Change group perms:
 
 async function addModifyGroup(g : string) {
-    const s = await groupSearch(g)
-    if (s) {
-        emits('setModifyGroup', g, 'add')
-    } else {
-        arePopupsActive[1] = true
-    }
+    setPerms('modifyGroups', g, 'add')
 }
 function removeModifyGroup(g : string) {
-    emits('setModifyGroup', g, 'remove')
+    setPerms('modifyGroups', g, 'remove')
 }
 async function addReadGroup(g : string) {
-    const s = await groupSearch(g)
-    if (s) {
-        emits('setReadGroup', g, 'add')
-    } else {
-        arePopupsActive[3] = true
-    }
+    setPerms('readGroups', g, 'add')
 }
 function removeReadGroup(g : string) {
-    emits('setReadGroup', g, 'remove')
+    setPerms('readGroups', g, 'remove')
 }
-async function groupSearch(g : string) {
-    const rj = await searchGroup(g)
-    return rj.body.groupPresent
-}
-
         // Toggling public
 
 function togglePublic() {
     const p = props.canAccessPublic
-    if (p == 'none') {
-        emits('setPublic', 'read')
-    } else if (p == 'read') {
-        emits('setPublic', 'modify')
-    } else if (p == 'modify') {
-        emits('setPublic', 'none')
+    if (p) {
+        setPerms('public', 'public', 'remove')
+    } else {
+        setPerms('public', 'public', 'add')
     }
 }
 const publicEntryColour = computed(() => {
     const p = props.canAccessPublic
-    if (p == 'none') {
-        return 'red'
-    } else if (p == 'read') {
-        return 'yellow'
-    } else if (p == 'modify') {
+    if (p) {
         return 'green'
+    } else {
+        return 'red'
     }
 })
 
+function setPerms(type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', u: string, action: 'add' | 'remove') {
+    emits('setPerms', type, u, action)
+}
+
 const emits = defineEmits<{
-    (e: 'setModifyUser', u: string, action: string): void,
-    (e: 'setReadUser', u: string, action: string): void,
-    (e: 'setModifyGroup', u: string, action: string): void,
-    (e: 'setReadGroup', u: string, action: string): void,
-    (e: 'setPublic', perms: string): void,
+    (e: 'setPerms', type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', u: string, action: 'add' | 'remove'): void
 }>()
 
 </script>
@@ -183,14 +149,11 @@ const emits = defineEmits<{
                 <div class="perms-list">
                     <Entry :colour="publicEntryColour"
                         :removable=false @click="togglePublic">
-                        <template v-if="(canAccessPublic == 'none')">
+                        <template v-if="(!canAccessPublic)">
                             Private
                         </template>
-                        <template v-else-if="(canAccessPublic == 'read')">
-                            Can Read
-                        </template>
-                        <template v-else-if="(canAccessPublic == 'modify')">
-                            Can Contribute
+                        <template v-else-if="(canAccessPublic)">
+                            Public
                         </template>
                     </Entry>
                 </div>

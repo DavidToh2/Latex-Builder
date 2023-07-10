@@ -28,7 +28,7 @@ export interface userPerms {
     canModifyGroups: string[],
     canReadUsers: string[],
     canReadGroups: string[],
-    canAccessPublic: 'none' | 'read' | 'modify'
+    canAccessPublic: boolean
 }
 
 const emptyUserPerms = {
@@ -37,7 +37,7 @@ const emptyUserPerms = {
     canModifyGroups: <string[]>[],
     canReadUsers: <string[]>[],
     canReadGroups: <string[]>[],
-    canAccessPublic: 'none'
+    canAccessPublic: false
 } as userPerms
 
 export { emptyUserData, emptyUserPerms }

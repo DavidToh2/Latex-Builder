@@ -224,6 +224,10 @@ function closePopup() {
 
         // When user perms are changed...
 
+function setPerms(type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', u: string, action: 'add' | 'remove') {
+    
+}
+
 function setModifyUserOfActive(u : string, action : string) {
     if (action == 'add') {
         active.userPerms.canModifyUsers.push(u)
@@ -323,9 +327,7 @@ function dump() {
                     :can-modify-users="active.userPerms.canModifyUsers" :can-read-users="active.userPerms.canReadUsers"
                     :can-modify-groups="active.userPerms.canModifyGroups" :can-read-groups="active.userPerms.canReadGroups"
                     :can-access-public="active.userPerms.canAccessPublic"
-                    @set-modify-user="setModifyUserOfActive" @set-read-user="setReadUserOfActive"
-                    @set-modify-group="setModifyGroupOfActive" @set-read-group="setReadGroupOfActive"
-                    @set-public="setPublic"
+                    @set-perms=""
                 />
             </div>
 

@@ -1,3 +1,6 @@
+const { convertUserIDsToUsernames } = require('../db-auth')
+const { ServerError } = require('../express-classes/error')
+
 function parseID(data, source) {
     try {
         if (source == 'server') {       // Sending a question from server to frontend.
@@ -41,21 +44,27 @@ function parseID(data, source) {
             }
             
         }
-        return data
-    }
-    catch(err) { 
-        idError(err, `Failed to parse ID from ${source}!`)
-        return 0
+    } catch(err) { 
+        throw new ServerError(`Failed to parse ID from ${source}!`, err.message)
     }
 }
 
-function idError(err, errorMsg) {
-    console.log(errorMsg)
-    console.log(err)
+function parseUserPerms(qn) {
+
+    // Converts all user IDs in qn.userPerms to usernames
+
+    try {
+        convertUserIDsToUsernames(qn.userPerms.canModifyUsers)
+        convertUserIDsToUsernames(qn.userPerms.canModifyGroups)
+        convertUserIDsToUsernames(qn.userPerms.canReadUsers)
+        convertUserIDsToUsernames(qn.userPerms.canReadGroups)
+
+    } catch(err) {
+        throw new ServerError(`Failed to parse ID from ${source}!`, err.message)
+    }
+
 }
 
-module.exports = { parseID }
-
-// ( async() => { console.log(await newID()) } )()
+module.exports = { parseID, parseUserPerms }
 
 

@@ -37,3 +37,19 @@ export async function questionSave(f : HTMLFormElement, displayID : string) {
         return responsejson
     }
 }
+
+export async function questionUpdatePerms(
+    displayID : string,
+    type : 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', 
+    action : 'add' | 'remove', name : string | null
+    ) {
+    
+    const j = {
+        type: type,
+        action: action,
+        name: name,
+        fn: 'qn-setPerms'
+    }
+    const response = await postJSON(j, `${BASE_URL}/database/set/perms/${displayID}`) as Response
+    const responsejson = await response.json()
+}

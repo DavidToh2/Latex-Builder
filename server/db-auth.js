@@ -57,6 +57,13 @@ async function newUser(userdata) {
     }
 }
 
+async function modifyUser(userID, userdata) {
+
+    // Only for modifying social info.
+
+    const errorString = 'Failed to modify user info!'
+}
+
 async function findUserIDUsingUsername(username) {
 
     // Called when user signs up, to check for uniqueness.
@@ -99,13 +106,27 @@ async function findUsernameUsingID(userID) {
         const userArr = await Users.find(u).lean()
 
         if (userArr.length > 1) {
-            throw new DatabaseError(errorString, `findUser() found multiple users for username ${username}!`)
+            throw new DatabaseError(errorString, `findUsernameUsingID() found multiple users!`)
         } else if (userArr.length == 0) {
-            return 0
+            throw new DatabaseError(errorString, `findUsernameUsingID() did not find any users!`)
         } else {
             return userArr[0]['username']
         }
 
+    } catch(err) {
+        newError(err, errorString)
+    }
+}
+
+async function convertUserIDsToUsernames(uIDArray) {
+
+    // Called to display question contributors' usernames
+
+    const errorString = 'db-auth/convertUserIDsToUsernames: Failed to convert user IDs:'
+    try {
+        uIDArray.forEach(async (uID, index, uIDArr) => {
+            uIDArr[index] = await findUsernameUsingID(uID)
+        })
     } catch(err) {
         newError(err, errorString)
     }
@@ -125,15 +146,15 @@ async function findUserInfoUsingID(userID) {
         const userArr = await Users.find(u).lean()
 
         if (userArr.length > 1) {
-            throw new DatabaseError(errorString, `findUser() found multiple users for userID ${username}!`)
+            throw new DatabaseError(errorString, `findUserInfoUsingID() found multiple users!`)
         } else if (userArr.length == 0) {
-            return 0
+            throw new DatabaseError(errorString, `findUserInfoUsingID() did not find any users!`)
         } else {
             const r = {
                 username: userArr[0]['username'],
                 socialInfo: userArr[0]['socialInfo'],
-                accountStatus: userArr[0]['accountStatus'],
-                questions: userArr[0]['questions']
+                questions: userArr[0]['questions'],
+                accountStatus: userArr[0]['accountStatus']
             }
             return r
         }
@@ -208,7 +229,7 @@ async function setUserQuestions(userID, fn, qnID) {
                 { id: userID }, 
                 { $push: { questions: qnID } }
             )
-            if (result.length > 0) {
+            if (result.length == 1) {
                 return true
             } else {
                 return false
@@ -216,14 +237,25 @@ async function setUserQuestions(userID, fn, qnID) {
         } else if (fn == 'remove') {
             const result = await Users.findOneAndUpdate(
                 { id: userID }, 
-                { $pullAll: { questions: qnID } }
+                { $pull: { questions: qnID } }
             )
-            if (result.length > 0) {
+            if (result.length == 1) {
                 return true
             } else {
                 return false
             }
         }
+    } catch(err) {
+        newError(err, errorString)
+    }
+}
+
+async function findGroupUsingName(groupname) {
+
+    const errorString = 'Failed to find group!'
+
+    try {
+        return false
     } catch(err) {
         newError(err, errorString)
     }
@@ -242,8 +274,12 @@ function hashPassword(pwd, salt) {
 
 module.exports = {
     newUser, 
-    findUserInfoUsingID, findUsernameUsingID, findUserIDUsingUsername, 
+
+    findUserInfoUsingID, findUsernameUsingID, convertUserIDsToUsernames,
+    findUserIDUsingUsername, 
     authenticateUser,
+
+    findGroupUsingName,
 
     setUserQuestions
 }

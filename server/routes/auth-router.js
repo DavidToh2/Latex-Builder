@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { newUser, authenticateUser, findUserInfoUsingID, findUserIDUsingUsername } = require('./../db-auth')
+const dbAuth = require('../db-auth')
 const { ResponseBody, ResponseError } = require('../express-classes/response')
 const { UserError, DatabaseError, ServerError } = require('../express-classes/error')
 
@@ -13,7 +13,7 @@ router.post('/signup', async function(req, res, next) {
         const userData = req.body
         console.log(userData)
 
-        const nU = await newUser(userData)
+        const nU = await dbAuth.newUser(userData)
         const response = new ResponseBody(userData['fn'])
         response.status = 0
 
@@ -35,7 +35,7 @@ router.post('/login', async function(req, res, next) {
     try {
         const userData = req.body
 
-        const nU = await authenticateUser(userData)
+        const nU = await dbAuth.authenticateUser(userData)
         const response = new ResponseBody(userData['fn'])
 
         response.status = 0
@@ -88,11 +88,28 @@ router.post('/get', isAuthenticated, async function(req, res, next) {
 
     try {
         const uID = req.session.uID
-        const u = await findUserInfoUsingID(uID)
+        const u = await dbAuth.findUserInfoUsingID(uID)
 
         const response = new ResponseBody(req.body['fn'])
         response.status = 0
         response.body = u
+
+        res.json(response)
+    } catch(err) {
+        next(err)
+    }
+})
+
+router.post('/set', isAuthenticated, async function(req, res, next) {
+
+    // Modify user data.
+
+    try {
+        const uID = req.session.uID
+        const data = req.body
+
+        const response = new ResponseBody(data['fn'])
+        response.status = 0
 
         res.json(response)
     } catch(err) {
@@ -108,7 +125,7 @@ router.post('/search/user', isAuthenticated, async function(req, res, next) {
         const data = req.body
         const u = data['username']
 
-        const up = await findUserIDUsingUsername(u)
+        const up = await dbAuth.findUserIDUsingUsername(u)
 
         const response = new ResponseBody(data['fn'])
         if (up) {
@@ -135,7 +152,9 @@ router.post('/search/group', isAuthenticated, async function(req, res, next) {
         const data = req.body
         const u = data['groupname']
 
-        const up = await findUserIDUsingUsername(u)
+        // PLACEHOLDER
+
+        const up = await dbAuth.findGroupUsingName(u)
 
         const response = new ResponseBody(data['fn'])
         if (up) {

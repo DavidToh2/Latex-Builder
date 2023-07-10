@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { newQuestion, getQuestions, deleteQuestion, saveQuestion } = require('../db-question')
+const dbQuestion = require('../db-question')
 const { ResponseBody, ResponseError } = require('../express-classes/response')
 const { UserError, DatabaseError, ServerError } = require('../express-classes/error')
 
@@ -14,12 +14,12 @@ router.post('/get', async function(req, res, next) {                  // FIND / 
         const reqData = parseWebToServer(req.body)
         console.log(reqData)
 
-        var user = 'public'
+        var userID = 'public'
         if (req.session.uID) {
-            user = req.session.uID
+            userID = req.session.uID
         }
 
-        const fQ = await getQuestions(reqData, user)
+        const fQ = await dbQuestion.getQuestions(reqData, userID)
 
         const response = new ResponseBody(reqData['fn'])
         if (fQ.length == 0) {
@@ -51,7 +51,12 @@ router.post('/set/new', async function(req, res, next) {              // SET NEW
 
         const response = new ResponseBody(reqData['fn'])
 
-        const nQ = await newQuestion(reqData)
+        var userID = 'public'
+        if (req.session.uID) {
+            userID = req.session.uID
+        }
+
+        const nQ = await dbQuestion.newQuestion(reqData, userID)
         response.status = 0
         response.body = nQ
         console.log(response)
@@ -60,10 +65,6 @@ router.post('/set/new', async function(req, res, next) {              // SET NEW
     } catch(err) {
         next(err)
     }
-})
-router.post('/set/new', function(req, res, next) {
-    const err = new UserError("Not logged in!", "You must be logged in to create questions!")
-    next(err)
 })
 
 router.post('/set/update/:displayID', async function(req, res, next) {           // UPDATE EXISTING QUESTION
@@ -74,7 +75,37 @@ router.post('/set/update/:displayID', async function(req, res, next) {          
         console.log(reqData)
         const displayID = req.params['displayID']
 
-        const sQ = await saveQuestion(displayID, reqData)
+        var userID = 'public'
+        if (req.session.uID) {
+            userID = req.session.uID
+        }
+
+        const sQ = await dbQuestion.saveQuestion(displayID, reqData, userID)
+        
+        const response = new ResponseBody(reqData['fn'])
+        response.status = 0
+        response.body = sQ
+        console.log(response)
+
+        res.json(response)
+    } catch(err) {
+        next(err)
+    }
+})
+
+router.post('/set/perms/:displayID', async function(req, res, next) {
+    try {
+        console.log("Action parameters:")
+        const reqData = req.body
+        console.log(reqData)
+        const displayID = req.params['displayID']
+
+        var userID = 'public'
+        if (req.session.uID) {
+            userID = req.session.uID
+        }
+
+        const sQ = await dbQuestion.setQuestionPerms(displayID, reqData, userID)
         
         const response = new ResponseBody(reqData['fn'])
         response.status = 0
@@ -95,7 +126,12 @@ router.post('/delete/:displayID', async function(req, res, next) {
         console.log(reqData)
         const displayID = req.params['displayID']
 
-        const dQ = await deleteQuestion(displayID)
+        var userID = 'public'
+        if (req.session.uID) {
+            userID = req.session.uID
+        }
+
+        const dQ = await dbQuestion.deleteQuestion(displayID, userID)
         
         const response = new ResponseBody(reqData['fn'])
         response.status = 0

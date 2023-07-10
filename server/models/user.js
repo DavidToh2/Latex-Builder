@@ -51,7 +51,7 @@ const userSchema = new Schema( {
 const userPerms = new Schema( {
     owner: {
         type: String,
-        required: [true, 'Question is missing owner']
+        required: true
     },
     canModifyUsers: [String],
     canModifyGroups: [String],
