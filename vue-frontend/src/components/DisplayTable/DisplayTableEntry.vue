@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
     import { computed } from 'vue'
-    import type { qn } from '@/types/QuestionTypes';
+    import type { qn } from '@/types/QuestionTypes'
 
-    import { useUserStore } from '@/stores/userStore';
-    const UserStore = useUserStore()
+    import { useQuestionStore } from '@/stores/questionStore'
+    const QuestionStore = useQuestionStore()
 
     export interface Props {
         q : qn,
@@ -13,23 +13,23 @@
     const props = defineProps<Props>()
 
     const emits = defineEmits<{
-        (e: 'insert', displayID: string, direction: string): void
-        (e: 'delete', displayID: string): void
-        (e: 'up', displayID: string): void
-        (e: 'down', displayID: string): void
+        (e: 'insert', id: string, direction: string): void
+        (e: 'delete', id: string): void
+        (e: 'up', id: string): void
+        (e: 'down', id: string): void
     }>()
 
-    function insertQuestion(dispID : string, direction : string) {
-        emits('insert', dispID, direction)
+    function insertQuestion(id : string, direction : string) {
+        emits('insert', id, direction)
     }
-    function deleteQuestion(dispID : string) {
-        emits('delete', dispID)
+    function deleteQuestion(id : string) {
+        emits('delete', id)
     }
-    function questionUp(dispID : string) {
-        emits('up', dispID)
+    function questionUp(id : string) {
+        emits('up', id)
     }
-    function questionDown(dispID : string) {
-        emits('down', dispID)
+    function questionDown(id : string) {
+        emits('down', id)
     }
 
     const isDatabase = computed<boolean>(() => {
@@ -39,12 +39,16 @@
         return (props.internalName == 'build-table-qn')
     })
 
+    const qnDisplayID = computed<string>(() => {
+        return QuestionStore.getQnDisplayID(props.q)
+    })
+
 </script>
 
 <template>
     <div class="display-table-entry-row">
         <div class="display-table-id display-table-cell" style="padding: 8px 0px; text-align: center;">
-            {{ q.displayID }}
+            {{ qnDisplayID }}
         </div>
         <div class="display-table-question display-table-cell">
             {{ q.question }}
@@ -64,12 +68,12 @@
         </div>
         <div class="display-table-options display-table-cell">
             <div class="option-icons">
-                <img class="icon-sm" src="@/assets/svg/angle-left.svg" v-if="isDatabase" @click="insertQuestion(q.displayID, 'left')">
-                <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteQuestion(q.displayID)">
-                <img class="icon-sm" src="@/assets/svg/angle-right.svg" v-if="isDatabase" @click="insertQuestion(q.displayID, 'right')">
+                <img class="icon-sm" src="@/assets/svg/angle-left.svg" v-if="isDatabase" @click="insertQuestion(q.id, 'left')">
+                <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteQuestion(q.id)">
+                <img class="icon-sm" src="@/assets/svg/angle-right.svg" v-if="isDatabase" @click="insertQuestion(q.id, 'right')">
                 <div class="up-down-buttons" v-if="isBuild">
-                    <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="questionUp(q.displayID)">
-                    <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="questionDown(q.displayID)">
+                    <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="questionUp(q.id)">
+                    <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="questionDown(q.id)">
                 </div>
             </div>
         </div>

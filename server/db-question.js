@@ -13,6 +13,14 @@ const ACCOUNT_CAN_SET_QN = ['admin', 'active', 'limited']
 const questionDB = mongoose.connection.useDb('questions', { useCache: true} )
 const Question = questionDB.model("questions", questionSchema)
 
+const emptyUserPerms = {
+    owner: '',
+    canModifyUsers: [],
+    canModifyGroups: [],
+    canReadUsers: [],
+    canReadGroups: [],
+    canAccessPublic: true
+}
 
 async function newQuestion(nQ, userID) {
 
@@ -49,8 +57,9 @@ async function newQuestion(nQ, userID) {
 
                 // Set owner and last modified date
 
+        nQ['userPerms'] = emptyUserPerms
         nQ['userPerms']['owner'] = userID
-        nQ['lastModified'] = Date.now()
+        nQ['lastModified'] = new Date()
 
                 // Insert the question
 
@@ -61,12 +70,8 @@ async function newQuestion(nQ, userID) {
         console.log('Question inserted!')
 
                 // Parse IDs to displayIDs before passing to web
-        
-        var qn = []
 
-        var q = qnRaw[j].toObject()
-        aux.parseID(q, 'server')
-        qn.push(q)
+        var q = qnRaw[0].toObject()
 
                 // Add the question ID to our user's personal questions[] array
 
@@ -75,7 +80,7 @@ async function newQuestion(nQ, userID) {
             throw new DatabaseError(errorString, 'Failed to set user\'s personal question array!')
         }
 
-        return qns
+        return q
     } catch(err) {
         newError(err, errorString)
     }
@@ -88,36 +93,29 @@ async function getQuestions(dataDict, userID) {
     const errorString = 'db-question/getQuestions: Failed to find question:'
     try {
         console.log("Finding questions...")
-        const qnsAll = await Question.find(dataDict).lean()
 
+        const qnsAll = await Question.find(dataDict).lean()
         const qns = []
 
                 // Only return questions for which user has viewing permission.
                 // Parse question IDs to displayIDs before passing to web
 
-        var user = 'public'
-        if (userID != 'public') {
-            u = await dbAuth.findUserInfoUsingID(userID)
-            user = u.username
-        }
-
         qnsAll.forEach((qn) => {
-            switch(user) {
+            switch(userID) {
                 case 'public':
                     if (qn.userPerms.canReadPublic || qn.userPerms.canModifyPublic) {
-                        aux.parseID(qn, 'server')
+                        delete qn.userPerms
                         qns.push(qn)
                     }
                 break
                 default:
                     if (
-                        qn.userPerms.owner == user ||
-                        qn.userPerms.canModifyUsers.indexOf(user) >= 0 ||
-                        qn.userPerms.canReadUsers.indexOf(user) >= 0 ||
+                        qn.userPerms.owner == userID ||
+                        qn.userPerms.canModifyUsers.indexOf(userID) >= 0 ||
+                        qn.userPerms.canReadUsers.indexOf(userID) >= 0 ||
                         u.accountStatus == 'admin'
                     ) {
-                        aux.parseID(qn, 'server')
-                        aux.parseUserPerms(qn)
+                        delete qn.userPerms
                         qns.push(qn)
                     }
                 break
@@ -130,7 +128,7 @@ async function getQuestions(dataDict, userID) {
     }
 }
 
-async function deleteQuestion(i, userID) {
+async function deleteQuestion(id, userID) {
 
     const errorString = `Failed to delete question with ID ${i}!`
 
@@ -143,12 +141,10 @@ async function deleteQuestion(i, userID) {
             throw new UserError(errorString, 'You need to be logged in to delete questions!')
         }
         const u = await dbAuth.findUserInfoUsingID(userID)
-        const user = u.username
 
                 // Get the question object to check for user permissions
 
-        var dQ = {'displayID': i}
-        aux.parseID(dQ, 'web')
+        var dQ = {'id': id}
         const q = await Question.findOne(dQ).lean()
         if (!q) {
             throw new DatabaseError(errorString, 'Question ID not found!')
@@ -157,12 +153,12 @@ async function deleteQuestion(i, userID) {
                 // Find the question's owner
 
         const owner = q.userPerms.owner
-        const ownerID = await dbAuth.findUserIDUsingUsername(owner)
-        if (!ownerID) {
-            throw new DatabaseError(errorString, `Owner ${owner} no longer exists!`)
+        const ownername = await dbAuth.findUsernameUsingID(owner)
+        if (!ownername) {
+            throw new DatabaseError(errorString, `Owner no longer exists!`)
         }
 
-        if (owner == user || u.accountStatus == 'admin') {
+        if (owner == userID || u.accountStatus == 'admin') {
 
                     // If owner or admin, delete the question and remove from owner's question array
 
@@ -170,7 +166,7 @@ async function deleteQuestion(i, userID) {
             if (!res) {
                 throw new DatabaseError(errorString, 'deleteOne() method failed!')
             }
-            const c = await dbAuth.setUserQuestions(ownerID, 'remove', dQ.id)
+            const c = await dbAuth.setUserQuestions(owner, 'remove', dQ.id)
             if (!c) {
                 throw new DatabaseError(errorString, 'Failed to set user\'s personal question array!')
             }
@@ -184,7 +180,7 @@ async function deleteQuestion(i, userID) {
     }
 }
 
-async function saveQuestion(i, dataDict, userID) {
+async function saveQuestion(id, dataDict, userID) {
 
     const errorString = `Failed to save question with ID ${i}:`
 
@@ -193,12 +189,13 @@ async function saveQuestion(i, dataDict, userID) {
 
                 // Get the question document (no lean(): it's updated directly!)
 
-        var qID = {'displayID': i}
-        aux.parseID(qID, 'web')             
+        var qID = {'id': id}            
         var q = await Question.findOne(qID)
         if (!q) {
-            throw new DatabaseError(errorString, `Question with displayID ${i} not found!`)
+            throw new DatabaseError(errorString, `Question with id ${id} not found!`)
         }
+
+        delete dataDict['id']
 
                 // Check user perms
 
@@ -206,28 +203,23 @@ async function saveQuestion(i, dataDict, userID) {
             throw new UserError(errorString, 'You need to be logged in to make changes to questions!')
         }
 
-        const u = await findUserInfoUsingID(userID)
-        const user = u.username
+        const u = await dbAuth.findUserInfoUsingID(userID)
         if (
-            q.userPerms.owner == user ||
-            q.userPerms.canModifyUsers.indexOf(user) >= 0 ||
+            q.userPerms.owner == userID ||
+            q.userPerms.canModifyUsers.indexOf(userID) >= 0 ||
             u.accountStatus == 'admin'
         ) {
 
                     // Edit the question
 
-            const qs = q.update(dataDict, function(err, qn) {
-                if (err) {
-                    throw new DatabaseError(errorString, err.message)
-                } else {
-                    return qn
-                }
-            })
+            dataDict['lastModified'] = new Date()
+
+            const qs = await q.updateOne(dataDict)
             if (!qs) {
                 throw new DatabaseError(errorString, 'Failed to update question!')
             }
 
-            console.log(`Saved question with ID ${i}`)
+            console.log(`Saved question with ID ${id}`)
             return qs  
         } else {
             throw new UserError(errorString, 'You do not have sufficient permissions to make changes to this question!')
@@ -237,20 +229,19 @@ async function saveQuestion(i, dataDict, userID) {
     }
 }
 
-async function setQuestionPerms(dispID, data, userID) {
+async function setQuestionPerms(id, data, userID) {
 
     const errorString = 'Failed to set question permissions:'
 
     try {
-        console.log(`Setting permissions for question with displayID ${dispID}`)
+        console.log(`Setting permissions for question with displayID ${id}`)
 
                 // Get the question document (no lean(): it's updated directly!)
 
-        var qID = {'displayID': i}
-        aux.parseID(qID, 'web')             
+        var qID = {'id': id}           
         var q = await Question.findOne(qID)
         if (!q) {
-            throw new DatabaseError(errorString, `Question with displayID ${i} not found!`)
+            throw new DatabaseError(errorString, `Question with displayID ${id} not found!`)
         }
 
                 // Check user perms
@@ -259,9 +250,8 @@ async function setQuestionPerms(dispID, data, userID) {
             throw new UserError(errorString, 'You must be logged in to modify this question\'s user permissions!')
         }
 
-        const u = await findUserInfoUsingID(userID)
-        const user = u.username
-        if (q.userPerms.owner == user || u.accountStatus == 'admin') {
+        const u = await dbAuth.findUserInfoUsingID(userID)
+        if (q.userPerms.owner == userID || u.accountStatus == 'admin') {
                     
                     // Parse desired actions
 
@@ -269,40 +259,39 @@ async function setQuestionPerms(dispID, data, userID) {
             const action = data['action']
             const targetName = data['name']
             console.log(`To ${action} ${targetName} to/from ${type}`)
-            const callback = ((err, qn) => {
-                if (err) { throw new DatabaseError(errorString, err.message) }
-                else { return qn }
-            })
-            var r = 0
+
+                    // Set permissions
+
+            var r
 
             if (action == 'add') {
                 switch(type) {
                     case 'modifyUsers':
                         const u1 = await dbAuth.findUserIDUsingUsername(targetName)
                         if (u1) {
-                            r = q.update({$push: { 'userPerms.canModifyUsers': u1 }}, callback)
+                            r = await q.updateOne({$push: { 'userPerms.canModifyUsers': u1 }})
                         }
                     break
                     case 'modifyGroups':
                         const u2 = await dbAuth.findGroupUsingName(targetName)
                         if (u2) {
-                            r = q.update({$push: { 'userPerms.canModifyGroups': targetName }}, callback)
+                            r = await q.updateOne({$push: { 'userPerms.canModifyGroups': targetName }})
                         }
                     break
                     case 'readUsers':
                         const u3 = await dbAuth.findUserIDUsingUsername(targetName)
                         if (u3) {
-                            r = q.update({$push: { 'userPerms.canReadUsers': u3 }}, callback)
+                            r = await q.updateOne({$push: { 'userPerms.canReadUsers': u3 }})
                         }
                     break
                     case 'readGroups':
                         const u4 = await dbAuth.findGroupUsingName(targetName)
                         if (u4) {
-                            r = q.update({$push: { 'userPerms.canReadGroups': targetName }}, callback)
+                            r = await q.updateOne({$push: { 'userPerms.canReadGroups': targetName }})
                         }
                     break
                     case 'public':
-                        r = q.update({ 'userPerms.canAccessPublic': true }, callback)
+                        r = await q.updateOne({ 'userPerms.canAccessPublic': true })
                     break
                 }
             } else if (action == 'remove') {
@@ -310,29 +299,29 @@ async function setQuestionPerms(dispID, data, userID) {
                     case 'modifyUsers':
                         const u5 = await dbAuth.findUserIDUsingUsername(targetName)
                         if (u5) {
-                            r = q.update({$pull: { 'userPerms.canModifyUsers': u5 }}, callback)
+                            r = await q.updateOne({$pull: { 'userPerms.canModifyUsers': u5 }})
                         }
                     break
                     case 'modifyGroups':
                         const u6 = await dbAuth.findGroupUsingName(targetName)
                         if (u6) {
-                            r = q.update({$pull: { 'userPerms.canModifyGroups': targetName }}, callback)
+                            r = await q.updateOne({$pull: { 'userPerms.canModifyGroups': targetName }})
                         }
                     break
                     case 'readUsers':
                         const u7 = await dbAuth.findUserIDUsingUsername(targetName)
                         if (u7) {
-                            r = q.update({$pull: { 'userPerms.canReadUsers': u7 }}, callback)
+                            r = await q.updateOne({$pull: { 'userPerms.canReadUsers': u7 }})
                         }
                     break
                     case 'readGroups':
                         const u8 = await dbAuth.findGroupUsingName(targetName)
                         if (u8) {
-                            r = q.update({$pull: { 'userPerms.canReadGroups': targetName }}, callback)
+                            r = await q.updateOne({$pull: { 'userPerms.canReadGroups': targetName }})
                         }
                     break
                     case 'public':
-                        r = q.update({ 'userPerms.canAccessPublic': false }, callback)
+                        r = await q.updateOne({ 'userPerms.canAccessPublic': false })
                     break
                 }
             }
@@ -352,23 +341,75 @@ async function setQuestionPerms(dispID, data, userID) {
     }
 }
 
+async function getQuestionPerms(id, userID) {
+
+    const errorString = 'db-question/getQuestions: Failed to get question permissions:'
+    try {
+        console.log("Fetching question permissions...")
+
+        var qID = {'id': id} 
+
+        const q = await Question.findOne(qID, 'userPerms').lean()
+        const qnPerms = q.userPerms
+        if (!qnPerms) {
+            throw new DatabaseError(errorString, 'Question.findOne() method failed!')
+        }
+
+                // Only return questions for which user has viewing permission.
+                // Parse question IDs to displayIDs before passing to web
+
+        var qp = {}
+
+        switch(userID) {
+            case 'public':
+                if (qnPerms.canReadPublic || qnPerms.canModifyPublic) {
+                    qp = qnPerms
+                } else {
+                    throw new UserError(errorString, 'You need to be logged in to view this question\'s user permissions!')
+                }
+            break
+            default:
+                if (
+                    qnPerms.owner == userID ||
+                    qnPerms.canModifyUsers.indexOf(userID) >= 0 ||
+                    qnPerms.canReadUsers.indexOf(userID) >= 0 ||
+                    u.accountStatus == 'admin'
+                ) {
+                    qp = qnPerms
+                } else {
+                    throw new UserError(errorString, 'You do not have sufficient permissions to view this question\'s user permissions!')
+                }
+            break
+        }
+        const result = await aux.parseUserPerms(qp)
+        if (result) {
+            return qp
+        } else {
+            throw new ServerError(errorString, `Failed to parse userIDs into usernames!`)
+        }
+
+    } catch(err) {
+        newError(err, errorString)
+    }
+}
+
 async function newID() {
 
     const errorString = `db-question/newID: Failed to assign new ID:`
     try {
-        console.log("Querying database for new ID...")
+        // console.log("Querying database for new ID...")
         const usedIDs = await Question.distinct('id')
-        console.log(usedIDs)
+        // console.log(usedIDs)
         i = 1
-        while (usedIDs.includes(i)) {
+        while (usedIDs.includes(String(i))) {
             i++
         }
-        return i
+        return String(i)
     } catch(err) {
         newError(err, errorString)
     }
 }
 
 module.exports = {
-    newQuestion, getQuestions, deleteQuestion, saveQuestion, setQuestionPerms
+    newQuestion, getQuestions, deleteQuestion, saveQuestion, setQuestionPerms, getQuestionPerms
 }

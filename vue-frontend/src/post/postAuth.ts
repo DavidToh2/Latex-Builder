@@ -42,9 +42,7 @@ export async function authGetUserInfo() {
     var j = { fn: 'auth-get' }
     const response = await postJSON(j, `${BASE_URL}/auth/get`) as Response
     const responsejson = await response.json()
-    const userInfo = responsejson.body as userData
-    console.log(userInfo)
-    return userInfo
+    return responsejson
 }
 export async function searchUser(u : string) {
     var j = { fn: 'check-user', username: u }

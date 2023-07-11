@@ -6,7 +6,7 @@ const Schema = mongoose.Schema
 const questionSchema = new Schema( {
 
     id: {
-        type: Number,
+        type: String,
         required: [true, 'Missing ID!']
     },
     question: {
@@ -46,7 +46,7 @@ const questionSchema = new Schema( {
 
     // Solution and Images
 
-    solution: String,
+    solution: [String],
     solutionImages: [[String]],
 
     // User permission and modification data

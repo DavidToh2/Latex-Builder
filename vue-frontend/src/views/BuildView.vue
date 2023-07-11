@@ -31,7 +31,7 @@ const worksheet : ws = reactive({
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'insertElementIntoBuild') || (name == 'deleteFromBuild') || (name == 'swapTwoElementsInBuild') ) {
+        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'insertElementIntoBuild') || (name == 'deleteElementFromBuild') || (name == 'swapTwoElementsInBuild') ) {
             after((result) => {
                 if (result) {
                     const newBuildQnList = QuestionStore.getBuild() as worksheetElement[]
@@ -99,9 +99,9 @@ function elementDown(i : number) {
 		QuestionStore.swapTwoElementsInBuild(i, i+1)
 	}
 }
-function removeFromBuild(displayID : string) {
-	// console.log(`Deleting the following item from build: ${displayID}`)
-	QuestionStore.deleteFromBuild(displayID)
+function removeFromBuild(id : string) {
+	// console.log(`Deleting the following item from build: ${id}`)
+	QuestionStore.deleteElementFromBuild(id)
 }
 
 const isDragging = ref(false)
@@ -113,7 +113,7 @@ function startPlaceholderDrag(elementType : string) {
 	const p : worksheetElement = {
 		type: "placeholder",
 		body: {
-			displayID: "placeholder",
+			id: "placeholder",
 			text: elementType
 		}
 	}
@@ -137,7 +137,7 @@ function addElement(e : DragEvent, i : number) {
 					type: "latex",
 					body: defaultLatex
 				}
-				n.body.displayID = `latex${li}`
+				n.body.id = `latex${li}`
 				worksheet.config.latexElements.latexCount++
 				break
 			case 'latexHeading':
@@ -146,7 +146,7 @@ function addElement(e : DragEvent, i : number) {
 					type: "latexHeading",
 					body: defaultLatexHeading
 				}
-				n.body.displayID = `latex${lhi}`
+				n.body.id = `latex${lhi}`
 				worksheet.config.latexElements.latexHeadingCount++
 				break
 			case 'latexEnum':
@@ -155,20 +155,20 @@ function addElement(e : DragEvent, i : number) {
 					type: "latexEnum",
 					body: defaultLatexEnum
 				}
-				n.body.displayID = `latex${lei}`
+				n.body.id = `latex${lei}`
 				worksheet.config.latexElements.latexEnumCount++
 				break
 			default:
 				n = {
 					type: "placeholder",
 					body: {
-						displayID: `placeholderDefault`,
+						id: `placeholderDefault`,
 						text: 'placeholder'
 					}
 				}
 				break
 		}
-		QuestionStore.deleteFromBuild('placeholder')
+		QuestionStore.deleteElementFromBuild('placeholder')
 		QuestionStore.insertElementIntoBuild(n, i)
 	}
 }
@@ -202,8 +202,6 @@ onMounted(() => {
 		}
 	})
 })
-
-// const buildIDArr = computed<string[]>(() => { return QuestionStore.getBuildIDList() })
 
 </script>
 

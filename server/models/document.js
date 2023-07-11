@@ -47,6 +47,10 @@ const TemplateSchema = new Schema( {
 })
 
 const DocumentSchema = new Schema( {
+    documentID: {
+        type: String,
+        required: true
+    },
     documentName: {
         type: String,
         required: true

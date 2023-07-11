@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 
 import { authLogin } from '@/post/postAuth'
 import type { userData } from '@/types/UserTypes'
-import type { ServerError } from '@/types/ErrorTypes'
+import type { UserError, ServerError } from '@/types/ErrorTypes'
 import { formatErrorMessage } from '@/types/ErrorTypes'
 
 import { useUserStore } from '@/stores/userStore'
@@ -26,12 +26,13 @@ async function loginUser() {
     } else if (responsejson.status == 1) {
         // Failure
 
-	    const error = responsejson.body as ServerError
+	    const error = responsejson.body as UserError
         const errorMsg = error.cause
         loginFailure(errorMsg)
 
     } else {
         // Success
+        
         loginFail.value = false
 
         const data = responsejson.body as userData

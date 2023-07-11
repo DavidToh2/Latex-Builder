@@ -20,12 +20,14 @@ class DatabaseError extends ServerError {
 }
 
 function newError(err, errorString) {
+    console.log("New error:")
+    console.log(err)
     if (err instanceof UserError) {
         throw new UserError(err.message, err.cause, err.status)
     } else if (err instanceof DatabaseError) {
         throw new DatabaseError(err.message, err.cause, err.status)
     } else {
-        throw new ServerError(errorString, err.cause)
+        throw new ServerError(errorString, err.message)
     }
 }
 

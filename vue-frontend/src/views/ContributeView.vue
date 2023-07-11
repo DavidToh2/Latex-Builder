@@ -7,21 +7,40 @@ import UserPerms from '@/components/UserPerms/UserPerms.vue'
 import Popup from '@/components/Common/Popup/Popup.vue'
 
 import type { qn, qnFilters, qnFilterNames } from '@/types/QuestionTypes'
-import { emptyQn, emptyFilters, syncFiltersWithQn, syncQnWithFilters } from '@/types/QuestionTypes'
+import { emptyQn, emptyFilters } from '@/types/QuestionTypes'
+import type { userPerms } from '@/types/UserTypes'
+import { emptyUserPerms } from '@/types/UserTypes'
+import type { UserError, ServerError } from '@/types/ErrorTypes'
+import { formatErrorMessage } from '@/types/ErrorTypes'
+
 import { useQuestionStore } from '@/stores/questionStore'
 import { useUserStore } from '@/stores/userStore'
-import { questionSave, questionDelete } from '@/post/postQn';
-import { reactive, ref, watch, onActivated, onDeactivated } from 'vue'
+
+import { questionSave, questionDelete, questionGetPerms, questionUpdatePerms } from '@/post/postQn';
+import { reactive, ref, watch, computed, onActivated, onDeactivated } from 'vue'
 
 const contributeOptionsLeftTab = ['Question', 'Solution', 'Images', 'Contributors']
 const contributeOptionsRightTab = ['Save', 'Delete']
 
 var active : qn = reactive({...emptyQn})
-var newQn : qn = reactive({...emptyQn})
-var activeFilters : qnFilters = reactive({...emptyFilters})
-var activeOptions = reactive([true, false, false, false])
-var activeOptionID = ref<number>(0)
+const activeFilters = computed<qnFilters>(() => {
+    const f = {
+        category: active.category,
+        topic: active.topic,
+        subtopic: active.subtopic,
+        difficulty: active.difficulty,
+        sourceName: active.sourceName,
+        sourceYear: active.sourceYear,
+        tags: active.tags
+    }
+    return f
+})
+var activePerms : userPerms = reactive({...emptyUserPerms})
+
+var tabs = reactive([true, false, false, false])
+var tabID = ref<number>(0)
 var IDlist = ref<string[]>(['0'])
+var displayIDlist = ref<string[]>(['0'])
 
 const QuestionStore = useQuestionStore()
 const UserStore = useUserStore()
@@ -29,23 +48,11 @@ const UserStore = useUserStore()
 const popupActive = ref(false)
 const popupText = ref('')
 
-            // Sync active and activeFilters:
-
-watch(active, (newA, oldA) => {
-    saveActiveQn()
-    syncFiltersWithQn(activeFilters, newA)
-}, {deep: true})
-
-watch(activeFilters, (newF, oldF) => {
-    syncQnWithFilters(active, newF)
-    saveActiveQn()
-}, {deep: true})
-
             // On component state change:
 
 onActivated(() => {
     const ad = QuestionStore.getContributeActiveQnID()
-    const newQuestion = QuestionStore.getQnUsingID('contribute', ad.value) as qn
+    const newQuestion = QuestionStore.getQnUsingID('contribute', ad) as qn
     Object.assign(active, newQuestion)
     updateContributeTab()
 })
@@ -55,8 +62,10 @@ onActivated(() => {
 function removeFromContribute(qnID : string) {
     if (qnID == '0') {
         // removeFromContribute(0) just resets the newQn and displays it
-        Object.assign(newQn, emptyQn)
-        Object.assign(active, newQn)
+        QuestionStore.updateQn('contribute', '0', emptyQn)
+        if (active.id == '0') {
+            Object.assign(active, emptyQn)
+        }
     } else {
         QuestionStore.deleteFromContribute(qnID)
     }
@@ -64,7 +73,7 @@ function removeFromContribute(qnID : string) {
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ((name == 'insertFromDatabaseToContribute') || (name == 'insertIntoContribute') || (name == 'deleteFromContribute')) {
+        if ((name == 'insertFromDatabaseToContribute') || (name == 'insertIntoContribute') || (name == 'deleteFromContribute') || (name == 'resetContribute')) {
             after((result) => {
                 if (result) {
                     updateContributeTab()
@@ -77,46 +86,36 @@ QuestionStore.$onAction(
 function updateContributeTab() {
     const newContributeIDList = QuestionStore.getContributeIDList() as string[]
     IDlist.value = newContributeIDList
+    const newContributeDisplayIDList = QuestionStore.getContributeDisplayIDList() as string[]
+    displayIDlist.value = newContributeDisplayIDList
 }
 
 function updateQuestionFilters(ss : qnFilters) {
     const qF = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
     for (const key of qF) {
         var k = key as qnFilterNames
-        activeFilters[k] = ss[k]
+        active[k] = ss[k]
     }
-    activeFilters['sourceYear'] = ss['sourceYear']
-}
-
-        // Used to sync active and activeFilters
-
-function saveActiveQn() {
-    QuestionStore.updateQn('contribute', active.displayID, active)
-    QuestionStore.saveContributeActiveQnID(active.displayID)
+    active['sourceYear'] = ss['sourceYear']
 }
 
         // When displayed question is changed...
 
-function changeDisplayedQuestion(newQnID : string) {
+async function changeDisplayedQuestion(newQnID : string) {
 
     const a = {...active} as qn
 
-    if (active.displayID == '0') {
-        // If current displayed question is the new question, store it
-        Object.assign(newQn, a)
-    } else {
-        // Update current displayed question fields into Contribute store
-        QuestionStore.updateQn('contribute', active.displayID, a)
-    }
+    // Update current displayed question fields into Contribute store
+    QuestionStore.updateQn('contribute', active.id, a)
 
     // Get new displayed question
-    if (newQnID == '0') {
-        Object.assign(active, newQn)
-    } else {
-        const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
-        Object.assign(active, newQuestion)
-    }
+    const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
+    Object.assign(active, newQuestion)
 
+    // Get new displayed question's permissions
+    const b = await getActivePerms()
+
+    QuestionStore.setContributeActiveID(newQnID)
 }
 
         // When displayed tab is changed, or tab option (SAVE / DELETE) is selected...
@@ -125,12 +124,12 @@ async function changeOptionTab(s : string, n : number) {
 
     const mainForm = document.getElementById('contribute-container') as HTMLFormElement
 
-    if (n == activeOptionID.value) {
+    if (n == tabID.value) {
         return
     }
-    activeOptionID.value = n
+    tabID.value = n
 
-    for (var i=0; i<4; i++) { activeOptions[i] = false }
+    for (var i=0; i<4; i++) { tabs[i] = false }
 
     switch(s) {
         case 'Question':
@@ -143,6 +142,9 @@ async function changeOptionTab(s : string, n : number) {
 
         break;
         case 'Contributors':
+            if (active.id != '0') {
+                const permsGet = await getActivePerms()
+            }
 
         break;
 
@@ -154,51 +156,49 @@ async function changeOptionTab(s : string, n : number) {
                 openPopup("Please check that all necessary fields of your question have been filled up")
 
             } else {
-
-
                 
-                // SAVE QUESTION
+                // SAVE QUESTION TO SERVER
 
-                const responsejson = await questionSave(mainForm, active.displayID)
+                const responsejson = await questionSave(mainForm, active.id)
                 if (responsejson.status == -1) {
                     // Error occured
-                    const error = responsejson.error
-                    console.log(error)
-
+                    const error = responsejson.error as ServerError
+                    const errormsg = formatErrorMessage(error)
+                    openPopup(errormsg)
                 } else if (responsejson.status == 1) {
                     // Failure
-
+                    const error = responsejson.body as UserError
+                    const errorMsg = error.cause
+                    openPopup(errorMsg)
                 } else {
                     // Success
-                    const savedQn = responsejson.body[0] as qn
-                    const dispID = savedQn['displayID']
-                    if (active.displayID == '0') {
-                        removeFromContribute(active.displayID)
-
-                        QuestionStore.insertIntoContribute(dispID, savedQn)
-                        changeDisplayedQuestion(dispID)
+                    const savedQn = responsejson.body as qn
+                    const ID = savedQn['id']
+                    if (active.id == '0') {
+                        removeFromContribute(active.id)
+                        QuestionStore.insertIntoContribute(ID, savedQn)
+                        changeDisplayedQuestion(ID)
                     }
                 }
             }
-            activeOptionID.value = 0
-
+            tabID.value = 0
         break;
 
         case 'Delete':
-            if (active.displayID == '0') {
-                removeFromContribute(active.displayID)
+            if (active.id == '0') {
+                removeFromContribute(active.id)
             } else {
-                removeFromContribute(active.displayID)
-                const response = await questionDelete(mainForm, active.displayID)   
+                removeFromContribute(active.id)
+                const response = await questionDelete(mainForm, active.id)   
                 console.log(response)
                 changeDisplayedQuestion('0')
             }
 
-            activeOptionID.value = 0
+            tabID.value = 0
         break;
     }
 
-    activeOptions[activeOptionID.value] = true
+    tabs[tabID.value] = true
 }
 
 function checkForEmptyFields(q : qn) {
@@ -224,62 +224,65 @@ function closePopup() {
 
         // When user perms are changed...
 
-function setPerms(type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', u: string, action: 'add' | 'remove') {
-    
+async function setPerms(type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', name: string, action: 'add' | 'remove') {
+
+    if (active.id == '0') {
+        openPopup('Please save the question before setting user permissions!')
+        return false
+    }
+
+    const responsejson = await questionUpdatePerms(active.id, type, action, name)
+
+    if (responsejson.status == -1) {
+        // Error occured
+        const error = responsejson.error
+        console.log(error)
+
+    } else if (responsejson.status == 1) {
+        // Failure
+
+    } else {
+        // Success
+        const arePermsUpdated = await getActivePerms()
+    }
 }
 
-function setModifyUserOfActive(u : string, action : string) {
-    if (action == 'add') {
-        active.userPerms.canModifyUsers.push(u)
-    } else if (action == 'remove') {
-        const k = active.userPerms.canModifyUsers.indexOf(u)
-        active.userPerms.canModifyUsers.splice(k, 1)
-    }
-}
-function setReadUserOfActive(u : string, action : string) {
-    if (action == 'add') {
-        active.userPerms.canReadUsers.push(u)
-    } else if (action == 'remove') {
-        const k = active.userPerms.canReadUsers.indexOf(u)
-        active.userPerms.canReadUsers.splice(k, 1)
-    }
-}
-function setModifyGroupOfActive(g : string, action : string) {
-    const c = active.userPerms.canModifyGroups
-    const k = c.indexOf(g)
-    console.log(`Index of ${g} is ${k}`)
-    if ((action == 'add') && (k < 0)) {
-        active.userPerms.canModifyGroups.push(g)
-        console.log('pushing')
-    } else if ((action == 'remove') && (k >= 0)) {
-        active.userPerms.canModifyGroups.splice(k, 1)
-    }
-    console.log(active.userPerms)
-}
-function setReadGroupOfActive(g : string, action : string) {
-    const c = active.userPerms.canReadGroups
-    const k = c.indexOf(g)
-    if ((action == 'add') && (k < 0)) {
-        active.userPerms.canReadGroups.push(g)
-    } else if ((action == 'remove') && (k >= 0)) {
-        active.userPerms.canReadGroups.splice(k, 1)
-    }
-}
-function setPublic(perms : string) {
-    if (['none', 'read', 'modify'].indexOf(perms) < 0) {
-        return false
-    } else {
-        active.userPerms.canAccessPublic = perms as "none" | "read" | "modify"
+async function getActivePerms() {
+    if (active.id == '0') {
+        Object.assign(activePerms, emptyUserPerms)
         return true
+    }
+    const responsejson = await questionGetPerms(active.id)
+    if (responsejson.status == -1) {
+        // Error occured
+        const error = responsejson.error as ServerError
+        const errormsg = formatErrorMessage(error)
+        openPopup(errormsg)
+        return false
+
+    } else if (responsejson.status == 1) {
+        // Failure
+        const error = responsejson.body as UserError
+        const errorMsg = error.cause
+        openPopup(errorMsg)
+        return false 
+
+    } else {
+        // Success
+        const currentPerms = responsejson.body as userPerms
+        Object.assign(activePerms, currentPerms)  
+        return true
+
     }
 }
 
 function dump() {
-
+    console.log("Contribute ID List:")
     console.log(QuestionStore.getContributeIDList())
+    console.log(IDlist.value)
+    console.log("Active question:")
     console.log(active)
-    console.log(active.displayID)
-    console.log(newQn)
+    console.log(active.id)
 }
 
 </script>
@@ -288,7 +291,7 @@ function dump() {
     <div class="viewport">
         <Title title="Contribute" />
 
-        <UserTab :tab-list="IDlist" :active-tab="active.displayID" 
+        <UserTab :display-list="displayIDlist" :internal-list="IDlist" :active-tab="active.id" 
             @change-active-question="changeDisplayedQuestion" @remove-from-tab="removeFromContribute"
         />
 
@@ -297,11 +300,11 @@ function dump() {
             <QuestionFilters func="contribute" :ss="activeFilters" @update="updateQuestionFilters"/>
 
             <Tab :tab-left="contributeOptionsLeftTab" :tab-right="contributeOptionsRightTab" 
-                internal-name="questionOptions" :font-size=21 :active-i-d="activeOptionID"
+                internal-name="questionOptions" :font-size=21 :active-i-d="tabID"
                 @change-tab="changeOptionTab"
             />
             
-            <div id="question-container" :class="{ 'inactive-container': !activeOptions[0] }">
+            <div id="question-container" :class="{ 'inactive-container': !tabs[0] }">
                 <div class="latex">
                     <textarea class="latex-text" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
                 </div>
@@ -309,25 +312,22 @@ function dump() {
                 </div>
             </div>
 
-            <div id="solution-container" :class="{ 'inactive-container': !activeOptions[1] }">
+            <div id="solution-container" :class="{ 'inactive-container': !tabs[1] }">
                 <div class="latex">
-                    <textarea class="latex-text" name="solution" placeholder="Type solution here:" v-model="active.solution"></textarea>
+                    <textarea class="latex-text" name="solution" placeholder="Type solution here:" v-model="active.solution[0]"></textarea>
                 </div>
                 <div class="latex-view" id="solution-latex-view" @click="dump">
                 </div>
             </div>
 
-            <div id="image-container" :class="{ 'inactive-container': !activeOptions[2] }">
+            <div id="image-container" :class="{ 'inactive-container': !tabs[2] }">
                 Image container to be implemented!
             </div>
 
-            <div id="user-container" :class="{ 'inactive-container': !activeOptions[3] }">
+            <div id="user-container" :class="{ 'inactive-container': !tabs[3] }">
                 <UserPerms 
-                    :owner="active.userPerms.owner" 
-                    :can-modify-users="active.userPerms.canModifyUsers" :can-read-users="active.userPerms.canReadUsers"
-                    :can-modify-groups="active.userPerms.canModifyGroups" :can-read-groups="active.userPerms.canReadGroups"
-                    :can-access-public="active.userPerms.canAccessPublic"
-                    @set-perms=""
+                    :user-perms="activePerms"
+                    @set-perms="setPerms"
                 />
             </div>
 

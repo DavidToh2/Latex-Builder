@@ -14,16 +14,15 @@ export interface qnFilters {
 export type qnFilterNames = 'category' | 'topic' | 'subtopic' | 'difficulty' | 'sourceName' | 'tags'
 
 export interface qn extends qnFilters {
-    displayID: string
+    id: string
     question: string
 
     images: string[]
 
-    solution: string
-    solutionImages: string[]
+    solution: string[]
+    solutionImages: string[][]
 
     lastModified: string
-    userPerms: userPerms
 }
 
 export interface qns {
@@ -42,7 +41,7 @@ const emptyFilters = {
 } as qnFilters
 
 const emptyQn = {
-    displayID: '0',
+    id: '0',
     category: [],
     question: '',
 
@@ -54,32 +53,12 @@ const emptyQn = {
     tags: [],
 
     images: [],
-    solution: '',
-    solutionImages: [],
+    solution: [],
+    solutionImages: [[]],
 
-    lastModified: '',
-    userPerms: emptyUserPerms
+    lastModified: ''
     
 } as qn
 
-function syncFiltersWithQn(filters : qnFilters, q : qn) {
-    const a = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
-    const qn = {...q}
-    for (var key of a) {
-        const k = key as qnFilterNames
-        filters[k] = qn[k]
-    }
-    filters['sourceYear'] = qn['sourceYear']
-}
-function syncQnWithFilters(q : qn, filters : qnFilters) {
-    const a = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
-    const f = {...filters}
-    for (var key of a) {
-        const k = key as qnFilterNames
-        q[k] = f[k]
-    }
-    q['sourceYear'] = f['sourceYear']
-}
 
-
-export { emptyFilters, emptyQn, syncFiltersWithQn, syncQnWithFilters }
+export { emptyFilters, emptyQn }

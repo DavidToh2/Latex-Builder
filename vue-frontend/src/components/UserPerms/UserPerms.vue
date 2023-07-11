@@ -1,21 +1,14 @@
 <script setup lang="ts">
 
-import UserSearch from '@/components/Common/UserSearch.vue'
+import UserSearch from './UserSearch.vue'
 import Entry from '../Common/Entry.vue'
+import type { userPerms } from '@/types/UserTypes'
+import { emptyUserPerms } from '@/types/UserTypes'
 import { ref, reactive, computed } from 'vue'
 
-interface Props {
-    owner: string,
-    canModifyUsers: string[],
-    canModifyGroups: string[],
-    canReadUsers: string[],
-    canReadGroups: string[],
-    canAccessPublic: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    canModifyUsers: () => ['hi', 'bye']
-})
+const props = defineProps<{
+    userPerms: userPerms
+}>()
 
 const arePopupsActive = reactive([false, false, false, false])
 function closePopup(t : number) {
@@ -57,7 +50,7 @@ function removeReadGroup(g : string) {
         // Toggling public
 
 function togglePublic() {
-    const p = props.canAccessPublic
+    const p = props.userPerms.canAccessPublic
     if (p) {
         setPerms('public', 'public', 'remove')
     } else {
@@ -65,7 +58,7 @@ function togglePublic() {
     }
 }
 const publicEntryColour = computed(() => {
-    const p = props.canAccessPublic
+    const p = props.userPerms.canAccessPublic
     if (p) {
         return 'green'
     } else {
@@ -73,13 +66,17 @@ const publicEntryColour = computed(() => {
     }
 })
 
-function setPerms(type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', u: string, action: 'add' | 'remove') {
-    emits('setPerms', type, u, action)
+function setPerms(type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', name: string, action: 'add' | 'remove') {
+    emits('setPerms', type, name, action)
 }
 
 const emits = defineEmits<{
-    (e: 'setPerms', type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', u: string, action: 'add' | 'remove'): void
+    (e: 'setPerms', type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', name: string, action: 'add' | 'remove'): void
 }>()
+
+function dumpPerms() {
+    console.log(props.userPerms)
+}
 
 </script>
 
@@ -87,14 +84,14 @@ const emits = defineEmits<{
     <div id="userperms">
         <div id="userperms-owner" class="infobox">
             <div class="perms-description">Owner:</div>
-            <div>{{ owner }}</div>
+            <div>{{ userPerms.owner }}</div>
         </div>
         <div id="userperms-canmodifyusers" class="infobox">
             <div class="perms-description">Contributing users:</div>
             <div class="perms-content">
                 <div class="perms-list">
-                    <Entry v-if="canModifyUsers.length == 0" :removable="false">None</Entry>
-                    <Entry v-for="(item, index) in canModifyUsers" @close="removeModifyUser(item)">
+                    <Entry v-if="userPerms.canModifyUsers.length == 0" :removable="false">None</Entry>
+                    <Entry v-for="(item, index) in userPerms.canModifyUsers" @close="removeModifyUser(item)">
                         {{ item }}
                     </Entry>
                 </div>
@@ -108,7 +105,7 @@ const emits = defineEmits<{
             <div class="perms-description">Contributing groups:</div>
             <div class="perms-content">
                 <div class="perms-list">
-                    <Entry v-for="(item, index) in canModifyGroups" @close="removeModifyGroup(item)">{{ item }}</Entry>
+                    <Entry v-for="(item, index) in userPerms.canModifyGroups" @close="removeModifyGroup(item)">{{ item }}</Entry>
                 </div>
                 <div class="perms-add">
                     <UserSearch :is-popup-active="arePopupsActive[1]" popup-text="Group not found!"
@@ -120,8 +117,8 @@ const emits = defineEmits<{
             <div class="perms-description">Users with view access:</div>
             <div class="perms-content">
                 <div class="perms-list">
-                    <Entry v-if="canReadUsers.length == 0" :removable="false">None</Entry>
-                    <Entry v-for="(item, index) in canReadUsers" @close="removeReadUser(item)">
+                    <Entry v-if="userPerms.canReadUsers.length == 0" :removable="false">None</Entry>
+                    <Entry v-for="(item, index) in userPerms.canReadUsers" @close="removeReadUser(item)">
                         {{ item }}
                     </Entry>
                 </div>
@@ -135,7 +132,7 @@ const emits = defineEmits<{
             <div class="perms-description">Groups with view access:</div>
             <div class="perms-content">
                 <div class="perms-list">
-                    <Entry v-for="(item, index) in canReadGroups" @close="removeReadGroup(item)">{{ item }}</Entry>
+                    <Entry v-for="(item, index) in userPerms.canReadGroups" @close="removeReadGroup(item)">{{ item }}</Entry>
                 </div>
                 <div class="perms-add">
                     <UserSearch :is-popup-active="arePopupsActive[3]" popup-text="Group not found!"
@@ -146,19 +143,20 @@ const emits = defineEmits<{
         <div id="userperms-canpublic" class="infobox">
             <div class="perms-description">Public Permissions:</div>
             <div class="perms-content">
-                <div class="perms-list">
+                <div class="perms-list" style="cursor: pointer">
                     <Entry :colour="publicEntryColour"
                         :removable=false @click="togglePublic">
-                        <template v-if="(!canAccessPublic)">
+                        <template v-if="(!userPerms.canAccessPublic)">
                             Private
                         </template>
-                        <template v-else-if="(canAccessPublic)">
+                        <template v-else-if="(userPerms.canAccessPublic)">
                             Public
                         </template>
                     </Entry>
                 </div>
             </div>
         </div>
+        <Entry @close="dumpPerms">Debug</Entry>
     </div>
 
 </template>

@@ -9,7 +9,7 @@ const userSocialDataSchema = new Schema( {
         required: [true, 'Missing email']
     },
     groups: [String],
-    bio: String,
+    bio: String, 
     joinDate: Date
 })
 
@@ -58,9 +58,8 @@ const userPerms = new Schema( {
     canReadUsers: [String],
     canReadGroups: [String],
     canAccessPublic: {
-        type: String,
-        required: true,
-        enum: ['false', 'read', 'modify']
+        type: Boolean,
+        required: true
     }
 })
 

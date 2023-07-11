@@ -83,6 +83,7 @@ app.use('/auth', authrouter)
 
 app.use(function(err, req, res, next) {
 
+	console.log("Application error handler:")
 	console.log(err)
 
 	if (err instanceof UserError) {
@@ -121,9 +122,8 @@ app.use(function (req, res, next) {
 // Network/Resource Error Handler
 app.use(function (err, req, res, next) {
 	// render the error page
-	console.log("Error caught by global handler:")
-	console.log(err.message)
-	console.log(err.cause)
+	console.log("Global error handler:")
+	console.log(err)
 	res.status(err.status || 500);
 	res.send(err.message);
 });

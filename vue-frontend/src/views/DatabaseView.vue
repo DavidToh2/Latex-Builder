@@ -7,7 +7,6 @@ import type { qn, qns, qnFilters, qnFilterNames } from '@/types/QuestionTypes'
 import { emptyFilters } from '@/types/QuestionTypes'
 import { useQuestionStore } from '@/stores/questionStore'
 import { questionGet, questionDelete } from '@/post/postQn'
-import { getFormData } from '@/aux'
 
 import { reactive, onActivated, onDeactivated } from 'vue'
 
@@ -23,10 +22,11 @@ onActivated(() => {
     displayDatabase() 
 })
 onDeactivated(() => { 
-    QuestionStore.saveDatabaseQuestionFilters(searchParameters) 
+    QuestionStore.setDatabaseQuestionFilters(searchParameters) 
 })
 
 const searchParameters = reactive({...emptyFilters})
+
 function updateSearchParameters(ss : qnFilters) {
     const qF = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
     for (const key of qF) {
@@ -34,8 +34,9 @@ function updateSearchParameters(ss : qnFilters) {
         searchParameters[k] = ss[k]
     }
     searchParameters['sourceYear'] = ss['sourceYear']
-}
 
+    QuestionStore.setDatabaseQuestionFilters(searchParameters)
+}
 
 async function submitSearchEvent() {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
@@ -61,23 +62,34 @@ function displayDatabase() {            // Fetches data from store
     results.qns = [...QuestionStore.getDatabase().slice().reverse()]
 }
 
-function insertIntoOtherView(displayID : string, direction : string) {
+QuestionStore.$onAction(
+    ({name, store, args, after, onError }) => {
+        if ((name == 'resetDatabase')) {
+            after((result) => {
+                Object.assign(searchParameters, QuestionStore.getDatabaseQuestionFilters())
+                displayDatabase()
+            })
+        }
+    }
+)
+
+function insertIntoOtherView(ID : string, direction : string) {
     switch(direction) {
         case 'left':
-            QuestionStore.insertFromDatabaseToContribute(displayID)
+            QuestionStore.insertFromDatabaseToContribute(ID)
         break;
         case 'right':
-            QuestionStore.insertQnFromDatabaseToBuild(displayID)
+            QuestionStore.insertQnFromDatabaseToBuild(ID)
         break;
     }
 }
 
-async function submitDeleteEvent(displayID : string) {
+async function submitDeleteEvent(ID : string) {
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
 
     // DELETE QUESTION
 
-    const responsejson = await questionDelete(f, displayID)
+    const responsejson = await questionDelete(f, ID)
     if (responsejson.status == -1) {
         // Error occured
         const error = responsejson.error
@@ -89,7 +101,7 @@ async function submitDeleteEvent(displayID : string) {
     } else {
         // Success
         const data = responsejson.body
-        QuestionStore.deleteFromContribute(displayID)
+        QuestionStore.deleteFromContribute(ID)
     }
 
     // Refresh the database

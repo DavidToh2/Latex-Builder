@@ -29,6 +29,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
     function setAuthStatus(b : boolean) {
         authStatus.value = b
+        return true
     }
     function getAuthStatus() {
         return authStatus.value

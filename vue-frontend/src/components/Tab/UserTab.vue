@@ -1,9 +1,13 @@
 <script setup lang="ts">
 
-    import { onUpdated, onMounted } from 'vue'
+    import { onUpdated, onMounted, computed } from 'vue'
+    import { useQuestionStore } from '@/stores/questionStore'
+
+    const QuestionStore = useQuestionStore()
 
     export interface Props {
-        tabList: string[],
+        internalList: string[],
+        displayList: string[],
         activeTab: string
     }
 
@@ -14,28 +18,14 @@
         (e: 'removeFromTab', qnID: string): void
     }>()
 
-    function changeActiveQuestionDisplay(newID : string) {
-        const tabs = document.querySelectorAll(".tab-question")
-        for (const t of tabs) {
-            const i = t.id
-            if (t.classList.contains("active")) {
-                t.classList.remove("active")
-            }
-            if (i == `contribute-${newID}`) {
-                t.classList.add("active")
-            }
-        }
+    function changeActiveQuestion(index : number) {
+        emits('changeActiveQuestion', props.internalList[index])
     }
-
-    function removeFromTab(id : string) {
-        if (props.activeTab == id) {
-            var i = 0
-            while (props.tabList[i] != id) {
-                i++
-            }
-            emits('changeActiveQuestion', props.tabList[i-1])
+    function removeFromTab(index : number) {
+        if (props.activeTab == props.internalList[index]) {
+            emits('changeActiveQuestion', props.internalList[index-1])
         }
-        emits('removeFromTab', id)
+        emits('removeFromTab', props.internalList[index])
     }
     onMounted(() => {
         changeActiveQuestionDisplay(props.activeTab)
@@ -44,18 +34,31 @@
         changeActiveQuestionDisplay(props.activeTab)
     })
 
+    function changeActiveQuestionDisplay(newInternalID : string) {
+        const tabs = document.querySelectorAll(".tab-question")
+        for (const t of tabs) {
+            const i = t.id
+            if (t.classList.contains("active")) {
+                t.classList.remove("active")
+            }
+            if (i == `contribute-${newInternalID}`) {
+                t.classList.add("active")
+            }
+        }
+    }
+
 </script>
 
 <template>
     <div id="contribute-tab-container">
-        <div class="tab-question" v-for="item in tabList" :id="'contribute-' + item">
+        <div class="tab-question" v-for="(item, index) in displayList" :id="'contribute-' + internalList[index]">
             <template v-if="item == '0'">
-                <div class="tab-question-text" @click="$emit('changeActiveQuestion', item)">New</div>
-                <div class="tab-question-x" @click="removeFromTab(item)">&#0215;</div>
+                <div class="tab-question-text" @click="changeActiveQuestion(index)">New</div>
+                <div class="tab-question-x" @click="removeFromTab(index)">&#0215;</div>
             </template>
             <template v-else>
-                <div class="tab-question-text" @click="$emit('changeActiveQuestion', item)">{{ item }}</div>
-                <div class="tab-question-x" @click="removeFromTab(item)">&#0215;</div>
+                <div class="tab-question-text" @click="changeActiveQuestion(index)">{{ item }}</div>
+                <div class="tab-question-x" @click="removeFromTab(index)">&#0215;</div>
             </template>
         </div>
     </div>

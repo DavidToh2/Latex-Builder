@@ -10,15 +10,13 @@ import BuildView from '@/views/BuildView.vue'
 import DocumentView from '@/views/DocumentView.vue'
 import DriveView from '@/views/DriveView.vue'
 import LatexView from '@/views/LatexView.vue'
-
 import AccountView from '@/views/AccountView.vue'
 
 import { ref, computed, onMounted } from 'vue'
 import type { Component } from 'vue'
-
 import { useUserStore } from '@/stores/userStore'
 
-import { isAuth, authGetUserInfo } from '@/post/postAuth'
+import { isAuth } from '@/post/postAuth'
 
 const UserStore = useUserStore()
 
@@ -58,7 +56,12 @@ const views = {
 } as {[id: string] : Component}
 
 onMounted(async() => {
-	setAuthStatus()
+	if (await isAuth()) {
+		UserStore.setAuthStatus(true)
+	} else {
+		UserStore.clearUserData()
+		UserStore.setAuthStatus(false)
+	}
 	if (centerViews.includes(currentLeftView.value)) { workspaceDisplayMode.value++ }
 	if (centerViews.includes(currentRightView.value)) { workspaceDisplayMode.value+= 2 }
 })
@@ -68,28 +71,21 @@ UserStore.$onAction(
 		if (name == 'displayView') {
 			after(async (result) => {
 				if (result) {
-					setAuthStatus()
 					const newView = UserStore.getNewView()
 					updateView(newView)
 				}
 			})
 		}
+		if (name == 'setAuthStatus') {
+			after(async (result) => {
+				if (result) {
+					// Update all views
+					// Actually don't need, because the views will update themselves
+				}
+			})
+		}
 	}
 )
-
-async function setAuthStatus() {
-	if (await isAuth()) {
-		console.log("User authenticated")
-		UserStore.setAuthStatus(true)
-		if (!UserStore.getUserDataStatus()) {
-			const d = await authGetUserInfo()
-			UserStore.setUserData(d)
-		}
-	} else {
-		console.log("User not authenticated")
-		UserStore.setAuthStatus(false)
-	}
-}
 
 function updateView(newView : string) {
 

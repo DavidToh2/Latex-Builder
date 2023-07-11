@@ -7,7 +7,9 @@ export interface userSocialData {
 
 export interface userData {
     username: string
-    socialData: userSocialData
+    socialData: userSocialData,
+    accountStatus: string,
+    questions: string[]
 }
 
 const emptyUserSocialData = {
@@ -19,7 +21,9 @@ const emptyUserSocialData = {
 
 const emptyUserData = {
     username: '',
-    socialData: emptyUserSocialData
+    socialData: emptyUserSocialData,
+    accountStatus: '',
+    questions: <string[]>[]
 } as userData
 
 export interface userPerms {

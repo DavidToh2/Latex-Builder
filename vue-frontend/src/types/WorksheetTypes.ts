@@ -3,22 +3,22 @@ import type { userPerms } from "./UserTypes"
 import { emptyUserPerms } from "./UserTypes"
 
 export interface placeholder {
-    displayID: 'placeholder',
+    id: 'placeholder',
     text: string
 }
 export interface latex {
-    displayID: string,
+    id: string,
     text: string
 }
 export interface latexEnum {
-    displayID: string,
+    id: string,
     type: 'numeric' | 'alphabetic' | 'roman' | "bullet" | "dash",
     behaviour: 'start' | 'end',
     template: string,
     options: string
 }
 export interface latexHeading {
-    displayID: string,
+    id: string,
     type: 'section' | 'subsection' | 'subsubsection',
     text: string
 }
@@ -27,18 +27,18 @@ export type latexTypeNames = 'latex' | 'latexHeading' | 'latexEnum'
 const latexTypeStrings = ['latex', 'latexHeading', 'latexEnum']
 
 const defaultLatex : latex = {
-    displayID: "latex",
+    id: "latex",
     text: ""
 }
 const defaultLatexEnum : latexEnum = {
-    displayID: "latexEnum",
+    id: "latexEnum",
     type: "numeric",
     behaviour: "start",
     template: "ENUM.",
     options: ""
 }
 const defaultLatexHeading : latexHeading = {
-    displayID: "latexHeading",
+    id: "latexHeading",
     type: "section",
     text: ""
 }

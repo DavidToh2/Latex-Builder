@@ -168,10 +168,6 @@ if (nU) {
 ```
 
 Other user data, such as username and social info, are directly sent back via the response to be stored in the local UserStore. For more information, refer to the frontend documentation.
-```
-	response.body['username'] = nU['username']
-	response.body['socialInfo'] = nU['socialInfo']
-```
 
 ## Authentication Check (Backend)
 

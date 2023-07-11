@@ -18,8 +18,8 @@
     const props = defineProps<Props> ()
 
     const emits = defineEmits<{
-        (e: 'insert', displayID: string, direction: string): void
-        (e: 'delete', displayID: string): void
+        (e: 'insert', ID: string, direction: string): void
+        (e: 'delete', ID: string): void
         (e: 'up', i : number): void
         (e: 'down', i : number): void
         (e: 'swap', index1: number, index2: number): void
@@ -29,11 +29,11 @@
 
             // Object emit functions
 
-    async function deleteObject(displayID: string) {
-        emits('delete', displayID)
+    async function deleteObject(ID: string) {
+        emits('delete', ID)
     }
-    function insertObject(displayID : string, direction : string) {
-        emits('insert', displayID, direction)
+    function insertObject(ID : string, direction : string) {
+        emits('insert', ID, direction)
     }
     function objectUp(i : number) {
         emits('up', i)

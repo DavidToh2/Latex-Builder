@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import Popup from './Popup/Popup.vue';
+import Popup from '@/components/Common/Popup/Popup.vue';
 import { ref } from 'vue';
 
 const props = defineProps<{
@@ -13,6 +13,11 @@ const emits = defineEmits<{
     (e: 'closePopup'): void
 }>()
 
+function addUser(u : string) {
+    user.value = ''
+    emits('addUser', u)
+}
+
 const user = ref('')
 
 </script>
@@ -21,7 +26,7 @@ const user = ref('')
     <div class="user-search-container">
         <div class="user-searchbar-container">
             <input class="input-sm user-search" v-model="user">
-            <div class="btn-nobg user-search-btn" @click="emits('addUser', user)">Add</div>
+            <div class="btn-nobg user-search-btn" @click="addUser(user)">Add</div>
         </div>
         <Popup :is-active="isPopupActive" @close="emits('closePopup')">
             <span v-html="popupText"></span>

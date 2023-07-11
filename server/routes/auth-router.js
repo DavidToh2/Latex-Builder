@@ -41,11 +41,7 @@ router.post('/login', async function(req, res, next) {
         response.status = 0
         req.session.regenerate((err) => {if(err) next(err)})
         req.session.uID = nU['id']
-        const u = {
-            username: nU['username'],
-            socialData: nU['socialData']
-        }
-        response.body = u
+        response.body = nU
 
         res.json(response)
     } catch(err) {

@@ -23,11 +23,13 @@ async function newUser(userdata) {
         const new_userID = crypto.randomBytes(64).toString('hex')
         const new_hashedpassword = hashPassword(new_password, new_salt)
 
+        const now = new Date()
+
         const nU_social = {
             email: new_email,
             groups: [],
             bio: 'Default bio',
-            joinDate: Date.now()
+            joinDate: now
         }
 
         const nU = {
@@ -35,7 +37,8 @@ async function newUser(userdata) {
             username: new_username,
             salt: new_salt,
             hashedPassword: new_hashedpassword,
-            socialData: nU_social
+            socialData: nU_social,
+            accountStatus: 'limited'
         }
 
         // User error: user already exists
@@ -124,9 +127,10 @@ async function convertUserIDsToUsernames(uIDArray) {
 
     const errorString = 'db-auth/convertUserIDsToUsernames: Failed to convert user IDs:'
     try {
-        uIDArray.forEach(async (uID, index, uIDArr) => {
-            uIDArr[index] = await findUsernameUsingID(uID)
-        })
+        for (var i=0; i<uIDArray.length; i++) {
+            uIDArray[i] = await findUsernameUsingID(uIDArray[i])
+        }
+        return true
     } catch(err) {
         newError(err, errorString)
     }
@@ -143,20 +147,14 @@ async function findUserInfoUsingID(userID) {
             id: userID
         }
 
-        const userArr = await Users.find(u).lean()
+        const userArr = await Users.find(u, 'username socialData questions accountStatus').lean()
 
         if (userArr.length > 1) {
             throw new DatabaseError(errorString, `findUserInfoUsingID() found multiple users!`)
         } else if (userArr.length == 0) {
             throw new DatabaseError(errorString, `findUserInfoUsingID() did not find any users!`)
         } else {
-            const r = {
-                username: userArr[0]['username'],
-                socialInfo: userArr[0]['socialInfo'],
-                questions: userArr[0]['questions'],
-                accountStatus: userArr[0]['accountStatus']
-            }
-            return r
+            return userArr[0]
         }
 
     } catch(err) {
@@ -211,7 +209,14 @@ async function authenticateUser(userdata) {
 
         console.log(`User ${userstring} validated: ${userValidated}`)
         if (userValidated) {
-            return user
+            const r = {
+                id: user.id,
+                username: user.username,
+                socialData: user.socialData,
+                questions: user.questions,
+                accountStatus: user.accountStatus
+            }
+            return r
         } else {
             throw new UserError(errorString, 'Invalid credentials!')
         }
@@ -227,9 +232,10 @@ async function setUserQuestions(userID, fn, qnID) {
         if (fn == 'add') {
             const result = await Users.findOneAndUpdate(
                 { id: userID }, 
-                { $push: { questions: qnID } }
+                { $push: { questions: qnID } },
+                { new: true }
             )
-            if (result.length == 1) {
+            if (result) {
                 return true
             } else {
                 return false
@@ -237,9 +243,10 @@ async function setUserQuestions(userID, fn, qnID) {
         } else if (fn == 'remove') {
             const result = await Users.findOneAndUpdate(
                 { id: userID }, 
-                { $pull: { questions: qnID } }
+                { $pull: { questions: qnID } },
+                { new: true } 
             )
-            if (result.length == 1) {
+            if (result) {
                 return true
             } else {
                 return false

@@ -67,20 +67,20 @@ router.post('/set/new', async function(req, res, next) {              // SET NEW
     }
 })
 
-router.post('/set/update/:displayID', async function(req, res, next) {           // UPDATE EXISTING QUESTION
+router.post('/set/update/:ID', async function(req, res, next) {           // UPDATE EXISTING QUESTION
 
     try {
         console.log("Input parameters:")
         const reqData = parseWebToServer(req.body)
         console.log(reqData)
-        const displayID = req.params['displayID']
+        const ID = req.params['ID']
 
         var userID = 'public'
         if (req.session.uID) {
             userID = req.session.uID
         }
 
-        const sQ = await dbQuestion.saveQuestion(displayID, reqData, userID)
+        const sQ = await dbQuestion.saveQuestion(ID, reqData, userID)
         
         const response = new ResponseBody(reqData['fn'])
         response.status = 0
@@ -93,19 +93,19 @@ router.post('/set/update/:displayID', async function(req, res, next) {          
     }
 })
 
-router.post('/set/perms/:displayID', async function(req, res, next) {
+router.post('/set/perms/:ID', async function(req, res, next) {
     try {
         console.log("Action parameters:")
         const reqData = req.body
         console.log(reqData)
-        const displayID = req.params['displayID']
+        const ID = req.params['ID']
 
         var userID = 'public'
         if (req.session.uID) {
             userID = req.session.uID
         }
 
-        const sQ = await dbQuestion.setQuestionPerms(displayID, reqData, userID)
+        const sQ = await dbQuestion.setQuestionPerms(ID, reqData, userID)
         
         const response = new ResponseBody(reqData['fn'])
         response.status = 0
@@ -118,20 +118,45 @@ router.post('/set/perms/:displayID', async function(req, res, next) {
     }
 })
 
-router.post('/delete/:displayID', async function(req, res, next) {
+router.post('/get/perms/:ID', async function(req, res, next) {                  // FIND / GET QUESTION PERMS
+
+    try {
+        const reqData = req.body
+        console.log("Target question:")
+        const ID = req.params['ID']
+
+        var userID = 'public'
+        if (req.session.uID) {
+            userID = req.session.uID
+        }
+
+        const fQ = await dbQuestion.getQuestionPerms(ID, userID)
+
+        const response = new ResponseBody(reqData['fn'])
+        response.status = 0
+        response.body = fQ
+
+        res.json(response)
+
+    } catch(err) {
+        next(err)
+    }
+})
+
+router.post('/delete/:ID', async function(req, res, next) {
 
     try {    
         console.log("Input parameters:")
         const reqData = req.body
         console.log(reqData)
-        const displayID = req.params['displayID']
+        const ID = req.params['ID']
 
         var userID = 'public'
         if (req.session.uID) {
             userID = req.session.uID
         }
 
-        const dQ = await dbQuestion.deleteQuestion(displayID, userID)
+        const dQ = await dbQuestion.deleteQuestion(ID, userID)
         
         const response = new ResponseBody(reqData['fn'])
         response.status = 0
@@ -146,6 +171,8 @@ router.post('/delete/:displayID', async function(req, res, next) {
 })
 
 function parseWebToServer(reqData) {
+    console.log("Parsing web to server...")
+    console.log(reqData)
     for (const f of stringToArrayFields) {
         if (reqData.hasOwnProperty(f)) {
             reqData[f] = reqData[f].split(', ')
@@ -156,6 +183,7 @@ function parseWebToServer(reqData) {
             reqData[f] = Number(reqData[f])
         }
     }
+    console.log(reqData)
     return reqData
 }
 
