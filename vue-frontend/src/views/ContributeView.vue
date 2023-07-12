@@ -185,8 +185,8 @@ async function changeOptionTab(s : string, newTabValue : number) {
                 } else if (responsejson.status == 1) {
                     // Failure
                     const error = responsejson.body as UserError
-                    const errorMsg = error.cause
-                    UserStore.openPopup(errorMsg)
+                    const errormsg = error.cause
+                    UserStore.openPopup(errormsg)
                 } else {
                     // Success
                     const savedQn = responsejson.body as qn
@@ -331,7 +331,7 @@ function dump() {
             <QuestionFilters func="contribute" :ss="activeFilters" @update="updateQuestionFilters"/>
 
             <Tab :tab-left="contributeOptionsLeftTab" :tab-right="contributeOptionsRightTab" 
-                internal-name="questionOptions" :font-size=21 :active-i-d="tabID"
+                internal-name="questionOptions" :font-size=21 :active-tab-index="tabID"
                 @change-tab="changeOptionTab"
             />
             

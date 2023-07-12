@@ -6,6 +6,9 @@ import Tab from '@/components/Tab/Tab.vue'
 import pdf from 'vue-pdf-embed'
 import { useQuestionStore } from '@/stores/questionStore'
 import { getPDF } from '@/post/postFile'
+import { useUserStore } from '@/stores/userStore'
+import type { UserError, ServerError } from '@/types/ErrorTypes'
+import { formatErrorMessage } from '@/types/ErrorTypes'
 
 const activeTabID = ref(0)
 const documentTab = ['Document', 'Console Output']
@@ -13,6 +16,7 @@ const documentTab = ['Document', 'Console Output']
 const blobURL = ref('')
 
 const QuestionStore = useQuestionStore()
+const UserStore = useUserStore()
 
 onMounted(async () => {
     const pdfName = ''
@@ -22,12 +26,11 @@ onMounted(async () => {
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ( (name == 'setDisplayPDFName') || (name == 'resetDisplayPDFName') ) {
+        if ( (name == 'setDisplayPDFName') ) {
             after(async (result) => {
                 if (result) {
                     const pdfName = QuestionStore.getDisplayPDFName()
-                    console.log(pdfName)
-                    const x = await displayPDF(pdfName)
+                    await displayPDF(pdfName)
                 }
             })
         }
@@ -35,11 +38,33 @@ QuestionStore.$onAction(
 )
 
 async function displayPDF(pdfName : string) {
+    if (!UserStore.getAuthStatus()) {
+        return false
+    }
     try {
-        const pdfBlob = await getPDF(pdfName)
-        blobURL.value = URL.createObjectURL(pdfBlob)
-        console.log(`Displaying PDF ${pdfName}`)
-        return true
+        const pdfResponse = await getPDF(pdfName)
+        if (pdfResponse instanceof Blob) {
+            // PDF successfully fetched
+            blobURL.value = URL.createObjectURL(pdfResponse)
+            console.log(`Displaying PDF ${pdfName}`)
+            return true
+        } else {
+            console.log(pdfResponse)
+            if (pdfResponse.status == -1) {
+                // Error
+                const error = pdfResponse.error as ServerError
+                const errormsg = formatErrorMessage(error)
+                UserStore.openPopup(errormsg)
+                return false
+
+            } else if (pdfResponse.status == 1) {
+                // Failure
+                const error = pdfResponse.body as UserError
+                const errormsg = error.cause
+                UserStore.openPopup(errormsg)
+                return false
+            }
+        }
     } catch(err) {
         console.log(err)
         return false

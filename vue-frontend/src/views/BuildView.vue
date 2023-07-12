@@ -12,11 +12,15 @@ import { ref, reactive, onMounted, computed } from 'vue'
 
 import type { worksheetElement, ws } from '@/types/WorksheetTypes';
 import { defaultLatex, defaultLatexHeading, defaultLatexEnum, emptyWorksheetConfig, latexTypeStrings } from '@/types/WorksheetTypes'
-import { useQuestionStore } from '@/stores/questionStore';
+import type { UserError, ServerError } from '@/types/ErrorTypes'
+import { formatErrorMessage } from '@/types/ErrorTypes'
 
 import { buildWorksheet } from '@/post/postFile';
+import { useQuestionStore } from '@/stores/questionStore';
+import { useUserStore } from '@/stores/userStore';
 
 const QuestionStore = useQuestionStore()
+const UserStore = useUserStore()
 
 const buildOptionsLeftTab = ['Selected Questions', 'Document Settings']
 const buildOptionsRightTab = ['Compile', 'Download']
@@ -62,6 +66,11 @@ async function changeOptionTab(s : string, n : number) {
 			console.log(QuestionStore.getBuildIDList())
 		break;
 		case buildOptionsRightTab[0]:
+
+			if (!UserStore.getAuthStatus()) {
+				UserStore.openPopup("You must be logged in to compile documents!")
+				break;
+			}
 			worksheet.elements = QuestionStore.getBuild()
 
 			// BUILD WORKSHEET
@@ -69,12 +78,16 @@ async function changeOptionTab(s : string, n : number) {
 			const responsejson = await buildWorksheet(worksheet)
 			if (responsejson.status == -1) {
 				// Error occured
-				const error = responsejson.error
-				console.log(error)
+				const error = responsejson.error as ServerError
+				const errormsg = formatErrorMessage(error)
+				UserStore.openPopup(errormsg)
+				QuestionStore.resetDisplayPDFName()
 
 			} else if (responsejson.status == 1) {
 				// Failure: LaTeX compilation error
-				console.log("User error")
+				const error = responsejson.body as UserError
+				const errormsg = error.cause
+				UserStore.openPopup(errormsg)
 				QuestionStore.resetDisplayPDFName()
 
 			} else {
@@ -210,7 +223,7 @@ onMounted(() => {
 		<Title title="Worksheet Builder" />
 		<Tab 
 			:tab-left="buildOptionsLeftTab" :tab-right="buildOptionsRightTab" 
-			:font-size=22 internalName="buildOptions" :active-i-d="activeOptionID" @change-tab="changeOptionTab"
+			:font-size=22 internalName="buildOptions" :active-tab-index="activeOptionID" @change-tab="changeOptionTab"
 		/>
 		<!-- <div v-for="item in buildIDArr">{{ item }}</div> -->
 
@@ -221,7 +234,7 @@ onMounted(() => {
 				@delete="removeFromBuild" @up="elementUp" @down="elementDown"
 				:is-dragging="isDragging" @swap="swapTwoElements" @start-drag="startDrag"
 				/>
-		</div>
+		</div> 
 
 		<div id="document-settings-container" :class="{ 'inactive-container': !activeOptions[1] }">
 			<WorksheetFilters />

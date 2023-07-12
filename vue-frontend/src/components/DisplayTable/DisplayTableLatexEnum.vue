@@ -1,0 +1,10 @@
+<script setup lang="ts">
+
+</script>
+<template>
+    <div class="display-table-entry-row">
+        Latex Element Enum
+    </div>
+</template>
+<style scoped>
+</style>

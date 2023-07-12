@@ -1,4 +1,9 @@
 <script setup lang="ts">
+
+import DisplayTableLatex from './DisplayTableLatex.vue';
+import DisplayTableLatexEnum from './DisplayTableLatexEnum.vue';
+import DisplayTableLatexHeading from './DisplayTableLatexHeading.vue';
+
 import type { latex, latexEnum, latexHeading } from '@/types/WorksheetTypes';
 import type { latexTypes, latexTypeNames } from '@/types/WorksheetTypes';
 
@@ -33,12 +38,15 @@ import type { latexTypes, latexTypeNames } from '@/types/WorksheetTypes';
         <div class="display-table-element display-table-cell">  
             <!-- content here -->
             <template v-if="type == 'latex'">
+                <DisplayTableLatex />
                 Raw Latex
             </template>
             <template v-else-if="type == 'latexHeading'">
+                <DisplayTableLatexHeading />
                 Header
             </template>
             <template v-else-if="type == 'latexEnum'">
+                <DisplayTableLatexEnum />
                 List
             </template>
         </div>

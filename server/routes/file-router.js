@@ -21,7 +21,7 @@ router.post('/build/', isAuthenticated, async function(req, res, next) {
 
         res.json(response)
     } catch(err) {
-        next(err)
+        next(err) 
     }
 })
 

@@ -21,6 +21,12 @@ export async function getPDF(n : string) {
         r.name = 'preview'
     }
     const response = await postGetFile(r, `${BASE_URL}/file/get`)
-    const responseblob = await response.blob()
-    return responseblob
+    const contentType = response.headers.get('Content-Type') as string
+    if (contentType == 'application/json') {
+        const responsejson = await response.json()
+        return responsejson
+    } else {
+        const responseblob = await response.blob()
+        return responseblob
+    }
 }
