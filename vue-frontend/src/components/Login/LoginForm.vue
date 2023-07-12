@@ -38,6 +38,7 @@ async function loginUser() {
         const data = responsejson.body as userData
         UserStore.setUserData(data)
         UserStore.setAuthStatus(true)
+        console.log("LoginView: Set user data")
 
         emits('login-success')
     }

@@ -39,11 +39,19 @@ router.post('/login', async function(req, res, next) {
         const response = new ResponseBody(userData['fn'])
 
         response.status = 0
-        req.session.regenerate((err) => {if(err) next(err)})
-        req.session.uID = nU['id']
-        response.body = nU
+        req.session.regenerate(function(err) {
 
-        res.json(response)
+            if (err) next(err)
+
+            req.session.uID = nU['id']
+            delete nU['id']
+            response.body = nU
+            
+            req.session.save(function(err) {
+                if (err) next(err)
+                res.json(response)
+            })
+        })
     } catch(err) {
         next(err)
     }
@@ -54,12 +62,13 @@ router.post('/logout', isAuthenticated, function(req, res, next) {
 
     try {
         const userID = req.session.uID
-        req.session.uID = null
-        req.session.regenerate((err) => {if(err) next(err)})
+        console.log(`Logging out user ${userID}...`)
         const response = new ResponseBody(req.body['fn'])
         response.status = 0
-
-        res.json(response)
+        req.session.destroy(function(err) {
+            if (err) next(err)
+            res.json(response)
+        })
     } catch(err) {
         next(err)
     }

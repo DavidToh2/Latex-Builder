@@ -4,19 +4,11 @@ import UserSearch from './UserSearch.vue'
 import Entry from '../Common/Entry.vue'
 import type { userPerms } from '@/types/UserTypes'
 import { emptyUserPerms } from '@/types/UserTypes'
-import { ref, reactive, computed } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps<{
     userPerms: userPerms
 }>()
-
-const arePopupsActive = reactive([false, false, false, false])
-function closePopup(t : number) {
-    console.log(`Closing popup ${t}`)
-    if (t >= 0 && t <= 3) {
-        arePopupsActive[t] = false
-    }
-}
 
         // Change user perms:
 
@@ -96,8 +88,7 @@ function dumpPerms() {
                     </Entry>
                 </div>
                 <div class="perms-add">
-                    <UserSearch :is-popup-active="arePopupsActive[0]" popup-text="User not found!"
-                        @add-user="addModifyUser" @close-popup="closePopup(0)"/>
+                    <UserSearch @add-user="addModifyUser"/>
                 </div>
             </div>
         </div>
@@ -108,8 +99,7 @@ function dumpPerms() {
                     <Entry v-for="(item, index) in userPerms.canModifyGroups" @close="removeModifyGroup(item)">{{ item }}</Entry>
                 </div>
                 <div class="perms-add">
-                    <UserSearch :is-popup-active="arePopupsActive[1]" popup-text="Group not found!"
-                        @add-user="addModifyGroup" @close-popup="closePopup(1)"/>
+                    <UserSearch @add-user="addModifyGroup"/>
                 </div>
             </div>
         </div>
@@ -123,8 +113,7 @@ function dumpPerms() {
                     </Entry>
                 </div>
                 <div class="perms-add">
-                    <UserSearch :is-popup-active="arePopupsActive[2]" popup-text="User not found!"
-                        @add-user="addReadUser" @close-popup="closePopup(2)"/>
+                    <UserSearch @add-user="addReadUser"/>
                 </div>
             </div>
         </div>
@@ -135,8 +124,7 @@ function dumpPerms() {
                     <Entry v-for="(item, index) in userPerms.canReadGroups" @close="removeReadGroup(item)">{{ item }}</Entry>
                 </div>
                 <div class="perms-add">
-                    <UserSearch :is-popup-active="arePopupsActive[3]" popup-text="Group not found!"
-                        @add-user="addReadGroup" @close-popup="closePopup(3)"/>
+                    <UserSearch @add-user="addReadGroup"/>
                 </div>
             </div>
         </div>

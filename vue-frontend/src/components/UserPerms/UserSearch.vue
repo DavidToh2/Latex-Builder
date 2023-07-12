@@ -1,16 +1,9 @@
 <script setup lang="ts">
 
-import Popup from '@/components/Common/Popup/Popup.vue';
 import { ref } from 'vue';
-
-const props = defineProps<{
-    isPopupActive: boolean,
-    popupText: string
-}>()
 
 const emits = defineEmits<{
     (e: 'addUser', user: string): void
-    (e: 'closePopup'): void
 }>()
 
 function addUser(u : string) {
@@ -28,9 +21,6 @@ const user = ref('')
             <input class="input-sm user-search" v-model="user">
             <div class="btn-nobg user-search-btn" @click="addUser(user)">Add</div>
         </div>
-        <Popup :is-active="isPopupActive" @close="emits('closePopup')">
-            <span v-html="popupText"></span>
-        </Popup>
     </div>
 
 </template>

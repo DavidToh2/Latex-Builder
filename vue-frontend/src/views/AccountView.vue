@@ -3,22 +3,12 @@
 import LoginForm from '@/components/Login/LoginForm.vue'
 import SignupForm from '@/components/Login/SignupForm.vue'
 import Account from '@/components/Login/Account.vue'
-import Popup from '@/components/Common/Popup/Popup.vue'
 
 import { useUserStore } from '@/stores/userStore';
 import { useQuestionStore } from '@/stores/questionStore';
 import { ref, onActivated } from 'vue'
-import { authGetUserInfo, isAuth } from '@/post/postAuth';
-
-import type { userData } from '@/types/UserTypes'
-import type { UserError, ServerError } from '@/types/ErrorTypes'
-import { formatErrorMessage } from '@/types/ErrorTypes'
-
-const displayPopup = ref(false)
-const popupMessage = ref('')
 
 const UserStore = useUserStore()
-const QuestionStore = useQuestionStore()
 const c = UserStore.getAuthStatus() as boolean
 
 const isLoggedIn = ref(c)
@@ -26,15 +16,10 @@ const isSigningUp = ref(false)
 
 
 function popup(msg : string) {
-    popupMessage.value = msg
-    displayPopup.value = true
+    UserStore.openPopup(msg)
 }
 
-function closePopup() {
-    popupMessage.value = ''
-    displayPopup.value = false
-}
-function loginSuccess() {
+async function loginSuccess() {
     popup("Login successful!")
     pageStatusLogin()
 }
@@ -53,33 +38,11 @@ function pageStatusSignupToggle() {
 
 function pageStatusLogout() {
     isLoggedIn.value = false
-    QuestionStore.resetBuild()
-    QuestionStore.resetContribute()
-    QuestionStore.resetDatabase()
-
-    popupMessage.value = "Logged out!"
-    displayPopup.value = true
+    popup("Logged out!")
 }
 
 onActivated(async () => {
-    if (await isAuth()) {
-        const responsejson = await authGetUserInfo()
-        if (responsejson.status == -1) {
-            // Error occured
-            const error = responsejson.error as ServerError
-            const errormsg = formatErrorMessage(error)
-            console.log(errormsg)
-        } else if (responsejson.status == 1) {
-            // Failure
-            const error = responsejson.body as UserError
-            const errorMsg = error.cause
-            console.log(errorMsg)
-        } else if (responsejson.status == 0) {
-            const ud = responsejson.body as userData
-            UserStore.setAuthStatus(true)
-            UserStore.setUserData(ud)
-        }
-    }
+    // const c = await populateUserInfo()
 })
 
 </script>
@@ -107,10 +70,6 @@ onActivated(async () => {
                     Or, <div class="btn-textlink" v-on:click="pageStatusSignupToggle">log in</div> if you already have an account
                 </div>
             </div>
-
-            <Popup :isActive="displayPopup" @close="closePopup">
-                <span v-html="popupMessage"></span>
-            </Popup>
 
         </div>
 

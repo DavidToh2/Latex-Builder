@@ -171,8 +171,6 @@ router.post('/delete/:ID', async function(req, res, next) {
 })
 
 function parseWebToServer(reqData) {
-    console.log("Parsing web to server...")
-    console.log(reqData)
     for (const f of stringToArrayFields) {
         if (reqData.hasOwnProperty(f)) {
             reqData[f] = reqData[f].split(', ')
@@ -183,7 +181,6 @@ function parseWebToServer(reqData) {
             reqData[f] = Number(reqData[f])
         }
     }
-    console.log(reqData)
     return reqData
 }
 

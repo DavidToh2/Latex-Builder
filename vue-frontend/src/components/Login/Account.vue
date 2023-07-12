@@ -1,21 +1,18 @@
 <script setup lang="ts">
 
-import { reactive, onActivated, ref } from 'vue';
+import { reactive, onMounted, ref } from 'vue'
 
-import { useUserStore } from '@/stores/userStore';
-import { useQuestionStore } from '@/stores/questionStore';
-import type { userData } from '@/types/UserTypes';
-import { emptyUserData } from '@/types/UserTypes';
+import { useUserStore } from '@/stores/userStore'
+import type { userData } from '@/types/UserTypes'
+import { emptyUserData } from '@/types/UserTypes'
 import type { UserError, ServerError } from '@/types/ErrorTypes'
 import { formatErrorMessage } from '@/types/ErrorTypes'
 
-import Title from '../PageTitle.vue';
-import Popup from '../Common/Popup/Popup.vue'
+import Title from '../PageTitle.vue'
 
 import { authLogout } from '@/post/postAuth'
 
 const UserStore = useUserStore()
-const QuestionStore = useQuestionStore()
 
 async function logoutUser() {
     const responsejson = await authLogout()
@@ -23,13 +20,13 @@ async function logoutUser() {
         // Error occured
         const error = responsejson.error as ServerError
         const errormsg = formatErrorMessage(error)
-        openPopup(errormsg)
+        UserStore.openPopup(errormsg)
 
     } else if (responsejson.status == 1) {
         // Failure
         const error = responsejson.body as UserError
         const errorMsg = error.cause
-        openPopup(errorMsg)
+        UserStore.openPopup(errorMsg)
 
     } else if (responsejson.status == 0) {
         UserStore.setAuthStatus(false)
@@ -41,26 +38,30 @@ async function logoutUser() {
 
 const userdata = reactive<userData>({...emptyUserData})
 
-onActivated(() => {
-    const u = UserStore.getUserData()
-    console.log(u)
-    Object.assign(userdata, u)
+onMounted(() => {
+    setUserData()
 })
+
+UserStore.$onAction(
+	({name, store, args, after, onError}) => {
+		if (name == 'setUserData') {
+			after((result) => {
+				setUserData()
+			})
+		}
+	}
+)
+
+function setUserData() {
+    const u = UserStore.getUserData()
+    console.log("Displaying user data...")
+    Object.assign(userdata, u)
+}
 
 const emits = defineEmits<{
     (e: 'logout'): void,
     (u: 'updateUserData'): void
 }>()
-
-const popupActive = ref(false)
-const popupText = ref('')
-function closePopup() {
-    popupActive.value = false
-}
-function openPopup(msg : string) {
-    popupActive.value = true
-    popupText.value = msg
-}
 
 </script>
 
@@ -95,10 +96,6 @@ function openPopup(msg : string) {
         </div>
 
     </div>
-
-    <Popup :is-active="popupActive" @close="closePopup">
-        <span v-html="popupText"></span>
-    </Popup>
 </template>
 
 <style scoped>

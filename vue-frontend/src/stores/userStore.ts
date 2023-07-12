@@ -14,7 +14,6 @@ export const useUserStore = defineStore('UserStore', () => {
     function setUserData(data : userData) {
         dataStatus.value = true
         Object.assign(user, {...data})
-        console.log(user)
     }
     function getUserData() {
         return user
@@ -71,12 +70,29 @@ export const useUserStore = defineStore('UserStore', () => {
         }
     }
 
+    const popupHTML = ref('')
+    const popupOpen = ref(false)
+
+    function openPopup(html : string) {
+        popupOpen.value = true
+        popupHTML.value = html
+    }
+    function closePopup() {
+        popupOpen.value = false
+        popupHTML.value = ''
+    }
+    function getPopupHTML() {
+        return popupHTML.value
+    }
+
     return {
         user, dataStatus, authStatus,
         leftView, rightView, newView,
         setUserData, getUserData, clearUserData, getUserDataStatus,
         setAuthStatus, getAuthStatus,
-        setLeftView, setRightView, displayView, getNewView, getViewName, getViewSide
+        setLeftView, setRightView, displayView, getNewView, getViewName, getViewSide,
+
+        openPopup, closePopup, getPopupHTML
     }
     
 },

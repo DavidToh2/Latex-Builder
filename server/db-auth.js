@@ -154,7 +154,10 @@ async function findUserInfoUsingID(userID) {
         } else if (userArr.length == 0) {
             throw new DatabaseError(errorString, `findUserInfoUsingID() did not find any users!`)
         } else {
-            return userArr[0]
+            const x = userArr[0]
+            delete x['id']
+            delete x['_id']
+            return x
         }
 
     } catch(err) {

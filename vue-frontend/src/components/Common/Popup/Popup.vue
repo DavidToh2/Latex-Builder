@@ -36,6 +36,7 @@
     border: 3px solid var(--colour-border);
     border-radius: 12px;
     padding: 24px;
+    padding-right: 48px;
 
     display: none;
 }

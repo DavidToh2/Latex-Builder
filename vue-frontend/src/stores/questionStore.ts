@@ -240,12 +240,15 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
 
     function resetDatabase() {
         database.qnArray = []
+        return true
     }
     function resetContribute() {
         contribute.qnArray = [{...emptyQn}]
+        return true
     }
     function resetBuild() {
         build.wsArray = []
+        return true
     }
 
             // POPULATE THE DATABASE (by value)

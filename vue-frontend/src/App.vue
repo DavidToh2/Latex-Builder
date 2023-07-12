@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Navbar from './components/Navbar.vue'
+import Popup from './components/Common/Popup/Popup.vue'
 
 import HomeView from '@/views/HomeView.vue'
 import DocsView from '@/views/DocsView.vue'
@@ -15,10 +16,15 @@ import AccountView from '@/views/AccountView.vue'
 import { ref, computed, onMounted } from 'vue'
 import type { Component } from 'vue'
 import { useUserStore } from '@/stores/userStore'
+import { useQuestionStore } from './stores/questionStore'
+import { authGetUserInfo, isAuth } from '@/post/postAuth';
 
-import { isAuth } from '@/post/postAuth'
+import type { userData } from '@/types/UserTypes'
+import type { UserError, ServerError } from '@/types/ErrorTypes'
+import { formatErrorMessage } from '@/types/ErrorTypes'
 
 const UserStore = useUserStore()
+const QuestionStore = useQuestionStore()
 
 const currentLeftView = computed<string>(() => {return UserStore.getViewName('left')})
 const currentRightView = computed<string>(() => {return UserStore.getViewName('right')})
@@ -58,6 +64,7 @@ const views = {
 onMounted(async() => {
 	if (await isAuth()) {
 		UserStore.setAuthStatus(true)
+		await populateUserInfo()
 	} else {
 		UserStore.clearUserData()
 		UserStore.setAuthStatus(false)
@@ -66,9 +73,34 @@ onMounted(async() => {
 	if (centerViews.includes(currentRightView.value)) { workspaceDisplayMode.value+= 2 }
 })
 
+async function populateUserInfo() {
+    if (await isAuth()) {
+        const responsejson = await authGetUserInfo()
+        if (responsejson.status == -1) {
+            // Error occured
+            const error = responsejson.error as ServerError
+            const errormsg = formatErrorMessage(error)
+            console.log(errormsg)
+        } else if (responsejson.status == 1) {
+            // Failure
+            const error = responsejson.body as UserError
+            const errorMsg = error.cause
+            console.log(errorMsg)
+        } else if (responsejson.status == 0) {
+			// Success
+            console.log("Setting user data...")
+            const ud = responsejson.body as userData
+            UserStore.setAuthStatus(true)
+            UserStore.setUserData(ud)
+            return true
+        }
+    }
+}
+
 UserStore.$onAction(
 	({name, store, args, after, onError}) => {
 		if (name == 'displayView') {
+			// When view changes, update the new view
 			after(async (result) => {
 				if (result) {
 					const newView = UserStore.getNewView()
@@ -76,12 +108,20 @@ UserStore.$onAction(
 				}
 			})
 		}
-		if (name == 'setAuthStatus') {
-			after(async (result) => {
-				if (result) {
-					// Update all views
-					// Actually don't need, because the views will update themselves
-				}
+		if (name == 'clearUserData') {
+			// On logout, reset all views
+			after((result) => {
+				console.log("Clearing all views:")
+				QuestionStore.resetBuild()
+				QuestionStore.resetContribute()
+				QuestionStore.resetDatabase()
+			})
+		}
+		if (name == 'openPopup') {
+			after((result) => {
+				const pH = UserStore.getPopupHTML()
+				popupHTML.value = pH
+				popupActive.value = true
 			})
 		}
 	}
@@ -216,6 +256,14 @@ document.addEventListener('keydown', function(event) {
 	}
 })
 
+const popupHTML = ref('')
+const popupActive = ref(false)
+function closePopup() {
+	UserStore.closePopup()
+	popupHTML.value = ''
+	popupActive.value = false
+}
+
 </script>
 
 <template>
@@ -237,6 +285,10 @@ document.addEventListener('keydown', function(event) {
 			</KeepAlive>
 		</Transition>
 	</div>
+
+	<Popup :is-active="popupActive" @close="closePopup">
+		<span v-html="popupHTML"></span>
+	</Popup>
 
 </template>
 

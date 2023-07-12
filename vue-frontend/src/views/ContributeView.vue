@@ -4,7 +4,6 @@ import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
 import UserTab from '@/components/Tab/UserTab.vue'
 import Tab from '@/components/Tab/Tab.vue'
 import UserPerms from '@/components/UserPerms/UserPerms.vue'
-import Popup from '@/components/Common/Popup/Popup.vue'
 
 import type { qn, qnFilters, qnFilterNames } from '@/types/QuestionTypes'
 import { emptyQn, emptyFilters } from '@/types/QuestionTypes'
@@ -45,9 +44,6 @@ var displayIDlist = ref<string[]>(['0'])
 const QuestionStore = useQuestionStore()
 const UserStore = useUserStore()
 
-const popupActive = ref(false)
-const popupText = ref('')
-
             // On component state change:
 
 onActivated(() => {
@@ -73,10 +69,21 @@ function removeFromContribute(qnID : string) {
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ((name == 'insertFromDatabaseToContribute') || (name == 'insertIntoContribute') || (name == 'deleteFromContribute') || (name == 'resetContribute')) {
+        if ((name == 'insertFromDatabaseToContribute') || (name == 'insertIntoContribute') || (name == 'deleteFromContribute')) {
             after((result) => {
                 if (result) {
                     updateContributeTab()
+                }
+            })
+        }
+        if ((name == 'resetContribute')) {
+            after((result) => {
+                if (result) {
+                    updateContributeTab()
+                    removeFromContribute('0')
+                    changeDisplayedQuestion('0')
+                    changeOptionTab('Question', 0)
+                    Object.assign(activePerms, emptyUserPerms)
                 }
             })
         }
@@ -113,47 +120,57 @@ async function changeDisplayedQuestion(newQnID : string) {
     Object.assign(active, newQuestion)
 
     // Get new displayed question's permissions
-    const b = await getActivePerms()
+    if (UserStore.getAuthStatus()) {
+        await getActivePerms()
+    }
 
     QuestionStore.setContributeActiveID(newQnID)
 }
 
         // When displayed tab is changed, or tab option (SAVE / DELETE) is selected...
 
-async function changeOptionTab(s : string, n : number) {
+async function changeOptionTab(s : string, newTabValue : number) {
 
     const mainForm = document.getElementById('contribute-container') as HTMLFormElement
-
-    if (n == tabID.value) {
+    const oldTabValue = tabID.value
+    if (newTabValue == oldTabValue) {
         return
     }
-    tabID.value = n
 
     for (var i=0; i<4; i++) { tabs[i] = false }
 
     switch(s) {
         case 'Question':
+            tabID.value = newTabValue
 
         break;
         case 'Solution':
+            tabID.value = newTabValue
 
         break;
         case 'Images':
+            tabID.value = newTabValue
 
         break;
         case 'Contributors':
             if (active.id != '0') {
                 const permsGet = await getActivePerms()
+                if (!permsGet) {
+                    resetActivePerms()
+                    tabID.value = oldTabValue
+                } else {
+                    tabID.value = newTabValue
+                }
             }
 
         break;
 
         case 'Save':
             if (!UserStore.getAuthStatus()) {
-                openPopup("You need to be logged in to contribute questions!")
+                UserStore.openPopup("You need to be logged in to contribute questions!")
 
             } else if (!checkForEmptyFields(active)) {
-                openPopup("Please check that all necessary fields of your question have been filled up")
+                UserStore.openPopup("Please check that all necessary fields of your question have been filled up")
 
             } else {
                 
@@ -164,12 +181,12 @@ async function changeOptionTab(s : string, n : number) {
                     // Error occured
                     const error = responsejson.error as ServerError
                     const errormsg = formatErrorMessage(error)
-                    openPopup(errormsg)
+                    UserStore.openPopup(errormsg)
                 } else if (responsejson.status == 1) {
                     // Failure
                     const error = responsejson.body as UserError
                     const errorMsg = error.cause
-                    openPopup(errorMsg)
+                    UserStore.openPopup(errorMsg)
                 } else {
                     // Success
                     const savedQn = responsejson.body as qn
@@ -181,23 +198,35 @@ async function changeOptionTab(s : string, n : number) {
                     }
                 }
             }
-            tabID.value = 0
+            tabID.value = oldTabValue
         break;
 
         case 'Delete':
             if (active.id == '0') {
                 removeFromContribute(active.id)
             } else {
-                removeFromContribute(active.id)
-                const response = await questionDelete(mainForm, active.id)   
-                console.log(response)
-                changeDisplayedQuestion('0')
+                const responsejson = await questionDelete(mainForm, active.id)   
+                if (responsejson.status == -1) {
+                    // Error occured
+                    const error = responsejson.error as ServerError
+                    const errormsg = formatErrorMessage(error)
+                    UserStore.openPopup(errormsg)
+                } else if (responsejson.status == 1) {
+                    // Failure
+                    const error = responsejson.body as UserError
+                    const errorMsg = error.cause
+                    UserStore.openPopup(errorMsg)
+                } else {
+                    // Success
+                    removeFromContribute(active.id)
+                    changeDisplayedQuestion('0')    
+                }
             }
-
             tabID.value = 0
-        break;
+        break
     }
 
+    console.log(tabID.value)
     tabs[tabID.value] = true
 }
 
@@ -214,20 +243,12 @@ function checkForEmptyFields(q : qn) {
     return ready
 }
 
-function openPopup(m : string) {
-    popupText.value = m
-    popupActive.value = true
-}
-function closePopup() {
-    popupActive.value = false
-}
-
         // When user perms are changed...
 
 async function setPerms(type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 'readGroups' | 'public', name: string, action: 'add' | 'remove') {
 
     if (active.id == '0') {
-        openPopup('Please save the question before setting user permissions!')
+        UserStore.openPopup('Please save the question before setting user permissions!')
         return false
     }
 
@@ -235,21 +256,25 @@ async function setPerms(type: 'modifyUsers' | 'modifyGroups' | 'readUsers' | 're
 
     if (responsejson.status == -1) {
         // Error occured
-        const error = responsejson.error
-        console.log(error)
+        const error = responsejson.error as ServerError
+        const errorMsg = formatErrorMessage(error)
+        UserStore.openPopup(errorMsg)
 
     } else if (responsejson.status == 1) {
         // Failure
+        const error = responsejson.body as UserError
+        const errorMsg = error.cause
+        UserStore.openPopup(errorMsg)
 
     } else {
         // Success
-        const arePermsUpdated = await getActivePerms()
+        await getActivePerms()
     }
 }
 
 async function getActivePerms() {
     if (active.id == '0') {
-        Object.assign(activePerms, emptyUserPerms)
+        resetActivePerms()
         return true
     }
     const responsejson = await questionGetPerms(active.id)
@@ -257,14 +282,16 @@ async function getActivePerms() {
         // Error occured
         const error = responsejson.error as ServerError
         const errormsg = formatErrorMessage(error)
-        openPopup(errormsg)
+        UserStore.openPopup(errormsg)
+        resetActivePerms()
         return false
 
     } else if (responsejson.status == 1) {
         // Failure
         const error = responsejson.body as UserError
         const errorMsg = error.cause
-        openPopup(errorMsg)
+        UserStore.openPopup(errorMsg)
+        resetActivePerms()
         return false 
 
     } else {
@@ -274,6 +301,10 @@ async function getActivePerms() {
         return true
 
     }
+}
+
+function resetActivePerms() {
+    Object.assign(activePerms, emptyUserPerms)
 }
 
 function dump() {
@@ -333,9 +364,6 @@ function dump() {
 
         </form>
 
-        <Popup :is-active="popupActive" @close="closePopup">
-            <span v-html="popupText"></span>
-        </Popup>
     </div>
 </template>
 

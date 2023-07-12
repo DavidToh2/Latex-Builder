@@ -22,7 +22,6 @@ export async function authSignup(f : HTMLFormElement) {
 export async function authLogin(f : HTMLFormElement) {
     const response = await postForm(f, `${BASE_URL}/auth/login`, 'auth-login') as Response
     const responsejson = await response.json()
-    console.log(responsejson)
     return responsejson
 }
 export async function authLogout() {

@@ -4,6 +4,7 @@ const { mongoose } = require('./db-connection')
 const { questionSchema } = require("./models/question.js")
 const { ServerError, UserError, DatabaseError, newError } = require('./express-classes/error')
 const dbAuth = require('./db-auth')
+const { idText } = require('typescript')
 
 const LIMITED_ACCOUNT_QN_LIMIT = 5
 const ACCOUNT_CAN_SET_QN = ['admin', 'active', 'limited']
@@ -75,6 +76,7 @@ async function newQuestion(nQ, userID) {
 
                 // Add the question ID to our user's personal questions[] array
 
+        delete q['_id']
         const c = await dbAuth.setUserQuestions(userID, 'add', q.id)
         if (!c) {
             throw new DatabaseError(errorString, 'Failed to set user\'s personal question array!')
@@ -99,11 +101,19 @@ async function getQuestions(dataDict, userID) {
 
                 // Only return questions for which user has viewing permission.
                 // Parse question IDs to displayIDs before passing to web
+        var u = 'public'
+        if (userID != 'public') {
+            u = await dbAuth.findUserInfoUsingID(userID)
+            if (!u) {
+                throw new DatabaseError(errorString, 'Failed to get user info!')
+            }
+        }
 
         qnsAll.forEach((qn) => {
+            delete qn['_id']
             switch(userID) {
                 case 'public':
-                    if (qn.userPerms.canReadPublic || qn.userPerms.canModifyPublic) {
+                    if (qn.userPerms.canAccessPublic) {
                         delete qn.userPerms
                         qns.push(qn)
                     }
@@ -130,10 +140,10 @@ async function getQuestions(dataDict, userID) {
 
 async function deleteQuestion(id, userID) {
 
-    const errorString = `Failed to delete question with ID ${i}!`
+    const errorString = `Failed to delete question with ID ${id}!`
 
     try {
-        console.log(`Deleting question with displayID ${i}`)
+        console.log(`Deleting question with displayID ${id}`)
 
                 // Only allow the owner (or admins) to delete questions
 
@@ -141,7 +151,9 @@ async function deleteQuestion(id, userID) {
             throw new UserError(errorString, 'You need to be logged in to delete questions!')
         }
         const u = await dbAuth.findUserInfoUsingID(userID)
-
+        if (!u) {
+            throw new DatabaseError(errorString, 'Failed to get user info!')
+        }
                 // Get the question object to check for user permissions
 
         var dQ = {'id': id}
@@ -182,10 +194,10 @@ async function deleteQuestion(id, userID) {
 
 async function saveQuestion(id, dataDict, userID) {
 
-    const errorString = `Failed to save question with ID ${i}:`
+    const errorString = `Failed to save question with ID ${id}:`
 
     try {
-        console.log(`Saving question with displayID ${i}`)
+        console.log(`Saving question with displayID ${id}`)
 
                 // Get the question document (no lean(): it's updated directly!)
 
@@ -195,7 +207,7 @@ async function saveQuestion(id, dataDict, userID) {
             throw new DatabaseError(errorString, `Question with id ${id} not found!`)
         }
 
-        delete dataDict['id']
+        delete dataDict['id']       // Prevent changing question id
 
                 // Check user perms
 
@@ -204,6 +216,9 @@ async function saveQuestion(id, dataDict, userID) {
         }
 
         const u = await dbAuth.findUserInfoUsingID(userID)
+        if (!u) {
+            throw new DatabaseError(errorString, 'Failed to get user info!')
+        }
         if (
             q.userPerms.owner == userID ||
             q.userPerms.canModifyUsers.indexOf(userID) >= 0 ||
@@ -220,6 +235,7 @@ async function saveQuestion(id, dataDict, userID) {
             }
 
             console.log(`Saved question with ID ${id}`)
+            delete qs['_id']
             return qs  
         } else {
             throw new UserError(errorString, 'You do not have sufficient permissions to make changes to this question!')
@@ -251,6 +267,9 @@ async function setQuestionPerms(id, data, userID) {
         }
 
         const u = await dbAuth.findUserInfoUsingID(userID)
+        if (!u) {
+            throw new DatabaseError(errorString, 'Failed to get user info!')
+        }
         if (q.userPerms.owner == userID || u.accountStatus == 'admin') {
                     
                     // Parse desired actions
@@ -327,6 +346,7 @@ async function setQuestionPerms(id, data, userID) {
             }
 
             if (r) {
+                delete r['_id']
                 return r        // Should return question with updated permissions
             } else {
                 throw new DatabaseError(errorString, `Failed to modify user permissions for question ${dispID}!`)
@@ -356,7 +376,6 @@ async function getQuestionPerms(id, userID) {
         }
 
                 // Only return questions for which user has viewing permission.
-                // Parse question IDs to displayIDs before passing to web
 
         var qp = {}
 
@@ -369,6 +388,11 @@ async function getQuestionPerms(id, userID) {
                 }
             break
             default:
+                        // Get user object to check account status
+                const u = await dbAuth.findUserInfoUsingID(userID)
+                if (!u) {
+                    throw new DatabaseError(errorString, 'Failed to get user info!')
+                }
                 if (
                     qnPerms.owner == userID ||
                     qnPerms.canModifyUsers.indexOf(userID) >= 0 ||
@@ -383,6 +407,7 @@ async function getQuestionPerms(id, userID) {
         }
         const result = await aux.parseUserPerms(qp)
         if (result) {
+            delete qp['_id']
             return qp
         } else {
             throw new ServerError(errorString, `Failed to parse userIDs into usernames!`)
