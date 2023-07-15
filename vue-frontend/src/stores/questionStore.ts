@@ -259,7 +259,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
 
             // POPULATE CONTRIBUTE (by value)
 
-    function insertIntoContribute(ID: string, q : qn) {
+    function insertIntoContribute(ID : string, q : qn) {
         if (getContributeIDList().includes(ID)) {
             return false
         } else {

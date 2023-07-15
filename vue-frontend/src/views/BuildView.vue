@@ -35,7 +35,9 @@ const worksheet : ws = reactive({
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'insertElementIntoBuild') || (name == 'deleteElementFromBuild') || (name == 'swapTwoElementsInBuild') ) {
+        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'insertElementIntoBuild') 
+		|| (name == 'deleteElementFromBuild') || (name == 'updateElement')
+		|| (name == 'swapTwoElementsInBuild') ) {
             after((result) => {
                 if (result) {
                     const newBuildQnList = QuestionStore.getBuild() as worksheetElement[]
@@ -97,7 +99,7 @@ async function changeOptionTab(s : string, n : number) {
 			}
 		break;
 		case buildOptionsRightTab[1]:
-			
+
 		break;
 	}
 }

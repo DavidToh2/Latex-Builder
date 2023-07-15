@@ -195,6 +195,8 @@ async function changeOptionTab(s : string, newTabValue : number) {
                         removeFromContribute(active.id)
                         QuestionStore.insertIntoContribute(ID, savedQn)
                         changeDisplayedQuestion(ID)
+                    } else {
+                        QuestionStore.updateQn('contribute', ID, savedQn)
                     }
                 }
             }
@@ -314,6 +316,8 @@ function dump() {
     console.log("Active question:")
     console.log(active)
     console.log(active.id)
+    console.log("Contribute questions:")
+    console.log(QuestionStore.getContribute())
 }
 
 </script>
@@ -337,7 +341,7 @@ function dump() {
             
             <div id="question-container" :class="{ 'inactive-container': !tabs[0] }">
                 <div class="latex">
-                    <textarea class="latex-text" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
+                    <textarea class="latex-text latex-question" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
                 </div>
                 <div class="latex-view" id="question-latex-view" @click="dump">
                 </div>
@@ -345,7 +349,7 @@ function dump() {
 
             <div id="solution-container" :class="{ 'inactive-container': !tabs[1] }">
                 <div class="latex">
-                    <textarea class="latex-text" name="solution" placeholder="Type solution here:" v-model="active.solution[0]"></textarea>
+                    <textarea class="latex-text latex-solution" name="solution" placeholder="Type solution here:" v-model="active.solution[0]"></textarea>
                 </div>
                 <div class="latex-view" id="solution-latex-view" @click="dump">
                 </div>
@@ -437,13 +441,11 @@ function dump() {
     overflow-y: scroll;
 }
 
-.latex-text {
-	width: 100%;
-    height: 100%;
-    border-radius: 8px;
-    border: 1px solid #000000;
-    padding: 10px;
-    resize: none;
+.latex-question {
+    overflow-y: scroll;
+}
+.latex-solution {
+    overflow-y: scroll;
 }
 
 #question-save-button {

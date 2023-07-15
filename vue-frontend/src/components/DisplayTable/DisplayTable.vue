@@ -44,6 +44,7 @@
 
             // Drag and drop functions
 
+    const draggingActive = ref(true)
     const droppedElementIndex = ref(0)
     const targetElement = reactive({
         elementIndex: 0,
@@ -105,6 +106,10 @@
         emits('endDrag')
     }
 
+    function toggleDragAllow(s : boolean) {
+        draggingActive.value = s
+    }
+
     // Reset drop parameters once drop is finished
     onUpdated(() => {
         if (!props.isDragging) {
@@ -127,23 +132,43 @@
         </div>
         <div v-if="internalName == 'build-table'">
             <div class="display-table-results" v-for="(item, index) in elements">
-                <DisplayTableEntry v-if="item.type == 'qn'" :internalName="props.internalName + '-qn'" :q="(item.body as qn)" 
-                    @insert="insertObject" @delete="deleteObject" @up="objectUp(index)" @down="objectDown(index)"
-                    draggable="true" class="draggable" @dragstart="startElementDrag($event, index)" @dragend="endElementDrag"
+                <DisplayTableEntry v-if="item.type == 'qn'" 
+                    :internalName="props.internalName + '-qn'" 
+                    :q="(item.body as qn)" 
+                    @insert="insertObject" 
+                    @delete="deleteObject" 
+                    @up="objectUp(index)" 
+                    @down="objectDown(index)"
+                    :draggable="draggingActive" 
+                    class="draggable" 
+                    @dragstart="startElementDrag($event, index)" 
+                    @dragend="endElementDrag"
                     :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}"
-                    @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
+                    @dragenter="identifyCurrentElement($event, index)" 
+                    @dragover="detectElementAboveMouse"/>
 
                 <DisplayTableAddPlaceholder v-else-if="(item.type == 'placeholder') && isDragging" 
-                    :internalName="props.internalName + '-placeholder'" :text="(item.body as placeholder).text"
+                    :internalName="props.internalName + '-placeholder'" 
+                    :text="(item.body as placeholder).text"
                     :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}" 
-                    @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
+                    @dragenter="identifyCurrentElement($event, index)" 
+                    @dragover="detectElementAboveMouse"/>
 
                 <DisplayTableElement v-else-if="latexTypeStrings.includes(item.type)"
-                    :internalName="props.internalName + '-element'" :content="(item.body as latexTypes)" :type="(item.type as latexTypeNames)" 
-                    @insert="insertObject" @delete="deleteObject" @up="objectUp(index)" @down="objectDown(index)"
-                    draggable="true" class="draggable" @dragstart="startElementDrag($event, index)" @dragend="endElementDrag"
+                    :internalName="props.internalName + '-element'" 
+                    :item="item"
+                    @insert="insertObject" 
+                    @delete="deleteObject" 
+                    @up="objectUp(index)" 
+                    @down="objectDown(index)"
+                    :draggable="draggingActive" 
+                    class="draggable" 
+                    @dragstart="startElementDrag($event, index)" 
+                    @dragend="endElementDrag"
                     :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}"
-                    @dragenter="identifyCurrentElement($event, index)" @dragover="detectElementAboveMouse"/>
+                    @dragenter="identifyCurrentElement($event, index)" 
+                    @dragover="detectElementAboveMouse"
+                    @allow-drag="toggleDragAllow"/>
             </div>
         </div>
     </div>
