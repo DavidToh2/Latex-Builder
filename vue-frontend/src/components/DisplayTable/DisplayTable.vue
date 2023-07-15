@@ -18,15 +18,6 @@
         isDragging?: boolean
     }
     const props = defineProps<Props> ()
-    // const props = withDefaults(defineProps<Props> (), {
-    //     qns: () => { return [emptyQn] },
-    //     elements: () => { return [{
-    //         type: 'latex',
-    //         body: defaultLatex
-    //     }]}
-    // })
-    // const qns = reactive(props.qns)
-    // const elements = reactive(props.elements)
 
     const emits = defineEmits<{
         (e: 'insert', ID: string, direction: string): void
@@ -72,23 +63,28 @@
         c.classList.add("display-table-entry-row-dragged")
     }
     function identifyCurrentElement(e : DragEvent, i : number)  {
-        targetElement.elementIndex = i
-        targetElement.aboveMouse = false
-        // console.log(`Current element index: ${targetElement.elementIndex}`)
+        if (targetElement.elementIndex != i) {
+            targetElement.elementIndex = i
+            targetElement.aboveMouse = false
+            // console.log(`Current element index: ${targetElement.elementIndex}`)
+        }
     }
     function detectElementAboveMouse(e : DragEvent) {
         const element = e.currentTarget as HTMLElement
 
         const currentAboveMouseStatus = targetElement.aboveMouse
+        // console.log(`currentAboveMouseStatus: ${currentAboveMouseStatus}`)
         const rect = element.getBoundingClientRect()
-        if ((rect.top + 2 * rect.height / 3) < e.clientY) {
+        // console.log(`rect.top: ${rect.top}, rect.height: ${rect.height}, clientY: ${e.clientY}`)
+        if (!currentAboveMouseStatus && (rect.top + 2 * rect.height / 3) < e.clientY) {
             targetElement.aboveMouse = true
-            // console.log(`Element above mouse: ${targetElement.aboveMouse}`)
-        } else if ((rect.top + rect.height / 3) > e.clientY) {
+            
+        } else if (currentAboveMouseStatus && (rect.top + rect.height / 3) > e.clientY) {
             targetElement.aboveMouse = false
-            // console.log(`Element above mouse: ${targetElement.aboveMouse}`)
+            
         }
         const newAboveMouseStatus = targetElement.aboveMouse
+        // console.log(`currentAboveMouseStatus: ${currentAboveMouseStatus}, newAboveMouseStatus: ${newAboveMouseStatus}`)
 
         if (currentAboveMouseStatus != newAboveMouseStatus) {
             const t = targetElement.elementIndex

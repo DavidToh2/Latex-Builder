@@ -134,7 +134,7 @@ function startPlaceholderDrag(elementType : string) {
 	// console.log(QuestionStore.getBuild())
 }
 function swapTwoElements(a: number, b: number) {
-	// console.log("Swapping two elements...")
+	console.log("Swapping two elements...")
 	QuestionStore.swapTwoElementsInBuild(a, b)
 }
 
@@ -256,6 +256,7 @@ onMounted(() => {
 
 #build-container {
 	width: 100%;
+	height: 100%;
 }
 
 #document-settings-container {

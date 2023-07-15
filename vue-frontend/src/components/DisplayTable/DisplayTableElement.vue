@@ -63,13 +63,14 @@ const QuestionStore = useQuestionStore()
                     @update-latex="updateElement"/>
             </template>
             <template v-else-if="itemType == 'latexHeading'">
-                <DisplayTableLatexHeading />
-                Header
+                <DisplayTableLatexHeading 
+                    :content="(itemContent as latexHeading)"
+                    @update-heading="updateElement"/>
             </template>
             <template v-else-if="itemType == 'latexEnum'">
                 <DisplayTableLatexEnum 
-                    :content="(itemContent as latexEnum)"/>
-                List
+                    :content="(itemContent as latexEnum)"
+                    @update-enum="updateElement"/>
             </template>
         </div>
         <div class="display-table-options display-table-cell">
@@ -84,4 +85,12 @@ const QuestionStore = useQuestionStore()
     </div>
 </template>
 <style scoped>
+.display-table-entry-row {
+    background-color: var(--colour-background-soft);
+}
+.display-table-element :deep(.latex-element-title) {
+    font-weight: bold;
+    font-size: var(--font-size-lg1);
+    padding: 7px 0px;
+}
 </style>

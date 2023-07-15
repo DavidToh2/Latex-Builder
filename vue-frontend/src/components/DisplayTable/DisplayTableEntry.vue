@@ -47,7 +47,7 @@
 
 <template>
     <div class="display-table-entry-row">
-        <div class="display-table-id display-table-cell" style="padding: 8px 0px; text-align: center;">
+        <div class="display-table-id display-table-cell" style="text-align: center;">
             {{ qnDisplayID }}
         </div>
         <div class="display-table-question display-table-cell">

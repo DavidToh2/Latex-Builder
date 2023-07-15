@@ -29,7 +29,10 @@
 
 </script>
 <template>
-    <div class="display-table-entry-row latex-container">
+    <div class="latex-element-title">
+        Raw latex
+    </div>
+    <div class="latex-container">
         <textarea class="latex-text" v-model="latexContent.text"
             @focusin="latexUpdate($event)" @keyup="latexUpdate($event)"
             @focusout="latexUpdateDone">
@@ -37,5 +40,16 @@
     </div>
 </template>
 <style scoped>
+.latex-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 5px;
+}
+
+.latex-title {
+    font-weight: bold;
+    font-size: var(--font-size-lg1);
+}
 
 </style>
