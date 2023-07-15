@@ -3,7 +3,9 @@
     import DisplayTableEntry from "./DisplayTableEntry.vue"
     import DisplayTableElement from "./DisplayTableElement.vue"
     import DisplayTableAddPlaceholder from "./DisplayTableAddPlaceholder.vue"
-    import type { qn } from '@/types/QuestionTypes'
+    import { emptyQn } from '@/types/QuestionTypes'
+    import type { qn } from "@/types/QuestionTypes"
+    import { defaultLatex } from "@/types/WorksheetTypes"
     import type { worksheetElement, latex, latexHeading, latexEnum, latexTypes, latexTypeNames, placeholder } from "@/types/WorksheetTypes"
     import { latexTypeStrings } from "@/types/WorksheetTypes"
     import { ref, reactive, onUpdated } from "vue"
@@ -16,6 +18,15 @@
         isDragging?: boolean
     }
     const props = defineProps<Props> ()
+    // const props = withDefaults(defineProps<Props> (), {
+    //     qns: () => { return [emptyQn] },
+    //     elements: () => { return [{
+    //         type: 'latex',
+    //         body: defaultLatex
+    //     }]}
+    // })
+    // const qns = reactive(props.qns)
+    // const elements = reactive(props.elements)
 
     const emits = defineEmits<{
         (e: 'insert', ID: string, direction: string): void
@@ -124,15 +135,15 @@
 <template>
     <div class="display-table">
         <DisplayTableHeader />
-        <div v-if="internalName == 'database-table'">
+        <div v-if="props.internalName == 'database-table'">
             <div class="display-table-results" v-for="(item, index) in qns">
                 <DisplayTableEntry :internalName="props.internalName + '-qn'" :q="item" 
                     @insert="insertObject" @delete="deleteObject" @up="objectUp(index)" @down="objectDown(index)"/>
             </div>
         </div>
-        <div v-if="internalName == 'build-table'">
-            <div class="display-table-results" v-for="(item, index) in elements">
-                <DisplayTableEntry v-if="item.type == 'qn'" 
+        <div v-if="props.internalName == 'build-table'">
+            <div class="display-table-results" v-for="(item, index) in elements" :key="item.body.id">
+                <DisplayTableEntry v-if="item.type == 'qn'"
                     :internalName="props.internalName + '-qn'" 
                     :q="(item.body as qn)" 
                     @insert="insertObject" 
@@ -147,7 +158,7 @@
                     @dragenter="identifyCurrentElement($event, index)" 
                     @dragover="detectElementAboveMouse"/>
 
-                <DisplayTableAddPlaceholder v-else-if="(item.type == 'placeholder') && isDragging" 
+                <DisplayTableAddPlaceholder v-else-if="(item.type == 'placeholder') && isDragging"
                     :internalName="props.internalName + '-placeholder'" 
                     :text="(item.body as placeholder).text"
                     :class="{'display-table-entry-row-dragged': (droppedElementIndex == index) && isDragging}" 
@@ -188,6 +199,7 @@
     --display-table-element-width: calc(100% - var(--display-table-id-width) - var(--display-table-options-width));
     flex-grow: 1;
     width: 100%;
+    height: 100%;
 }
 
 .display-table-results {

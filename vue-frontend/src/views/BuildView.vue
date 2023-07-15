@@ -35,9 +35,7 @@ const worksheet : ws = reactive({
 
 QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
-        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'insertElementIntoBuild') 
-		|| (name == 'deleteElementFromBuild') || (name == 'updateElement')
-		|| (name == 'swapTwoElementsInBuild') ) {
+        if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'insertElementIntoBuild') || (name == 'deleteElementFromBuild') || (name == 'updateElement') || (name == 'swapTwoElementsInBuild') ) {
             after((result) => {
                 if (result) {
                     const newBuildQnList = QuestionStore.getBuild() as worksheetElement[]
@@ -144,47 +142,48 @@ function addElement(e : DragEvent, i : number) {
 	const elementType = (e.dataTransfer as DataTransfer).getData('type')
 	// console.log(`Dropping element of type ${elementType} at position ${i}`)
 	if (latexTypeStrings.includes(elementType)) {
-		var n : worksheetElement
 		switch(elementType) {
-			case 'latex':
-				const li = worksheet.config.latexElements.latexCount
-				n = {
-					type: "latex",
-					body: defaultLatex
-				}
-				n.body.id = `latex${li}`
-				worksheet.config.latexElements.latexCount++
-				break
 			case 'latexHeading':
 				const lhi = worksheet.config.latexElements.latexHeadingCount
-				n = {
+				const n2 : worksheetElement = {
 					type: "latexHeading",
 					body: defaultLatexHeading
 				}
-				n.body.id = `latex${lhi}`
+				n2.body.id = `latexHeading${lhi}`
 				worksheet.config.latexElements.latexHeadingCount++
+				QuestionStore.insertElementIntoBuild(n2, i)
 				break
 			case 'latexEnum':
 				const lei = worksheet.config.latexElements.latexEnumCount
-				n = {
+				const n3 : worksheetElement = {
 					type: "latexEnum",
 					body: defaultLatexEnum
 				}
-				n.body.id = `latex${lei}`
+				n3.body.id = `latexEnum${lei}`
 				worksheet.config.latexElements.latexEnumCount++
+				QuestionStore.insertElementIntoBuild(n3, i)
+				break
+			case 'latex':
+				const li = worksheet.config.latexElements.latexCount
+				const n1 : worksheetElement = {
+					type: "latex",
+					body: defaultLatex
+				}
+				n1.body.id = `latex${li}`
+				worksheet.config.latexElements.latexCount++
+				QuestionStore.insertElementIntoBuild(n1, i)
 				break
 			default:
-				n = {
+				const n4 : worksheetElement = {
 					type: "placeholder",
 					body: {
 						id: `placeholderDefault`,
 						text: 'placeholder'
 					}
 				}
+				QuestionStore.insertElementIntoBuild(n4, i)
 				break
 		}
-		QuestionStore.deleteElementFromBuild('placeholder')
-		QuestionStore.insertElementIntoBuild(n, i)
 	}
 }
 
@@ -202,14 +201,14 @@ onMounted(() => {
 		event.preventDefault()
 		isDragging.value = false
 		const i = worksheet.elements.findIndex(element => (element.type == 'placeholder'))
+		if (i != -1) {
+			QuestionStore.deleteElementFromBuild('placeholder')
+		}
 
 		// If user mouse is outside the build DisplayTable, simply remove the placeholder
 		const bc = document.querySelector('#build-container') as HTMLDivElement
 		const bcrect = bc.getBoundingClientRect()
 		if ((event.clientX < bcrect.left) || (event.clientX > bcrect.right) || (event.clientY < bcrect.top) || (event.clientY > bcrect.bottom)) {
-			if (i != -1) {
-				worksheet.elements.splice(i, 1)
-			}
 
 		// Otherwise, insert the element
 		} else {

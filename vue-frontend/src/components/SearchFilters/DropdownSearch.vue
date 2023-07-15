@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
     import { reactive, computed, watch } from 'vue'
-    import { numberToPixels } from '@/aux'
+    import { numberToPixels } from '@/aux' 
 
     export interface Props {
         description: string

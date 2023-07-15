@@ -1,14 +1,16 @@
 <script setup lang="ts">
 
-    import type { latex, latexEnum, latexHeading } from '@/types/WorksheetTypes';
-    import { reactive, onUpdated } from 'vue';
+    import type { latex } from '@/types/WorksheetTypes';
+    import { reactive, ref } from 'vue';
 
     const props = defineProps<{
         content: latex
     }>()
     const latexContent = reactive(props.content)
+    const latexActive = ref(false)
 
-    function updateHeight(e : Event) {
+    function latexUpdate(e : Event) {
+        latexActive.value = true
         const t = e.target as HTMLTextAreaElement
         updateTextareaHeight(t)
     }
@@ -20,23 +22,20 @@
     const emits = defineEmits<{
         (e: 'updateLatex', newContent: latex): void
     }>()
-    function updateLatex() {
+    function latexUpdateDone() {
+        latexActive.value = false
         emits('updateLatex', latexContent)
     }
 
 </script>
 <template>
-    <div class="display-table-entry-row">
+    <div class="display-table-entry-row latex-container">
         <textarea class="latex-text" v-model="latexContent.text"
-            @focusin="updateHeight($event)" @keyup="updateHeight($event)"
-            @focusout="updateLatex()">
+            @focusin="latexUpdate($event)" @keyup="latexUpdate($event)"
+            @focusout="latexUpdateDone">
         </textarea>
     </div>
 </template>
 <style scoped>
-.latex-content {
-    border: 1px solid black;
-    width: 100%;
-}
 
 </style>

@@ -67,7 +67,8 @@ const QuestionStore = useQuestionStore()
                 Header
             </template>
             <template v-else-if="itemType == 'latexEnum'">
-                <DisplayTableLatexEnum />
+                <DisplayTableLatexEnum 
+                    :content="(itemContent as latexEnum)"/>
                 List
             </template>
         </div>

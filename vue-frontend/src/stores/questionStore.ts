@@ -70,7 +70,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         var idArr : string[] = []
         for (var i=0; i<targetArray.length; i++) {
             const b = targetArray[i].body
-            const bt = typeof(b)
+            const bt = targetArray[i].type
             if (['qn', 'latex', 'latexHeading', 'latexEnum'].includes(bt)) {
                 const c = b as qn | latexTypes
                 idArr.push(c.id)
@@ -298,7 +298,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
 
     function insertElementIntoBuild(e : worksheetElement, index : number) {
         if (latexTypeStrings.includes(e.type) || e.type == 'placeholder') {
-            build.wsArray.splice(index, 0, e)
+            build.wsArray.splice(index, 0, structuredClone(e))
             return true
         } else {
             return false
@@ -326,6 +326,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     function deleteElementFromBuild(ID : string) {
         const i = getElementIndexUsingID(build, ID)
         deleteIndexFromBuild(i)
+        return true
     }
     function deleteIndexFromBuild(index : number) {
         if (index > -1) {

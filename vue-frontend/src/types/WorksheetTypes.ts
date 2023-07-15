@@ -12,8 +12,8 @@ export interface latex {
 }
 export interface latexEnum {
     id: string,
-    type: 'numeric' | 'alphabetic' | 'roman' | "bullet" | "dash",
-    behaviour: 'start' | 'end',
+    type: 'numeric' | 'alphabetic' | 'roman' | 'bullet' | 'dash',
+    behaviour: 'start' | 'startAt' | 'resume',
     template: string,
     options: string
 }
@@ -34,7 +34,7 @@ const defaultLatexEnum : latexEnum = {
     id: "latexEnum",
     type: "numeric",
     behaviour: "start",
-    template: "ENUM.",
+    template: "",
     options: ""
 }
 const defaultLatexHeading : latexHeading = {
