@@ -17,41 +17,46 @@
 </script>
 
 <template>
-    <div class="hover-container">
-        <div class="hover-description">
+    <div class="popup-menu-entry">
+        <div class="popup-menu-description">
             {{ props.description }}
         </div>
-        <div class="btn-light hover-button" @click="switchActive(true)">
+        <div class="btn-light popup-menu-button" @click="switchActive(true)">
             Click to Open
         </div>
     </div>
-    <div class="hover-window" v-show="isActive">
-        <slot name="hover-content">
-            <!-- Hover display content goes here -->
-        </slot>
-        <div class="hover-close">
-            <img src="@/assets/svg/angle-right.svg" class="hover-close-button icon" @click="switchActive(false)">
+    <div class="popup-menu-container" v-show="isActive">
+        <div class="popup-menu-background">
+
+        </div>
+        <div class="popup-menu-window">
+            <slot name="popup-menu-content">
+                <!-- Hover display content goes here -->
+            </slot>
+            <div class="popup-menu-close">
+                <img src="@/assets/svg/angle-right.svg" class="popup-menu-close-button icon" @click="switchActive(false)">
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-.hover-container {
+.popup-menu-entry {
     display: flex;
     flex-direction: column;
     gap: 20px;
     align-items: center;
 }
 
-.hover-description {
+.popup-menu-description {
     font-size: var(--font-size-lg2);
 }
 
-.hover-button {
+.popup-menu-button {
     width: 100%;
 }
 
-.hover-window {
+.popup-menu-container {
     position: fixed;
     top: 25%;
     left: 25%;
@@ -59,22 +64,22 @@
     height: 50%;
     background-color: white;
     z-index: 10;
-    border: 3px solid black;
+    border: 1px solid var(--colour-border-dark);
     border-radius: 30px;
     padding: 30px 30px;
 }
 
-.hover-menu-inactive {
+.popup-menu-menu-inactive {
     display: none;
 }
 
-.hover-close {
+.popup-menu-close {
     position: absolute;
     top: 20px;
     left: calc(100% - 50px);
 }
 
-.hover-close-button {
+.popup-menu-close-button {
     height: 30px;
     width: 30px;
     cursor: pointer;

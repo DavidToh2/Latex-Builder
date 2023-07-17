@@ -14,7 +14,7 @@
 
 </script>
 <template>
-    <div class="popup-container" :class="{ 'popup-container-active': isActive }">
+    <div class="popup-container" v-show="isActive">
         <div class="popup-background">
 
         </div>
@@ -29,16 +29,6 @@
 </template>
 <style scoped>
 
-.popup-background {
-    background-color: rgba(100, 100, 100, 0.5);
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 5;
-}
-
 .popup-window {
     position: fixed;
     top: 150px;
@@ -51,12 +41,6 @@
     border-radius: 12px;
     padding: 24px;
     padding-right: 48px;
-}
-.popup-container {
-    display: none;
-}
-.popup-container-active {
-    display: block;
 }
 
 .popup-close {

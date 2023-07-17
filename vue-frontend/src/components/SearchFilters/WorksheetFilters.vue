@@ -7,7 +7,7 @@ import PopupMenu from '../Common/Popup/PopupMenu.vue';
     <div class="worksheet-filters-row">
         <div class="worksheet-filters">
             <PopupMenu description="Custom Packages">
-                <template v-slot:hover-content>
+                <template v-slot:popup-menu-content>
                     <div>
                         This is a test
                     </div>
@@ -21,7 +21,7 @@ import PopupMenu from '../Common/Popup/PopupMenu.vue';
         </div>
         <div class="worksheet-filters">
             <PopupMenu description="Document Layout">
-                <template v-slot:hover-content>
+                <template v-slot:popup-menu-content>
                     <div>
                         This is another test
                     </div>

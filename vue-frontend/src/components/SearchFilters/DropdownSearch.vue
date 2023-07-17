@@ -101,7 +101,7 @@
         search.searchText = str
     }
 
-    // Whenever the list of active selections is updated, send this information back to the parent using an emit.
+    // Whenever the list of active selections is updated, send this information back to the parent using an emit. 
 
     const setActiveSelections = () => {
         displayActiveSelections()

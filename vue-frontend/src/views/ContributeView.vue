@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Title from '@/components/PageTitle.vue'
-import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
+import QuestionFilters from '@/components/SearchFilters/QuestionFilters2.vue'
 import UserTab from '@/components/Tab/UserTab.vue'
 import Tab from '@/components/Tab/Tab.vue'
 import UserPerms from '@/components/UserPerms/UserPerms.vue'

@@ -1,17 +1,21 @@
 <script setup lang="ts">
 
-interface Props {
-    removable?: boolean,
-    colour?: string
-}
-const props = withDefaults(defineProps<Props>(), {
-    removable: true,
-    colour: 'none'
-})
+    import { numberToPixels } from '@/aux'
 
-const emits = defineEmits<{
-    (e: 'close'): void
-}>()
+    interface Props {
+        removable?: boolean,
+        colour?: string,
+        fontSize?: number
+    }
+    const props = withDefaults(defineProps<Props>(), {
+        removable: true,
+        colour: 'none',
+        fontSize: 16
+    })
+
+    const emits = defineEmits<{
+        (e: 'close'): void
+    }>()
 
 </script>
 
@@ -29,13 +33,13 @@ const emits = defineEmits<{
 <style scoped>
 
 .entry-close-button {
-    width: var(--font-size);
-    height: var(--font-size);
+    width: calc(v-bind(numberToPixels(fontSize)));
+    height: calc(v-bind(numberToPixels(fontSize)));
     cursor: pointer;
 }
 
 .entry-content {
-    font-size: var(--font-size);
+    font-size: calc(v-bind(numberToPixels(fontSize)));
 }
 
 </style>

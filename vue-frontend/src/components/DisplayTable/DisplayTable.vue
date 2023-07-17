@@ -131,13 +131,13 @@
 <template>
     <div class="display-table">
         <DisplayTableHeader />
-        <div v-if="props.internalName == 'database-table'">
+        <template v-if="props.internalName == 'database-table'">
             <div class="display-table-results" v-for="(item, index) in qns">
                 <DisplayTableEntry :internalName="props.internalName + '-qn'" :q="item" 
                     @insert="insertObject" @delete="deleteObject" @up="objectUp(index)" @down="objectDown(index)"/>
             </div>
-        </div>
-        <div v-if="props.internalName == 'build-table'">
+        </template>
+        <template v-if="props.internalName == 'build-table'">
             <div class="display-table-results" v-for="(item, index) in elements" :key="item.body.id">
                 <DisplayTableEntry v-if="item.type == 'qn'"
                     :internalName="props.internalName + '-qn'" 
@@ -177,7 +177,7 @@
                     @dragover="detectElementAboveMouse"
                     @allow-drag="toggleDragAllow"/>
             </div>
-        </div>
+        </template>
     </div>
 </template>
 
