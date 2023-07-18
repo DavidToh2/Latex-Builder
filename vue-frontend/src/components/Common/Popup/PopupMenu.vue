@@ -26,15 +26,15 @@
         </div>
     </div>
     <div class="popup-menu-container" v-show="isActive">
-        <div class="popup-menu-background">
+        <div class="popup-background">
 
         </div>
         <div class="popup-menu-window">
-            <slot name="popup-menu-content">
+            <slot>
                 <!-- Hover display content goes here -->
             </slot>
             <div class="popup-menu-close">
-                <img src="@/assets/svg/angle-right.svg" class="popup-menu-close-button icon" @click="switchActive(false)">
+                <img src="@/assets/svg/cross.svg" class="popup-menu-close-button icon" @click="switchActive(false)">
             </div>
         </div>
     </div>
@@ -56,7 +56,7 @@
     width: 100%;
 }
 
-.popup-menu-container {
+.popup-menu-window {
     position: fixed;
     top: 25%;
     left: 25%;
@@ -67,10 +67,7 @@
     border: 1px solid var(--colour-border-dark);
     border-radius: 30px;
     padding: 30px 30px;
-}
-
-.popup-menu-menu-inactive {
-    display: none;
+    overflow-y: scroll;
 }
 
 .popup-menu-close {

@@ -22,8 +22,8 @@ import { useUserStore } from '@/stores/userStore';
 const QuestionStore = useQuestionStore()
 const UserStore = useUserStore()
 
-const buildOptionsLeftTab = ['Selected Questions', 'Document Settings']
-const buildOptionsRightTab = ['Compile', 'Download']
+const buildOptionsLeftTab = ['Worksheet', 'Settings']
+const buildOptionsRightTab = ['Compile', 'Save']
 
 const activeOptions = reactive([true, false])
 const activeOptionID = ref<number>(0)
@@ -65,8 +65,8 @@ async function changeOptionTab(s : string, n : number) {
 			console.log(QuestionStore.getBuild())
 			console.log(QuestionStore.getBuildIDList())
 		break;
+		
 		case buildOptionsRightTab[0]:
-
 			if (!UserStore.getAuthStatus()) {
 				UserStore.openPopup("You must be logged in to compile documents!")
 				break;
@@ -97,7 +97,10 @@ async function changeOptionTab(s : string, n : number) {
 			}
 		break;
 		case buildOptionsRightTab[1]:
-
+			if (!UserStore.getAuthStatus()) {
+				UserStore.openPopup("You must be logged in to save documents!")
+				break;
+			}
 		break;
 	}
 }
@@ -238,7 +241,7 @@ onMounted(() => {
 		</div> 
 
 		<div id="document-settings-container" :class="{ 'inactive-container': !activeOptions[1] }">
-			<WorksheetFilters />
+			<WorksheetFilters :ws-config="worksheet.config"/>
 			
 		</div>
 	</div>
@@ -253,7 +256,6 @@ onMounted(() => {
 
 #document-settings-container {
 	width: 100%;
-    padding: 0px 10px;
 }
 
 .inactive-container {

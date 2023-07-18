@@ -1,24 +1,29 @@
 <script setup lang="ts">
 
-    import { reactive } from 'vue'
+    import { reactive, ref } from 'vue'
+    import { numberToPixels } from '@/aux'
 
     export interface Props {
         description: string
         internalName: string
+        activeInput: string
+        dropdownDir?: "row" | "column"
+        fontSize?: number
     }
 
-    const props = defineProps<Props>()
-
-    const search = reactive({
-        inputText: ''
+    const props = withDefaults(defineProps<Props>(), {
+        dropdownDir: "row",
+        fontSize: 18
     })
 
+    const input = ref(props.activeInput)
+
     const emits = defineEmits<{
-        (e: 'update', values: string[], intName: string): void
+        (e: 'update', values: string, intName: string): void
     }>()
 
     let updateInput = () => {
-        emits('update', [search.inputText], props.internalName)
+        emits('update', input.value, props.internalName)
     }
 
 </script>
@@ -28,8 +33,8 @@
         <div class="dropdown-description textbox">
             {{ description }}
         </div>
-        <div class="dropdown-search-container">
-            <textarea rows="1" class="input-sm dropdown-input" autocomplete="off" :name="internalName" style="resize: none;" v-model="search.inputText" @input="updateInput()"></textarea>
+        <div class="dropdown-input-container">
+            <textarea rows="1" class="input-sm dropdown-input" autocomplete="off" :name="internalName" style="resize: none;" v-model="input" @input="updateInput()"></textarea>
         </div>
     </div>
 </template>
@@ -38,18 +43,19 @@
 
 .dropdown-container {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: v-bind(dropdownDir);
+    align-items: left;
     gap: 7px;
     padding: 0px 7px;
     position: relative;
 }
 
 .dropdown-description {
-    font-size: var(--font-size-lg1);
+    font-size: calc(v-bind(numberToPixels(fontSize)));
+    width: max-content;
 }
 
-.dropdown-search-container {
+.dropdown-input-container {
     width: 100%;
     height: 32px;
 }

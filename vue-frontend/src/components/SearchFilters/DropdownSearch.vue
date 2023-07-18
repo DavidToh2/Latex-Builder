@@ -2,34 +2,37 @@
 
     import { reactive, computed, watch } from 'vue'
     import { numberToPixels } from '@/aux' 
+    import Entry from '@/components/Common/Entry.vue'
 
     export interface Props {
         description: string
         internalName: string
         activeSelections?: string[]
         availableSelections?: string[]
-        fontSize?: number
+
+        dropdownDir?: "row" | "column"
+        maxRows?: number
     }
 
         // Define the default value of props
 
     const props = withDefaults(defineProps<Props>(), {
         activeSelections: Object.assign(<string[]>[]),
-        fontSize: 18
+        availableSelections: Object.assign(<string[]>[]),
+        dropdownDir: "row",
+        maxRows: 2
     })
 
     const search = reactive({
         searchText: '',
         active: false,
-        activeSelections: <string[]> [...props.activeSelections as string[]]
+        activeSelections: props.activeSelections as string[],
+        availableSelections: props.availableSelections as string[]
     })
 
-    watch(() => props.activeSelections, (newActive, oldActive) => {
-        search.activeSelections = [...newActive as string[]]
-        displayActiveSelections()
-    }, {deep: true})
-
-    const dropdownDir = (props.fontSize == 18) ? "row" : "column"     // Formats direction of dropdown under styles. Note this variable is not reactive.
+    // watch(() => props.availableSelections, (newS, oldS) => {
+    //     search.availableSelections = newS as string[]
+    // })
 
     const searchbarRows = computed<number>(() => {
         if (search.searchText.length >= 25) {
@@ -38,7 +41,7 @@
             return 1
         }
     })
-    const inputContainerHeight = computed<number>(() => {
+    const containerHeight = computed<number>(() => {
         const p : number = (1 + searchbarRows.value) * 16
         return p
     })
@@ -47,64 +50,44 @@
         (e: 'update', values: string[], intName: string): void
     }>()
 
-    // When a user clicks on the input box, clear the searchText and const them type and search.
-
-    const initialiseSearch = (e : Event) => {
-        const t = e.target as HTMLInputElement
-        search.searchText = ""
-        t.value = ""
-        searchAvailableSelections(e)
-    }
-
         // Whenever the input text is updated, get the list of matching available selections.
 
-    const searchAvailableSelections = (e : Event) => {
+    watch(() => search.searchText, (newS, oldS) => {
+        searchAvailableSelections(newS)
+    })
 
-        const t1 = e.target as HTMLInputElement
-        const t = t1.nextElementSibling as HTMLSelectElement
-        search.searchText = t1.value        // The javascript searchText variable and HTML t1.value have to be manually synced up.
+    function searchAvailableSelections(s : string) {
+
+        search.availableSelections = []
+        const j : number = s.length
 
         // Search and display:
 
-        for (var child of t.children as HTMLCollection) {
+        for (var item of (props.availableSelections as string[])) {
 
-            child.classList.remove('dropdown-option-inactive')
+            const i : number = item.length
+            var r = false
 
-            const s : string = search.searchText
-            const s1 : string = child.innerHTML
-            const i : number = s.length
-            const j : number = s1.length
-            var r : boolean = false
-
-            for (var x=0; x<j-i; x++) {
-                if (s.substring(x, x+i).toLowerCase() == s1.substring(x, x+i).toLowerCase()) {
+            for (var x=0; x<i-j; x++) {
+                const a = s.substring(x, x+j).toLowerCase()
+                const b = item.substring(x, x+j).toLowerCase()
+                if (a == b) {
                     r = true
                 }
             }
 
-            if (!r) {
-                child.classList.add('dropdown-option-inactive')
+            if (r) {
+                search.availableSelections.push(item)
             }
         }
     }
 
-    // When a user clicks away from the input box, display their selected options.
-
-    const displayActiveSelections = () => {
-        var str = ''
-        if (search.activeSelections.length > 0) {
-            for (var item of search.activeSelections) {
-                str += item += ", "
-            }
-            str = str.slice(0, -2)
-        }
-        search.searchText = str
+    function removeItem(s : string) {
+        const i = search.activeSelections.indexOf(s)
+        search.activeSelections.splice(i, 1)
     }
 
-    // Whenever the list of active selections is updated, send this information back to the parent using an emit. 
-
-    const setActiveSelections = () => {
-        displayActiveSelections()
+    function setActiveSelections() {
         emits('update', search.activeSelections, props.internalName)
     }
 
@@ -116,19 +99,30 @@
             {{ description }}
         </div>
         <div class="dropdown-search-container" @mouseenter="search.active = true" @mouseleave="search.active = false">
-            <textarea :rows="searchbarRows" class="input-sm dropdown-searchbar" autocomplete="off"
-                :name="internalName"
-                :value="search.searchText" 
-                @focus="initialiseSearch($event)" 
-                @input="searchAvailableSelections($event)" 
-                @blur="displayActiveSelections()">
-            </textarea>
+            <div class="dropdown-searchbar">
+                <div class="dropdown-active-selections">
+                    <template v-for="item in search.activeSelections">
+                        <Entry colour="green" :font-size="14" @close="removeItem(item)">
+                            {{ item }}
+                        </Entry>
+                    </template>
+                </div>
+                <textarea :rows="searchbarRows" class="input-sm dropdown-search" autocomplete="off"
+                    :name="internalName"
+                    v-model="search.searchText">
+                </textarea>
+            </div>
             
             <select multiple class="dropdown-list" :class="{'dropdown-list-active': search.active}"
                 @change="setActiveSelections()" 
                 v-model="search.activeSelections">
 
-                <option class="dropdown-option" v-for="item in availableSelections" :value="item">{{ item }}</option>
+                <option class="dropdown-option" 
+                    v-for="item in props.availableSelections"
+                    v-show="search.availableSelections.includes(item)" 
+                    :value="item">
+                    {{ item }}
+                </option>
             </select>
         </div>
     </div>
@@ -138,16 +132,23 @@
 
 .dropdown-container {
     display: flex;
-    height: calc(v-bind(numberToPixels(inputContainerHeight)));
     flex-direction: v-bind('dropdownDir');
     /* align-items: center; */
     gap: 7px;
     padding: 0px 7px;
     position: relative;
 }
+.dropdown-container-row {
+    height: 32px;
+    flex-direction: row;
+}
+.dropdown-container-column {
+    height: 64px;
+    flex-direction: row;
+}
 
 .dropdown-description {
-    font-size: calc(v-bind(numberToPixels(fontSize)));
+    font-size: var(--font-size-lg1);
     height: 100%;
 }
 
@@ -155,15 +156,27 @@
     width: 100%;
 }
 
-.dropdown-searchbar {
-    display: block;
+.dropdown-active-selections {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
     width: 100%;
-    font-size: calc(v-bind(numberToPixels(fontSize - 2)));
+    font-size: var(--font-size);
+
+    max-height: 64px;
+    overflow-y: scroll;
+    position: relative;
+}
+
+.dropdown-search {
+    width: 100%;
 }
 
 .dropdown-list {
     display: none;
     list-style: none;
+    position: absolute;
 }
 
 .dropdown-list-active {
@@ -174,10 +187,7 @@
 }
 
 .dropdown-option {
-    font-size: calc(v-bind(numberToPixels(fontSize - 2)));
+    font-size: var(--font-size);
 }
 
-.dropdown-option-inactive {
-    display: none;
-}
 </style>

@@ -25,7 +25,7 @@ const PageMarginSettings = new Schema( {
 })
 const PageNumberSettings = new Schema( {
     display: "header" | "footer" | "none",
-    position: "left" | "middle" | "right"
+    position: "LORE" | "middle" | "ROLE"
 })
 const Page = new Schema( {
     dimensions: PageDimensions,
@@ -36,6 +36,7 @@ const Page = new Schema( {
 
 const TemplateSchema = new Schema( {
     templateName: String,
+    templateDescription: String,
     documentClass: {
         type: String,
         required: true

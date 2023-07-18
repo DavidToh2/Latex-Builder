@@ -68,7 +68,7 @@ interface worksheetPageMargins {
 }
 interface worksheetPageNumber {
     display: 'header' | 'footer' | 'none',
-    position: 'left' | 'middle' | 'right'
+    position: "LORE" | "middle" | "ROLE"
 }
 export interface worksheetPage {
     dimensions: worksheetPageDimensions,

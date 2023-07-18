@@ -26,14 +26,10 @@
     })  
 
     // ACTIVE SELECTIONS
-    var s = reactive({...props.ss} as qnFilters)
-
-    watch(() => props.ss, (ssNew, ssOld) => {
-        Object.assign(s, ssNew)
-    }, {deep: true})
+    var activeSelections = reactive<qnFilters>(props.ss as qnFilters)
 
     // AVAILABLE SELECTIONS (IN DROPDOWN MENUS)
-    var as = reactive({...emptyFilters})  
+    var availableSelections = reactive<qnFilters>({...emptyFilters})  
 
     function updatePossibleSelections() {
         populatePossibleEntries('category')
@@ -41,36 +37,37 @@
         populatePossibleEntries('difficulty')
         populatePossibleEntries('sourceName')
         populatePossibleEntries('subtopic')
+        populatePossibleEntries('tags')
     }
 
                 // POPULATE SELECTION'S AVAILABLE OPTIONS
                 // BASED ON PARENT SELECTION'S ACTIVE OPTIONS
 
-    function populatePossibleEntries(intName: string) {
+    function populatePossibleEntries(filterName: string) {
 
-        const i = intName as qnFilterNames
+        const filter = filterName as qnFilterNames
 
-        as[i] = []
+        availableSelections[filter] = []
 
-        var sc = s.category        // Selected categories.
+        var sc = activeSelections.category        // Selected categories.
         if (sc.length == 0) {
-            sc = as.category        // If none selected, choose from all categories.
+            sc = availableSelections.category        // If none selected, choose from all categories.
         }
 
-        switch(i) {
+        switch(filter) {
             case "category":        // All categories are always displayed.
-                as.category = Object.keys(paramdir)
+                availableSelections.category = Object.keys(paramdir)
             break
             case "topic":           // Populates all available topics based on the selected categories
                 for (var cat of sc) {
                     const a = paramdir[cat as keyof typeof paramdir]
                     const b = a['topic']
-                    const t = as['topic']
-                    as['topic'] = t.concat(Object.keys(b))
+                    const t = availableSelections['topic']
+                    availableSelections['topic'] = t.concat(Object.keys(b))
                 }
             break
             case "subtopic":        // Populates all available subtopics based on the selected categories and topics
-                const st = s.topic
+                const st = activeSelections.topic
                 
                 for (var cat of sc) {
                     const a = paramdir[cat as keyof typeof paramdir]['topic']
@@ -78,13 +75,13 @@
                     if (st.length == 0) {               // If no selected topics, display all available subtopics.
                         for (var tt of t) {
                             const arr = a[tt as keyof typeof a]        // Array of subtopics.
-                            as.subtopic = as.subtopic.concat(arr)
+                            availableSelections.subtopic = availableSelections.subtopic.concat(arr)
                         }
                     } else {                            // Otherwise, for each selected topic, display available subtopics.
                         for (var tt of t) {
                             if (st.includes(tt)) {
                                 const arr = a[tt as keyof typeof a]
-                                as.subtopic = as.subtopic.concat(arr)
+                                availableSelections.subtopic = availableSelections.subtopic.concat(arr)
                             }
                         }
                     }
@@ -92,29 +89,33 @@
             break
             case "difficulty":
             case "sourceName":          // Populates all available difficulties and sources based on the selected categories
+            case "tags":
                 for (var cat of sc) {
                     const a = paramdir[cat as keyof typeof paramdir] 
-                    const b = a[i] as string[]
-                    const c = as[i] as string[]
-                    as[i] = c.concat(b)
+                    const b = a[filter] as string[]
+                    const c = availableSelections[filter] as string[]
+                    availableSelections[filter] = c.concat(b)
                 }
             break
+
         }
 
-        // console.log(selections[intName as keyof typeof selections])
+        // console.log(selections[filterName as keyof typeof selections])
     }
 
                 // ON CHANGE OF ENTRY, UPDATE ACTIVE SELECTIONS ss
 
-    function updateSelections(filters: string[], name: string) {
+    function updateSourceYear(newYear: string, name: string) {
         if (name == "sourceYear") {
-            s["sourceYear"] = parseInt(filters[0])
-        } else {
-            const n = name as qnFilterNames
-            s[n] = filters
+            activeSelections["sourceYear"] = parseInt(newYear)
         }
+    }
+
+    function updateSelections(filters: string[], name: string) {
+        const n = name as qnFilterNames
+        activeSelections[n] = filters
         updatePossibleSelections()
-        updateParent(s)
+        updateParent(activeSelections)
     }
 
     const emits = defineEmits<{
@@ -136,41 +137,43 @@
 <template>
     <div class="question-filters-row" :id="func">
         <div class="question-filters">
-            <DropdownSearch description="Category" internalName="category" :fontSize="21" 
-                :activeSelections="s.category" 
-                :availableSelections="as.category" 
+            <DropdownSearch description="Category" internalName="category"
+                :activeSelections="activeSelections.category" 
+                :availableSelections="availableSelections.category" 
                 @update="updateSelections"
             />
-        </div>
-        <div class="question-filters">
             <DropdownSearch description="Topic" internalName="topic" 
-                :activeSelections="s.topic" 
-                :availableSelections="as.topic" 
+                :activeSelections="activeSelections.topic" 
+                :availableSelections="availableSelections.topic" 
                 @update="updateSelections"
             />
             <DropdownSearch description="Subtopic" internalName="subtopic" 
-                :activeSelections="s.subtopic" 
-                :availableSelections="as.subtopic" 
-                @update="updateSelections"
-            />
-            <DropdownSearch description="Difficulty" internalName="difficulty" 
-                :activeSelections="s.difficulty" 
-                :availableSelections="as.difficulty" 
+                :activeSelections="activeSelections.subtopic" 
+                :availableSelections="availableSelections.subtopic" 
                 @update="updateSelections"
             />
         </div>
         <div class="question-filters">
+            <DropdownSearch description="Difficulty" internalName="difficulty" 
+                :activeSelections="activeSelections.difficulty" 
+                :availableSelections="availableSelections.difficulty" 
+                @update="updateSelections"
+            />
             <DropdownSearch description="Source" internalName="sourceName" 
-                :activeSelections="s.sourceName"
-                :availableSelections="as.sourceName" 
+                :activeSelections="activeSelections.sourceName"
+                :availableSelections="availableSelections.sourceName" 
                 @update="updateSelections"
             />
             <Input description="Year" internalName="sourceYear" 
-                :activeInput="s.sourceYear"
-                @update="updateSelections"
+                :activeInput="(activeSelections.sourceYear).toString()"
+                @update="updateSourceYear"
             />
-            <Input description="Tags" internalName="tags"
-                :activeInput="s.sourceName"
+        </div>
+        <div class="question-filters">
+            <DropdownSearch description="Tags" internalName="tags"
+                :dropdown-dir="'column'"
+                :active-selections="activeSelections.tags"
+                :available-selections="availableSelections.tags"
                 @update="updateSelections"
             />
         </div>
@@ -181,9 +184,8 @@
 
 .question-filters-row {
     display: grid;
-    grid: auto / auto auto auto;
+    grid: auto / 33% 33% 33%;
     padding: 10px;
-    gap: 10px;
     width: 100%
 }
 
@@ -191,7 +193,7 @@
     height: 100%;
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: top;
     flex-direction: column;
     padding: 0px 7px;
     gap: 7px;
