@@ -1,5 +1,5 @@
-const { convertUserIDsToUsernames, findUsernameUsingID } = require('../db-auth')
-const { ServerError } = require('../express-classes/error')
+const { convertUserIDsToUsernames, findUsernameUsingID } = require('./db/db-auth')
+const { ServerError } = require('./express-classes/error')
 
 function parseID(data, source) {
     try {

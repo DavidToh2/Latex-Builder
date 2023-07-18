@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const dbAuth = require('../db-auth')
-const { ResponseBody, ResponseError } = require('../express-classes/response')
-const { UserError, DatabaseError, ServerError } = require('../express-classes/error')
+const dbAuth = require('../src/db/db-auth')
+const { ResponseBody, ResponseError } = require('../src/express-classes/response')
+const { UserError, DatabaseError, ServerError } = require('../src/express-classes/error')
 
 router.post('/signup', async function(req, res, next) {
 

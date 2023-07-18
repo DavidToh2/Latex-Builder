@@ -17,7 +17,7 @@ RUN texhash
 
 # Configure the node user
 RUN chown -R node /app \
-    && chmod -R +x /app/scripts \
+    && chmod -R +x /app/src/scripts \
     && chmod -R 700 /app/public/files
 
 EXPOSE 3000

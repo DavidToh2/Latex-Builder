@@ -149,6 +149,16 @@
     z-index: 5;
 }
 
+.header {
+	font-size: var(--font-size-lg3);
+}
+.subheader {
+	font-size: var(--font-size-lg2);
+}
+.subsubheader {
+	font-size: var(--font-size-lg1);
+}
+
 @media (min-width: 1024px) {
 
 	#app {

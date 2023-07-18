@@ -10,7 +10,7 @@ import WorksheetFilters from '@/components/SearchFilters/WorksheetFilters.vue';
 
 import { ref, reactive, onMounted, computed } from 'vue'
 
-import type { worksheetElement, ws } from '@/types/WorksheetTypes';
+import type { worksheetConfig, worksheetElement, ws } from '@/types/WorksheetTypes';
 import { defaultLatex, defaultLatexHeading, defaultLatexEnum, emptyWorksheetConfig, latexTypeStrings } from '@/types/WorksheetTypes'
 import type { UserError, ServerError } from '@/types/ErrorTypes'
 import { formatErrorMessage } from '@/types/ErrorTypes'
@@ -43,6 +43,14 @@ QuestionStore.$onAction(
                 }
             })
         }
+		if ( (name == 'setBuildWorksheetPage') || (name == 'setBuildWorksheetTemplate') || (name == 'setBuildWorksheetText') || (name == 'setBuildWorksheetTitle')) {
+			after((result) => {
+				if (result) {
+					const newBuildwsConfig = QuestionStore.getBuildworksheetConfig() as worksheetConfig
+					worksheet.config = newBuildwsConfig
+				}
+			})
+		}
     }
 )
 
@@ -62,8 +70,7 @@ async function changeOptionTab(s : string, n : number) {
 
 		break;
 		case buildOptionsLeftTab[1]:
-			console.log(QuestionStore.getBuild())
-			console.log(QuestionStore.getBuildIDList())
+
 		break;
 		
 		case buildOptionsRightTab[0]:
@@ -101,6 +108,8 @@ async function changeOptionTab(s : string, n : number) {
 				UserStore.openPopup("You must be logged in to save documents!")
 				break;
 			}
+			console.log(QuestionStore.getBuild())
+			console.log(QuestionStore.getBuildworksheetConfig())
 		break;
 	}
 }

@@ -169,8 +169,8 @@ async function changeOptionTab(s : string, newTabValue : number) {
             if (!UserStore.getAuthStatus()) {
                 UserStore.openPopup("You need to be logged in to contribute questions!")
 
-            } else if (!checkForEmptyFields(active)) {
-                UserStore.openPopup("Please check that all necessary fields of your question have been filled up")
+            } else if (!checkForInvalidFields(active)) {
+                UserStore.openPopup("Please ensure that all your inputs are valid!")
 
             } else {
                 
@@ -232,13 +232,14 @@ async function changeOptionTab(s : string, newTabValue : number) {
     tabs[tabID.value] = true
 }
 
-function checkForEmptyFields(q : qn) {
+function checkForInvalidFields(q : qn) {
     var ready = true
     if (
         q.question.trim().length == 0 ||
         q.category.length == 0 ||
         q.topic.length == 0 ||
-        q.subtopic.length == 0
+        q.subtopic.length == 0 ||
+        !(q.sourceYear && /^\d+$/.test(q.sourceYear))
     ) {
         ready = false
     }

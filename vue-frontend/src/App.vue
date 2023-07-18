@@ -9,7 +9,6 @@ import ContributeView from '@/views/ContributeView.vue'
 import DatabaseView from '@/views/DatabaseView.vue'
 import BuildView from '@/views/BuildView.vue'
 import DocumentView from '@/views/DocumentView.vue'
-import DriveView from '@/views/DriveView.vue'
 import LatexView from '@/views/LatexView.vue'
 import AccountView from '@/views/AccountView.vue'
 
@@ -55,7 +54,6 @@ const views = {
 	DatabaseView,
 	BuildView,
 	DocumentView,
-	DriveView,
 	LatexView,
 
 	AccountView

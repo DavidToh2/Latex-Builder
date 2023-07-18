@@ -107,7 +107,7 @@
 
     function updateSourceYear(newYear: string, name: string) {
         if (name == "sourceYear") {
-            activeSelections["sourceYear"] = parseInt(newYear)
+            activeSelections["sourceYear"] = newYear
         }
     }
 
@@ -165,7 +165,7 @@
                 @update="updateSelections"
             />
             <Input description="Year" internalName="sourceYear" 
-                :activeInput="(activeSelections.sourceYear).toString()"
+                :activeInput="activeSelections.sourceYear"
                 @update="updateSourceYear"
             />
         </div>

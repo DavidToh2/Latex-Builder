@@ -10,15 +10,15 @@ const logger = require('morgan');
 
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const { mongoose } = require('./db-connection')
+const { mongoose } = require('./src/db/db-connection')
 
 		// Import routing files
 
 const dbrouter = require('./routes/db-router')
 const filerouter = require('./routes/file-router')
 const authrouter = require('./routes/auth-router');
-const { UserError, DatabaseError, ServerError } = require('./express-classes/error');
-const { ResponseBody, ResponseError } = require('./express-classes/response');
+const { UserError, DatabaseError, ServerError } = require('./src/express-classes/error');
+const { ResponseBody, ResponseError } = require('./src/express-classes/response');
 
 		// Initialise the app
 

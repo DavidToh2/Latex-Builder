@@ -7,7 +7,7 @@ export interface qnFilters {
     subtopic: string[]
     difficulty: string[]
     sourceName: string[]
-    sourceYear: number
+    sourceYear: string
 
     tags: string[]
 }
@@ -36,7 +36,7 @@ const emptyFilters = {
     subtopic: <string[]> [],
     difficulty: <string[]> [],
     sourceName: <string[]> [],
-    sourceYear: 0,
+    sourceYear: '',
     tags: <string[]> []
 } as qnFilters
 
@@ -49,7 +49,7 @@ const emptyQn = {
     subtopic: [],
     difficulty: [],
     sourceName: [],
-    sourceYear: 0,
+    sourceYear: '',
     tags: [],
 
     images: [],

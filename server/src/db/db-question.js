@@ -1,10 +1,9 @@
-const aux = require('./aux/aux')
+const aux = require('../aux')
 const async = require('async')
 const { mongoose } = require('./db-connection')
 const { questionSchema } = require("./models/question.js")
-const { ServerError, UserError, DatabaseError, newError } = require('./express-classes/error')
+const { ServerError, UserError, DatabaseError, newError } = require('../express-classes/error')
 const dbAuth = require('./db-auth')
-const { idText } = require('typescript')
 
 const LIMITED_ACCOUNT_QN_LIMIT = 5
 const ACCOUNT_CAN_SET_QN = ['admin', 'active', 'limited']

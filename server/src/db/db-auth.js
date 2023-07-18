@@ -2,7 +2,7 @@
 const { mongoose } = require('./db-connection')
 const { userSchema } = require('./models/user')
 const crypto = require('crypto')
-const { UserError, DatabaseError, newError } = require('./express-classes/error')
+const { UserError, DatabaseError, newError } = require('../express-classes/error')
 
 const userDB = mongoose.connection.useDb('users', { useCache: true })
 

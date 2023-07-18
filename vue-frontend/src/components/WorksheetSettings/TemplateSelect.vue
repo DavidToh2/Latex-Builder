@@ -9,9 +9,8 @@
             Select Template
         </div>
         <div class="template-select-list">
-            <Template />
-            <Template />
-            <Template />
+            <Template template-title="Default" internal-name="default"/>
+            <Template template-title="Worksheet" internal-name="worksheet"/>
         </div>
     </div>
 </template>

@@ -53,20 +53,19 @@ export interface worksheetTitle {
     author: string,
     date: string
 }
-interface worksheetPageDimensions {
+export interface worksheetPageDimensions {
     top: string,
     left: string,
     bottom: string,
     right: string
 }
-interface worksheetPageMargins {
+export interface worksheetPageMargins {
     left: string,
     middle: string,
     right: string,
-    alternate: boolean,
-    design: string
+    thickness: string
 }
-interface worksheetPageNumber {
+export interface worksheetPageNumber {
     display: 'header' | 'footer' | 'none',
     position: "LORE" | "middle" | "ROLE"
 }
@@ -76,6 +75,10 @@ export interface worksheetPage {
     footer: worksheetPageMargins,
     pageNumber: worksheetPageNumber
 }
+export interface worksheetText {
+    paragraphSpacing: string,
+    paragraphIndent: string
+}
 
 export interface worksheetConfig {
     latexElements: {
@@ -84,13 +87,13 @@ export interface worksheetConfig {
         latexEnumCount: number
     },
 
-    documentName: string,
     template: string,
     title: worksheetTitle,
     packages: string[],
     setup: string,
     page: worksheetPage,
-    userPerms: userPerms
+    text: worksheetText,
+    preamble: string
 }
 
 const emptyWorksheetPageDimensions : worksheetPageDimensions = {
@@ -103,8 +106,7 @@ const emptyWorksheetPageMargins : worksheetPageMargins = {
     left: '',
     middle: '',
     right: '',
-    alternate: false,
-    design: ''
+    thickness: '0.5pt'
 }
 const emptyWorksheetPageNumber : worksheetPageNumber = {
     display: 'none',
@@ -112,9 +114,13 @@ const emptyWorksheetPageNumber : worksheetPageNumber = {
 }
 const emptyWorksheetPage : worksheetPage = {
     dimensions: emptyWorksheetPageDimensions,
-    header: emptyWorksheetPageMargins,
-    footer: emptyWorksheetPageMargins,
+    header: {...emptyWorksheetPageMargins},
+    footer: {...emptyWorksheetPageMargins},
     pageNumber: emptyWorksheetPageNumber
+}
+const emptyWorksheetText : worksheetText = {
+    paragraphIndent: '',
+    paragraphSpacing: ''
 }
 
 const emptyWorksheetConfig : worksheetConfig = {
@@ -122,9 +128,8 @@ const emptyWorksheetConfig : worksheetConfig = {
         latexCount: 0,
         latexHeadingCount: 0,
         latexEnumCount: 0
-    },
+    }, 
 
-    documentName: 'Document',
     template: 'default',
     title: {
         title: '',
@@ -134,8 +139,8 @@ const emptyWorksheetConfig : worksheetConfig = {
     packages: <string[]> [],
     setup: '',
     page: emptyWorksheetPage,
-    userPerms: emptyUserPerms
-
+    text: emptyWorksheetText,
+    preamble: ''
 }
 
 export interface ws {

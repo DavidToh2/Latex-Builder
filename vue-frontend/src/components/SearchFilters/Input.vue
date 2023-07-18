@@ -19,7 +19,7 @@
     const input = ref(props.activeInput)
 
     const emits = defineEmits<{
-        (e: 'update', values: string, intName: string): void
+        (e: 'update', value: string, intName: string): void
     }>()
 
     let updateInput = () => {

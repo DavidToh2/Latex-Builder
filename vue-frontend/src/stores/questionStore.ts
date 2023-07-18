@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 import type { qn, qnFilters } from '@/types/QuestionTypes'
-import type { latex, latexEnum, latexHeading, latexTypes, worksheetElement, worksheetConfig } from '@/types/WorksheetTypes'
+import type { latex, latexEnum, latexHeading, latexTypes, worksheetElement, worksheetConfig, worksheetPage, worksheetTitle, worksheetText } from '@/types/WorksheetTypes'
 import { emptyQn, emptyFilters } from '@/types/QuestionTypes'
 import { emptyWorksheetConfig } from '@/types/WorksheetTypes'
 
@@ -351,6 +351,28 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         }
     }
 
+                // UPDATE BUILD WS CONFIG
+
+    function getBuildworksheetConfig() {
+        return build.wsConfig
+    }
+    function setBuildWorksheetTitle(t : worksheetTitle) {
+        Object.assign(build.wsConfig.title, t)
+        return true
+    }
+    function setBuildWorksheetPage(p : worksheetPage) {
+        Object.assign(build.wsConfig.page, p)
+        return true
+    }
+    function setBuildWorksheetText(t : worksheetText) {
+        Object.assign(build.wsConfig.text, t)
+        return true
+    }
+    function setBuildWorksheetTemplate(s : string) {
+        build.wsConfig.template = s
+        return true
+    }
+
                 // COMPONENT STATE FUNCTIONS
     
     function saveContributeActiveQnID(ad : string) {
@@ -411,6 +433,9 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         // Component state functions
         saveContributeActiveQnID, getContributeActiveQnID,
         setDatabaseQuestionFilters, getDatabaseQuestionFilters,
+
+        // Build worksheet config
+        getBuildworksheetConfig, setBuildWorksheetPage, setBuildWorksheetTemplate, setBuildWorksheetText, setBuildWorksheetTitle,
 
         // Display PDF state
         setDisplayPDFName, getDisplayPDFName, resetDisplayPDFName

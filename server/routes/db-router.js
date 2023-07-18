@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const dbQuestion = require('../db-question')
-const { ResponseBody, ResponseError } = require('../express-classes/response')
-const { UserError, DatabaseError, ServerError } = require('../express-classes/error')
+const dbQuestion = require('../src/db/db-question')
+const { ResponseBody, ResponseError } = require('../src/express-classes/response')
+const { UserError, DatabaseError, ServerError } = require('../src/express-classes/error')
 
 const stringToArrayFields = ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']
 const stringToNumberFields = ['sourceYear']

@@ -2,12 +2,12 @@ const cp = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
-const { getTemplate } = require('./db-file')
+const { getTemplate } = require('./db/db-file')
 
 const { UserError, DatabaseError, newError } = require('./express-classes/error')
 
 const scriptroot = path.join(__dirname, 'scripts')
-const fileroot = path.join(__dirname, 'public/files')
+const fileroot = path.join(__dirname, '../public/files')
 
 function folderCreate(uID) {
     const filePath = `${fileroot}/${uID}`

@@ -1,0 +1,56 @@
+[
+    {
+        "templateName": "default",
+        "templateDescription": "This is the default template. Outputs a plain jane LaTeX document, with no further fancy formatting.",
+        "documentClass": "article",
+        "packages": ["matholympiad", "amsmath", "enumitem", "geometry", "graphicx", "fancyhdr"],
+        "setup": "",
+        "page": {
+            "dimensions": {
+                "top": "", "left": "", "bottom": "", "right": ""
+            },
+            "header": {
+                "left": "", "middle": "", "right": "", "thickness": ""
+            },
+            "footer": {
+                "left": "", "middle": "", "right": "", "thickness": ""
+            },
+            "pageNumber": {
+                "display": "none",
+                "position": "middle"
+            }
+        },
+        "text": {
+            "paragraphIndent": "",
+            "paragraphSpacing": ""
+        },
+        "preamble": ""
+    },
+    {
+        "templateName": "worksheet",
+        "templateDescription": "David's personal worksheet template!",
+        "documentClass": "article",
+        "packages": ["matholympiad", "amsmath", "enumitem", "geometry", "graphicx", "fancyhdr", "mathtools", "multirow"],
+        "setup": "",
+        "page": {
+            "dimensions": {
+                "top": "", "left": "", "bottom": "", "right": ""
+            },
+            "header": {
+                "left": "", "middle": "", "right": "", "thickness": "0.5px"
+            },
+            "footer": {
+                "left": "Prepared by: David", "middle": "", "right": "", "thickness": "0.5px"
+            },
+            "pageNumber": {
+                "display": "footer",
+                "position": "middle"
+            }
+        },
+        "text": {
+            "paragraphIndent": "0pt",
+            "paragraphSpacing": "0.8ex"
+        },
+        "preamble": ""
+    }
+]

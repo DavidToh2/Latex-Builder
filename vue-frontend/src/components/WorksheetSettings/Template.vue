@@ -2,11 +2,13 @@
 
     interface Props {
         templateTitle?: string,
+        internalName?: string,
         templateDescription?: string
     }
 
     const props = withDefaults(defineProps<Props>(), {
         templateTitle: "My Template",
+        internalName: "default",
         templateDescription: "This is a description of my template. Pick one of our free resume templates, fill it out, and land that dream job! Create and download your professional resume in less than 5 minutes. "
     })
 

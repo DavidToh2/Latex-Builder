@@ -2,9 +2,9 @@ const express = require('express')
 const router = express.Router()
 const path = require('path')
 const fs = require('fs')
-const { buildDocument } = require('../file')
-const { ResponseBody } = require('../express-classes/response')
-const { ServerError } = require('../express-classes/error')
+const { buildDocument } = require('../src/file')
+const { ResponseBody } = require('../src/express-classes/response')
+const { ServerError } = require('../src/express-classes/error')
 
 // Compile a build into a latex document
 

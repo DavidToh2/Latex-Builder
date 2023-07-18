@@ -6,11 +6,14 @@ import DisplayTable from '@/components/DisplayTable/DisplayTable.vue'
 import type { qn, qns, qnFilters, qnFilterNames } from '@/types/QuestionTypes'
 import { emptyFilters } from '@/types/QuestionTypes'
 import { useQuestionStore } from '@/stores/questionStore'
+import { useUserStore } from '@/stores/userStore'
+import { formatErrorMessage } from '@/types/ErrorTypes'
 import { questionGet, questionDelete } from '@/post/postQn'
 
 import { reactive, onActivated, onDeactivated } from 'vue'
 
 const QuestionStore = useQuestionStore()
+const UserStore = useUserStore()
 var results : qns = reactive({
     qns: []
 })
@@ -38,16 +41,24 @@ function updateSearchParameters(ss : qnFilters) {
     QuestionStore.setDatabaseQuestionFilters(searchParameters)
 }
 
-async function submitSearchEvent() {
+async function submitSearchEvent() { 
+    if (searchParameters.sourceYear && !(/^\d+$/.test(searchParameters.sourceYear))) {
+        UserStore.openPopup('Year must be a numerical value!')
+        return
+    }
     const f = document.querySelector('form#question-search-container') as HTMLFormElement
     const responsejson = await questionGet(f)
     if (responsejson.status == -1) {
         // Error occured
         const error = responsejson.error
-        console.log(error)
+        const errorMsg = formatErrorMessage(error)
+        UserStore.openPopup(errorMsg)
 
     } else if (responsejson.status == 1) {
         // Failure
+        const error = responsejson.body
+        const errorMsg = error.cause
+        UserStore.openPopup(errorMsg)
 
     } else {
         // Success
