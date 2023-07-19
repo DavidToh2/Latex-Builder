@@ -75,6 +75,17 @@ async function parseUserPerms(userPerms) {
 
 }
 
-module.exports = { parseID, parseUserPerms }
+function parseAlphanumericString(s) {
+    if (typeof s != 'string') {
+        throw new ServerError(`Sanitisation check failed!`, `String is not string!`)
+    }
+    else if (/^[A-Za-z0-9 ]*$/.test(s)) {
+        return true
+    } else {
+        throw new ServerError(`Sanitisation check failed!`, `String is not alphanumeric!`)
+    }
+}
+
+module.exports = { parseID, parseUserPerms, parseAlphanumericString }
 
 

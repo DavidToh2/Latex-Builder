@@ -1,7 +1,7 @@
 const { mongoose } = require('./db-connection')
 const { TemplateSchema, DocumentSchema } = require('./models/document')
 
-const { UserError, DatabaseError, newError } = require('../express-classes/error')
+const { UserError, DatabaseError, newError, ServerError } = require('../express-classes/error')
 const initTemplates = require('./init/initTemplates.json')
 
 const templateDB = mongoose.connection.useDb('templates', { useCache: true })
@@ -37,6 +37,9 @@ async function getTemplate(tName) {
 
     const errorString = "Failed to get new document template!"
     try {
+        if (!tName) {
+            throw new ServerError(errorString, 'Template name not present!')
+        }
         const d = {
             templateName: tName
         }

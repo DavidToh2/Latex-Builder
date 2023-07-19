@@ -2,9 +2,12 @@ const cp = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
-const { getTemplate } = require('./db/db-file')
+const dbTemplate = require('./db/db-file')
+const aux = require('./aux')
 
-const { UserError, DatabaseError, newError } = require('./express-classes/error')
+const { UserError, DatabaseError, ServerError, newError } = require('./express-classes/error')
+
+const DEFAULT_PACKAGES = ["matholympiad", "amsmath", "enumitem", "geometry", "graphicx", "fancyhdr"]
 
 const scriptroot = path.join(__dirname, 'scripts')
 const fileroot = path.join(__dirname, '../public/files')
@@ -23,42 +26,6 @@ function folderCreate(uID) {
     }
 }
 
-function packageOutput(packages) {
-    packages.forEach(function(item, index, arr) {
-        arr[index] = `\\usepackage\{${item}\}\n`
-    })
-    const packageString = packages.join('')
-    return packageString
-}
-
-function bodyOutput(body) {
-    body.forEach(function(item, index, arr) {
-
-        // If item is question
-        if (item.type == 'qn') {
-            arr[index] = item.body.question
-        }
-
-        // If item is latex, TODO
-        else {
-            arr[index] = ''
-        }
-    })
-    const bodyString = body.join('\n\n')
-    return bodyString
-}
-
-function documentOutput(documentClass, packages, setup, title, author, date, body) {
-    const packageString = packageOutput(packages)
-
-    const s = documentClass + '\n\n' + packageString + '\n\n' + setup + '\n\n'
-    + `\\title\{${title}\}` + `\\author\{${author}\}` + `\\date\{${date}\}` + '\n\n'
-    + "\\begin\{document\}" + "\\maketitle" + '\n\n'
-    + `${body}` + '\n\n'
-    + `\\end\{document\}`
-
-    return s
-}
 async function buildDocument(data, uID) {
 
     var filePath = ''
@@ -73,22 +40,41 @@ async function buildDocument(data, uID) {
         // Parse document data
         const config = data['config']
 
+            // Get template and populate template settings
         const templateName = config['template']
-        const template = await getTemplate(templateName)
-        const documentClass = template['documentClass']
-        const packages = template['packages']
+        aux.parseAlphanumericString(templateName)
 
+        const template = await dbTemplate.getTemplate(templateName)
+        const documentClass = template['documentClass']
+        const templatePackages = template['packages']
+
+            // Get additional packages
+        const documentPackages = config['packages']
+
+        const packages = Array.from(new Set([...DEFAULT_PACKAGES, ...templatePackages, ...documentPackages]))
+
+            // Get setup
         const setup = config['setup']
 
+            // Get document title 
         const documentTitle = config['title']
         const title = documentTitle['title']
+        aux.parseAlphanumericString(title)
         const author = documentTitle['author']
+        aux.parseAlphanumericString(author)
         const date = documentTitle['date']
+        aux.parseAlphanumericString(date)
 
+            // Get page settings
+        const page = config['page']
+
+            // Get text settings
+        const text = config['text']
+
+            // Get worksheet elements
         const bodyElements = data['elements']
-        const body = bodyOutput(bodyElements)
 
-        output = documentOutput(documentClass, packages, setup, title, author, date, body)
+        output = documentOutput(documentClass, packages, setup, documentTitle, page, text, bodyElements)
 
     } catch(err) {
         newError(err, 'Failed to parse document data in build!')
@@ -128,8 +114,51 @@ async function buildDocument(data, uID) {
 
 }
 
-function fileError(err) {
+function documentOutput(documentClass, packages, setup, documentTitle, page, text, bodyElements) {
+    const documentClassString = documentClassOutput(documentClass)
+    const packageString = packageOutput(packages)
 
+    const s = documentClassString + packageString + '\n\n' + setup + '\n\n'
+    + `\\title\{${title}\}` + `\\author\{${author}\}` + `\\date\{${date}\}` + '\n\n'
+    + "\\begin\{document\}" + "\\maketitle" + '\n\n'
+    + `${body}` + '\n\n'
+    + `\\end\{document\}`
+
+    return s
+}
+
+function documentClassOutput(documentClass) {
+    aux.parseAlphanumericString(documentClass)
+    return '\\documentClass\[a4paper,twoside\]\{' + documentClass + '\}\n\n'
+}
+
+function packageOutput(packages) {
+    packages.forEach(function(item, index, arr) {
+        aux.parseAlphanumericString(item)
+        arr[index] = '\\usepackage\{' + item + '\}\n'
+    })
+    const packageString = packages.join('')
+    return packageString
+}
+
+function bodyOutput(body) {
+    body.forEach(function(item, index, arr) {
+
+        // If item is question
+        if (item.type == 'qn') {
+            arr[index] = item.body.question
+        }
+
+        // If item is latex, TODO
+        else {
+            arr[index] = ''
+        }
+    })
+    const bodyString = body.join('\n\n')
+    return bodyString
+}
+
+function fileError(err) {
     console.log("Message output:")
     console.log(err.message.toString())
     console.log("stdout output:")       // LaTeX errors come out here
