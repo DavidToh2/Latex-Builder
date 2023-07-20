@@ -87,7 +87,7 @@ function getPDFDisplayWidth() {
         <div id="drive">
         
         </div>
-        <Tab internal-name="DocumentViewTab" :tab-left=documentTab :active-i-d=activeTabID :tab-right="[]" />
+        <Tab internal-name="DocumentViewTab" :tab-left=documentTab :active-tab-index=activeTabID :tab-right="[]" />
         <div id="document-viewer">
             <pdf
                 :source="blobURL"

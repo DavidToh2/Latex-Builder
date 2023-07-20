@@ -16,8 +16,8 @@
         latexEnumContent.type = i
         updateLatexEnum()
     }
-    const enumBehaviourSelections = ['Start', 'Start at', 'Resume']
-    const enumBehaviours = ['start', 'startAt', 'resume']
+    const enumBehaviourSelections = ['Start', 'Start at', 'Resume', 'Stop']
+    const enumBehaviours = ['start', 'startAt', 'resume', 'stop']
     function updateEnumBehaviour(internalName : string) {
         const i = internalName as 'start' | 'startAt' | 'resume'
         latexEnumContent.behaviour = i
@@ -66,28 +66,18 @@
         List
     </div>
     <div class="latex-enum-container">
-        <div class="latex-enum-settings latex-enum-type">
-            <div class="latex-enum-settings-title">
-                Type:
-            </div>
-            <div class="latex-enum-settings-type">
-                <SelectOptionsGrid :columns="3" 
-                    :selections="enumTypeSelections" :internal-names="enumTypes"
-                    :active-selection="latexEnumContent.type"
-                    @update="updateEnumType"/>
-            </div>
-        </div>
         <div class="latex-enum-settings latex-enum-behaviour">
             <div class="latex-enum-settings-title">
                 Behaviour:
             </div>
             <div class="latex-enum-settings-behaviour">
-                <SelectOptionsGrid :columns="1"
+                <SelectOptionsGrid :columns="2"
                     :selections="enumBehaviourSelections" :internal-names="enumBehaviours"
                     :active-selection="latexEnumContent.behaviour"
                     @update="updateEnumBehaviour"/>
             </div>
-            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 10px;">
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 10px;"
+                v-show="(latexEnumContent.behaviour != 'stop')">
                 <div style="display: flex; flex-direction: row; gap: 20px;">
                     <div style="width: min-content;">Starting index:</div>
                     <input class="input-sm latex-enum-settings-startindex" 
@@ -98,7 +88,20 @@
                 </div>
             </div>
         </div>
-        <div class="latex-enum-settings latex-enum-template">
+        <div class="latex-enum-settings latex-enum-type"
+            v-show="(latexEnumContent.behaviour != 'stop')">
+            <div class="latex-enum-settings-title">
+                Type:
+            </div>
+            <div class="latex-enum-settings-type">
+                <SelectOptionsGrid :columns="3" 
+                    :selections="enumTypeSelections" :internal-names="enumTypes"
+                    :active-selection="latexEnumContent.type"
+                    @update="updateEnumType"/>
+            </div>
+        </div>
+        <div class="latex-enum-settings latex-enum-template"
+            v-show="(latexEnumContent.behaviour != 'stop')">
             <div class="latex-enum-settings-title">
                 Template:
             </div>
@@ -126,7 +129,8 @@
     width: 100%;
     display: grid;
     column-gap: 30px;
-    grid: auto / 45% 30%;
+    row-gap: 10px;
+    grid: auto / 50% 45%;
 }
 
 .latex-enum-settings {
@@ -134,6 +138,11 @@
     flex-direction: row;
     gap: 20px;
     align-items: center;
+}
+
+.latex-enum-behaviour {
+    display: grid;
+    grid-template-columns: 20% 40% 20%;
 }
 
 .latex-enum-settings-title {

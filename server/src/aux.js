@@ -1,5 +1,5 @@
 const { convertUserIDsToUsernames, findUsernameUsingID } = require('./db/db-auth')
-const { ServerError } = require('./express-classes/error')
+const { ServerError, UserError } = require('./express-classes/error')
 
 function parseID(data, source) {
     try {
@@ -75,17 +75,106 @@ async function parseUserPerms(userPerms) {
 
 }
 
-function parseAlphanumericString(s) {
+function parseString(s) {
     if (typeof s != 'string') {
-        throw new ServerError(`Sanitisation check failed!`, `String is not string!`)
+        throw new ServerError(`Sanitisation check failed!`, `Illegal object passed!`)
     }
-    else if (/^[A-Za-z0-9 ]*$/.test(s)) {
-        return true
+    else if (/^[A-Za-z0-9,.-_:;'"*|\&\\\{\}\(\)\[\] ]*$/.test(s)) {
+        if (s) {
+            const l = s.length
+            var c = 0
+            for (var i=0; i<l; i++) {
+                if (s[i] == '\{') {
+                    c++
+                } else if (s[i] == '\}') {
+                    c--
+                    if (c < 0) {
+                        throw new UserError(`Sanitisation check failed!`, `Parenthesis do not match!`)
+                    }
+                }
+            }
+            if (c == 0) {
+                return true
+            } else {
+                throw new UserError(`Sanitisation check failed!`, `Parenthesis do not match!`)
+            }
+        } else {
+            return false
+        }
     } else {
-        throw new ServerError(`Sanitisation check failed!`, `String is not alphanumeric!`)
+        throw new ServerError(`Sanitisation check failed!`, `Illegal characters detected in string!`)
     }
 }
 
-module.exports = { parseID, parseUserPerms, parseAlphanumericString }
+function parseStringBrackets(s) {
+    if (typeof s != 'string') {
+        throw new ServerError(`Sanitisation check failed!`, `Illegal object passed!`)
+    } else {
+        const l = s.length
+        var c = [0, 0, 0]
+        var good = true
+        var i = 0
+        for (var i=0; i<l; i++) {
+            switch(s[i]) {
+                case '\{':
+                    c[0]++
+                break
+                case '\}':
+                    c[0]--
+                    if (c[0] < 0) {
+                        good = false
+                    }
+                break
+                case '\(':
+                    c[1]++
+                break
+                case '\)':
+                    c[1]--
+                    if (c[1] < 0) {
+                        good = false
+                    }
+                break
+                case '\[':
+                    c[2]++
+                break
+                case '\]':
+                    c[2]--
+                    if (c[2] < 0) {
+                        good = false
+                    }
+                break
+            }
+            if (!good) {
+                break
+            }
+        }
+        if (!good) {
+            return false
+        } else {
+            if (c[0] == 0 && c[1] == 0 && c[2] == 0) {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+}
+
+function parseAlphanumericString(s) {
+    if (typeof s != 'string') {
+        throw new ServerError(`Sanitisation check failed!`, `Illegal object passed!`)
+    }
+    else if (/^[A-Za-z0-9. ]*$/.test(s)) {
+        if (s) {
+            return true
+        } else {
+            return false
+        }
+    } else {
+        throw new ServerError(`Sanitisation check failed!`, `Illegal characters detected in alphanumeric string!`)
+    }
+}
+
+module.exports = { parseID, parseUserPerms, parseString, parseStringBrackets, parseAlphanumericString }
 
 

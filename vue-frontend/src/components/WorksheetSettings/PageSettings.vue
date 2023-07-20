@@ -22,8 +22,10 @@
         configUpdate()
     }
 
+    const pageHFKeys = ['left', 'middle', 'right', 'thickness']
+
     function updatePageHeader(s: string, n: string) {
-        if (pageMarginDimensions.includes(n)) {
+        if (pageHFKeys.includes(n)) {
             const n1 = n as "left" | "middle" | "right" | "thickness"
             wsPage.header[n1] = s
         }
@@ -31,7 +33,7 @@
     }
 
     function updatePageFooter(s: string, n: string) {
-        if (pageMarginDimensions.includes(n)) {
+        if (pageHFKeys.includes(n)) {
             const n1 = n as "left" | "middle" | "right" | "thickness"
             wsPage.footer[n1] = s
         }

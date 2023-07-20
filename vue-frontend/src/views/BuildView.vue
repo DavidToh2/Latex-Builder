@@ -146,14 +146,13 @@ function startPlaceholderDrag(elementType : string) {
 	// console.log(QuestionStore.getBuild())
 }
 function swapTwoElements(a: number, b: number) {
-	console.log("Swapping two elements...")
 	QuestionStore.swapTwoElementsInBuild(a, b)
 }
 
 function addElement(e : DragEvent, i : number) {
 	const elementType = (e.dataTransfer as DataTransfer).getData('type')
-	// console.log(`Dropping element of type ${elementType} at position ${i}`)
 	if (latexTypeStrings.includes(elementType)) {
+		// console.log(`Inserting element ${elementType} at index ${i}`)
 		switch(elementType) {
 			case 'latexHeading':
 				const lhi = worksheet.config.latexElements.latexHeadingCount

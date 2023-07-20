@@ -35,7 +35,7 @@ const Page = new Schema( {
 
 const Text = new Schema( {
     paragraphIndent: String,
-    pararaphSpacing: String
+    paragraphSpacing: String
 })
 
 const TemplateSchema = new Schema( {

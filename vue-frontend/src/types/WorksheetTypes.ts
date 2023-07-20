@@ -13,7 +13,7 @@ export interface latex {
 export interface latexEnum {
     id: string,
     type: 'numeric' | 'alphabetic' | 'roman' | 'bullet' | 'dash' | 'arrow',
-    behaviour: 'start' | 'startAt' | 'resume',
+    behaviour: 'start' | 'startAt' | 'resume' | 'stop',
     template: string,
     options: string
 }
