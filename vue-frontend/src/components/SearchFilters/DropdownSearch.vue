@@ -30,6 +30,11 @@
         availableSelections: props.availableSelections as string[]
     })
 
+    watch(() => props.activeSelections as string[], (newS, oldS) => {
+        search.activeSelections = props.activeSelections as string[]
+        search.availableSelections = props.availableSelections as string[]
+    }, {deep: true})
+
     // watch(() => props.availableSelections, (newS, oldS) => {
     //     search.availableSelections = newS as string[]
     // })

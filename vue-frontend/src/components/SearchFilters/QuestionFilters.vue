@@ -9,7 +9,7 @@
 
     export interface Props {
         func: string
-        ss?: qnFilters
+        ss: qnFilters
     }
 
     // SELECTIONS PASSED DOWN FROM THE PARENT COMPONENT. 
@@ -20,13 +20,18 @@
             subtopic: <string[]> [],
             difficulty: <string[]> [],
             sourceName: <string[]> [],
-            sourceYear: 0,
+            sourceYear: '',
             tags: <string[]> []
         })
-    })  
+    })
 
     // ACTIVE SELECTIONS
     var activeSelections = reactive<qnFilters>(props.ss as qnFilters)
+
+    watch(() => props.ss as qnFilters, (newS, oldS) => {
+        activeSelections = props.ss
+        updatePossibleSelections()
+    }, {deep: true})
 
     // AVAILABLE SELECTIONS (IN DROPDOWN MENUS)
     var availableSelections = reactive<qnFilters>({...emptyFilters})  
@@ -47,7 +52,7 @@
 
         const filter = filterName as qnFilterNames
 
-        availableSelections[filter] = []
+        availableSelections[filter] = [] 
 
         var sc = activeSelections.category        // Selected categories.
         if (sc.length == 0) {

@@ -15,12 +15,31 @@ export async function buildWorksheet(w : ws) {
 export async function getPDF(n : string) {
     const r = {
         name: n,
-        fn: 'file-get'
+        fn: 'file-get-pdf'
+    } as { [key: string] : string }
+    if (n == '') {
+        r.name = 'welcome'
+    }
+    const response = await postGetFile(r, `${BASE_URL}/file/get/pdf`)
+    const contentType = response.headers.get('Content-Type') as string
+    if (contentType == 'application/json') {
+        const responsejson = await response.json()
+        return responsejson
+    } else {
+        const responseblob = await response.blob()
+        return responseblob
+    }
+}
+
+export async function getImage(n : string) {
+    const r = {
+        name: n,
+        fn: 'file-get-img'
     } as { [key: string] : string }
     if (n == '') {
         r.name = 'preview'
     }
-    const response = await postGetFile(r, `${BASE_URL}/file/get`)
+    const response = await postGetFile(r, `${BASE_URL}/file/get/image`)
     const contentType = response.headers.get('Content-Type') as string
     if (contentType == 'application/json') {
         const responsejson = await response.json()

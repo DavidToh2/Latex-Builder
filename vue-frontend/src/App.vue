@@ -239,21 +239,6 @@ const transitionMode = computed<"default" | "out-in" | "in-out">(() => {
 	}
 })
 
-document.addEventListener('keydown', function(event) {
-	const c = event.target as HTMLElement
-	if ((c.classList as DOMTokenList).contains("latex-text")) {
-		if (event.code == "Tab") {
-			event.preventDefault()
-			const t = c as HTMLTextAreaElement
-			const ss = t.selectionStart
-			const se = t.selectionEnd
-			const v = t.value
-			t.value = v.substring(0, ss) + '\t' + v.substring(se)
-			t.selectionEnd += 1
-		}
-	}
-})
-
 const popupHTML = ref('')
 const popupActive = ref(false)
 function closePopup() {

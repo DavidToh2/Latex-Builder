@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-    import { reactive, ref } from 'vue'
+    import { reactive, ref, watch } from 'vue'
     import { numberToPixels } from '@/aux'
 
     export interface Props {
@@ -17,6 +17,10 @@
     })
 
     const input = ref(props.activeInput)
+
+    watch(() => props.activeInput, (newI, oldI) => {
+        input.value = props.activeInput
+    })
 
     const emits = defineEmits<{
         (e: 'update', value: string, intName: string): void

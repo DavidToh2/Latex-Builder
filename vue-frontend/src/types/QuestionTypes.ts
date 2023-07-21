@@ -53,7 +53,7 @@ const emptyQn = {
     tags: [],
 
     images: [],
-    solution: [],
+    solution: [''],
     solutionImages: [[]],
 
     lastModified: ''

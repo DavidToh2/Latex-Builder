@@ -10,13 +10,21 @@ const { UserError, DatabaseError, ServerError, newError } = require('./express-c
 const scriptroot = path.join(__dirname, 'scripts')
 const fileroot = path.join(__dirname, '../public/files')
 
-function folderCreate(uID) {
-    const filePath = `${fileroot}/${uID}`
+function folderCreate(uID, type) {
+    var filePath = `${fileroot}/${uID}`
+    switch(type) {
+        case 'pdf':
+            filePath = filePath + '/document'
+        break
+        case 'image':
+            filePath = filePath + '/image'
+        break
+    }
     if (fs.existsSync(filePath)) {
         return filePath
     } else {
         try {
-            fs.mkdirSync(filePath)
+            fs.mkdirSync(filePath, { recursive: true })
             return filePath
         } catch(err) {
             newError(err, `Failed to create folder ${filePath}!`)
@@ -29,88 +37,40 @@ async function buildDocument(data, uID) {
     var filePath = ''
     var output = ''
 
+    // Build document output text
+
     try {
         console.log("Attempting to build document...")
-
-        // Create folder directory
-        filePath = folderCreate(uID)
-
-        // Parse document data
-        const config = data['config']
-
-            // Get template and populate template settings
-        const templateName = config['template']
-        aux.parseAlphanumericString(templateName)
-
-        const template = await dbTemplate.getTemplate(templateName)
-        const documentClass = template['documentClass']
-
-            // Get additional packages
-        const documentPackages = config['packages']
-        const templatePackages = template['packages']
-        const packages = Array.from(new Set([...templatePackages, ...documentPackages]))
-
-            // Get page settings
-        const documentPage = config['page']
-        const templatePage = template['page']
-
-            // Get text settings
-        const documentText = config['text']
-        const templateText = template['text']
-
-            // Get document title 
-        const documentTitle = config['title']
-
-            // Get setup
-        const documentSetup = config['setup']
-        const templateSetup = template['setup']
-
-            // Get preamble
-        const templatePreamble = template['preamble']
-
-            // Get worksheet elements
-        const bodyElements = data['elements']
-        const bodyLatexData = config['latexElements']
-
-        output = documentOutput(
-            documentClass, 
-            packages, 
-            documentPage, templatePage, 
-            documentText, templateText, 
-            documentTitle, 
-            documentSetup, templateSetup,
-            templatePreamble, 
-            bodyElements
-        )
-
+        output = await documentOutput(data)
     } catch(err) {
         newError(err, 'Failed to parse document data in build!')
     }
 
-        // Write document into file
+    // Write document into file
+
     try {
+        filePath = folderCreate(uID, 'pdf')
         console.log("Attempting to write document to file...")
         fs.writeFileSync(`${filePath}/output.tex`, output)
     } catch(err) {
         newError(err, `Failed to write to build file ${filePath}/output.tex!`)
     }
 
-        // Compile LaTeX document
+    // Compile LaTeX document
+
     try {
         console.log("Attempting to compile document...")
         const res = cp.execSync(`./compile_latex.sh output.tex ${filePath}`, { cwd: scriptroot })
         console.log(res.toString())    // execSync returns stdout directly
-
-        // https://stackoverflow.com/questions/32874316/node-js-accessing-the-exit-code-and-stderr-of-a-system-command 
-        // If no err: status guaranteed to be 0
-
         return 0
-
     } catch(err) {
         fileError(err)
         throw new UserError('Failed to compile latex!', err.stdout.toString())
 
         /*
+        // https://stackoverflow.com/questions/32874316/node-js-accessing-the-exit-code-and-stderr-of-a-system-command 
+        // If no err: status guaranteed to be 0
+
         Error output from bash cp.execSync() works as follows:
 
         err.message.toString(): 'Command failed'
@@ -120,30 +80,104 @@ async function buildDocument(data, uID) {
     }
 }
 
+async function buildPreview(data, uID) {
+
+    var filePath = ''
+    var output = ''
+
+    // Build document for outputting preview
+
+    try {
+        console.log('Attempting to build preview...')
+        output = previewOutput(data)
+        console.log(output)
+    } catch(err) {
+        newError(err, 'Failed to parse document data in preview!')
+    }
+
+    // Write data into file
+
+    try {
+        filePath = folderCreate(uID, 'image')
+        console.log('Attempting to write preview to file...')
+        fs.writeFileSync(`${filePath}/preview.tex`, output)
+    } catch(err) {
+        newError(err, `Failed to write to preview file ${filePath}/preview.tex!`)
+    }
+
+    // Compile latex preview
+
+    try {
+        console.log('Attempting to compile preview...')
+        const res = cp.execSync(`./compile_latex_display.sh preview.tex ${filePath}`, { cwd: scriptroot } )
+        console.log(res.toString())
+        return 0
+    } catch(err) {
+        fileError(err)
+        throw new UserError('Failed to compile latex preview!', err.stdout.toString())
+    }
+
+}
+
 const DEFAULT_PACKAGES = ["matholympiad", "amsmath", "enumitem", "geometry", "graphicx", "fancyhdr"]
 const DEFAULT_PACKAGE_STRING = 
 `\\usepackage\{matholympiad\}
 \\usepackage\{amsmath\}
 \\usepackage\{enumitem\}
 \\usepackage\{fancyhdr\}
-\\usepackage\{graphicx\}`
-const DEFAULT_IMAGE_STRING = `\\graphicspath\{\{./images\}\}`
+\\usepackage\{graphicx\}
+`
+const DEFAULT_IMAGE_STRING = 
+`\\graphicspath\{\{./images\}\}
+`
 const BEGIN_DOCUMENT_STRING = 
 `\\begin\{document\}
-\\maketitle
-\\thispagestyle\{fancy\}`
-const END_DOCUMENT_STRING = `\\end\{document\}`
+`
+const TITLE_FANCYPAGE_STRING = 
+`\\maketitle
+\\thispagestyle\{fancy\}
+`
+const END_DOCUMENT_STRING = 
+`\\end\{document\}
+`
 
-function documentOutput(
-    documentClass, 
-    packages, 
-    documentPage, templatePage, 
-    documentText, templateText, 
-    documentTitle, 
-    documentSetup, templateSetup,
-    templatePreamble, 
-    bodyElements
-) {
+async function documentOutput(data) {
+
+    // Parse document data
+    const config = data['config']
+
+        // Get template and populate template settings
+    const templateName = config['template']
+    aux.parseAlphanumericString(templateName)
+
+    const template = await dbTemplate.getTemplate(templateName)
+    const documentClass = template['documentClass']
+
+        // Get additional packages
+    const documentPackages = config['packages']
+    const templatePackages = template['packages']
+    const packages = Array.from(new Set([...templatePackages, ...documentPackages]))
+
+        // Get page settings
+    const documentPage = config['page']
+    const templatePage = template['page']
+
+        // Get text settings
+    const documentText = config['text']
+    const templateText = template['text']
+
+        // Get document title 
+    const documentTitle = config['title']
+
+        // Get setup
+    const documentSetup = config['setup']
+    const templateSetup = template['setup']
+
+        // Get preamble
+    const templatePreamble = template['preamble']
+
+        // Get worksheet elements
+    const bodyElements = data['elements']
 
     const documentClassString = documentClassOutput(documentClass)
     const packageString = packageOutput(packages)
@@ -165,6 +199,7 @@ function documentOutput(
     + setupString
     + titleString
     + BEGIN_DOCUMENT_STRING
+    + TITLE_FANCYPAGE_STRING
     + preambleString
     + bodyString
     + END_DOCUMENT_STRING
@@ -172,9 +207,32 @@ function documentOutput(
     return s
 }
 
+function previewOutput(data) {
+    const documentClassString = documentClassOutput('article')
+
+    if (!aux.parseStringBrackets(data)) {
+        throw new UserError('Brackets do not match!')
+    }
+
+    const s = documentClassString 
+    + DEFAULT_PACKAGE_STRING 
+    + '\\pagestyle\{empty\}\n'
+    + '\\setlength\\parskip\{0.8ex\}\n'
+    + '\\setlength\\parindent\{0pt\}\n'
+    + BEGIN_DOCUMENT_STRING 
+    + data 
+    + END_DOCUMENT_STRING
+
+    return s
+}
+
 function documentClassOutput(documentClass) {
     aux.parseAlphanumericString(documentClass)
-    return '\\documentclass\[a4paper,twoside\]\{' + documentClass + '\}\n\n'
+    if (documentClass == 'article') {
+        return '\\documentclass\[a4paper,twoside\]\{article\}\n\n'
+    } else {
+        return '\\documentclass\{' + documentClass + '\}\n\n'
+    }
 }
 
 function packageOutput(packages) {
@@ -576,10 +634,8 @@ function fileError(err) {
     console.log(err.message.toString())
     console.log("stdout output:")       // LaTeX errors come out here
     console.log(err.stdout.toString())
-    console.log("stderr output:")
-    console.log(err.stderr.toString())
 }
 
 module.exports = {
-    buildDocument
+    buildDocument, buildPreview
 }

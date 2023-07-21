@@ -1,43 +1,27 @@
 <script setup lang="ts">
 
     import type { latex } from '@/types/WorksheetTypes';
-    import { reactive, ref } from 'vue';
+    import LatexInput from '@/components/Latex/LatexInput.vue'
+    import { reactive, ref, watch } from 'vue';
 
     const props = defineProps<{
-        content: latex
+        content: latex,
     }>()
     const latexContent = reactive(props.content)
-    const latexActive = ref(false)
-
-    function latexUpdate(e : Event) {
-        latexActive.value = true
-        const t = e.target as HTMLTextAreaElement
-        updateTextareaHeight(t)
-    }
-    function updateTextareaHeight(t : HTMLTextAreaElement) {
-        t.style.height = '1px'
-        t.style.height = (14 + t.scrollHeight) + 'px'
-    }
-
     const emits = defineEmits<{
-        (e: 'updateLatex', newContent: latex): void
+        (e: 'updateLatex', newContent: latex): void 
     }>()
-    function latexUpdateDone() {
-        latexActive.value = false
+
+    watch(() => latexContent.text, (newT, oldT) => {
         emits('updateLatex', latexContent)
-    }
+    })
 
 </script>
 <template>
     <div class="latex-element-title">
         Raw latex
     </div>
-    <div class="latex-container">
-        <textarea class="latex-text" v-model="latexContent.text"
-            @focusin="latexUpdate($event)" @keyup="latexUpdate($event)"
-            @focusout="latexUpdateDone">
-        </textarea>
-    </div>
+    <LatexInput v-model:latex="latexContent.text"/>
 </template>
 <style scoped>
 .latex-container {

@@ -152,12 +152,12 @@ function swapTwoElements(a: number, b: number) {
 function addElement(e : DragEvent, i : number) {
 	const elementType = (e.dataTransfer as DataTransfer).getData('type')
 	if (latexTypeStrings.includes(elementType)) {
-		// console.log(`Inserting element ${elementType} at index ${i}`)
+		console.log(`Inserting element ${elementType} at index ${i}`)
 		switch(elementType) {
 			case 'latexHeading':
 				const lhi = worksheet.config.latexElements.latexHeadingCount
 				const n2 : worksheetElement = {
-					type: "latexHeading",
+					type: "latexHeading", 
 					body: defaultLatexHeading
 				}
 				n2.body.id = `latexHeading${lhi}`
@@ -180,7 +180,7 @@ function addElement(e : DragEvent, i : number) {
 					type: "latex",
 					body: defaultLatex
 				}
-				n1.body.id = `latex${li}`
+				n1.body.id = `latex${li}` 
 				worksheet.config.latexElements.latexCount++
 				QuestionStore.insertElementIntoBuild(n1, i)
 				break

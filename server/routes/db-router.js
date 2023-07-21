@@ -10,9 +10,7 @@ const stringToNumberFields = ['sourceYear']
 router.post('/get', async function(req, res, next) {                  // FIND / GET QUESTIONS BASED ON DATADICT
 
     try {
-        console.log("Search parameters:")
-        const reqData = parseWebToServer(req.body)
-        console.log(reqData)
+        const reqData = req.body
 
         var userID = 'public'
         if (req.session.uID) {
@@ -22,11 +20,7 @@ router.post('/get', async function(req, res, next) {                  // FIND / 
         const fQ = await dbQuestion.getQuestions(reqData, userID)
 
         const response = new ResponseBody(reqData['fn'])
-        if (fQ.length == 0) {
-            response.status = 1
-        } else {
-            response.status = 0
-        }
+        response.status = 0
         response.body = fQ
         console.log(response)
 
@@ -40,13 +34,13 @@ router.post('/get', async function(req, res, next) {                  // FIND / 
         res.header("Content-Type", "application/json")
         res.send(JSON.stringify(data))
     */
-})
+}) 
 
 router.post('/set/new', async function(req, res, next) {              // SET NEW QUESTION
 
     try {
         console.log("Input parameters:")
-        const reqData = parseWebToServer(req.body)
+        const reqData = req.body
         console.log(reqData)
 
         const response = new ResponseBody(reqData['fn'])
@@ -71,7 +65,7 @@ router.post('/set/update/:ID', async function(req, res, next) {           // UPD
 
     try {
         console.log("Input parameters:")
-        const reqData = parseWebToServer(req.body)
+        const reqData = req.body
         console.log(reqData)
         const ID = req.params['ID']
 

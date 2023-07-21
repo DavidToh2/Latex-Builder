@@ -227,7 +227,8 @@
 }
 .display-table :deep(.display-table-question) {
     flex-basis: var(--display-table-questions-width);
-    white-space: pre;
+    max-width: var(--display-table-questions-width);
+	white-space: pre-wrap;
 }
 .display-table :deep(.display-table-topic) {
     flex-basis: var(--display-table-topic-width);

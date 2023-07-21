@@ -28,7 +28,7 @@ QuestionStore.$onAction(
     ({name, store, args, after, onError }) => {
         if ( (name == 'setDisplayPDFName') ) {
             after(async (result) => {
-                if (result) {
+                if (result) { 
                     const pdfName = QuestionStore.getDisplayPDFName()
                     await displayPDF(pdfName)
                 }

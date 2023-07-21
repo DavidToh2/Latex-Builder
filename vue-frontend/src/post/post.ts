@@ -59,6 +59,8 @@ export async function postForm(f : HTMLFormElement, url : string, descriptor : s
 
     var reqBody = getFormData(f) as { [key : string] : string | number | Date | null }
 
+    console.log(reqBody)
+
     reqBody['fn'] = descriptor
 
     if (descriptor == "qn-setNew" || descriptor == "qn-setUpdate") {
@@ -76,9 +78,9 @@ export async function postGetFile(data : { [key : string] : string}, url : strin
 
     const response = await fetch(url, {
         method: 'POST',
-        headers: {
+        headers: { 
             'Content-Type': 'application/json',
-            'Accept': 'application/pdf'
+            'Accept': 'application/pdf, image/png, image/svg+xml'
         },
         body: JSON.stringify(data),
         credentials: 'include'

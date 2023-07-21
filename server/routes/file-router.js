@@ -33,26 +33,20 @@ router.post('/template/add/', function(req, res, next) {
     }
 })
 
-router.post('/get', isAuthenticated, function(req, res, next) {
-
-    // Note: the vue-pdf-embed component sends its own "GET" request that does not include session data.
-    // Hence, authentication via this route is not possible.
-    // Authenticate from the frontend instead.
+router.post('/get/pdf', isAuthenticated, function(req, res, next) {
 
     const sendFileOptions = {
-        root: path.join(__dirname, '../public'),
+        root: path.join(__dirname, '../public/files'),
         headers: {
             'x-timestamp': Date.now()
         }
     }
 
     try {
-        var filePath
-        if (req.body.name == 'preview') {
-            filePath = `files/preview/preview.pdf`
-        } else {
+        var filePath = `welcome/welcome.pdf`
+        if (req.body.name != 'welcome') {
             const uID = req.session.uID
-            filePath = `files/${uID}/output.pdf`
+            filePath = `${uID}/document/output.pdf`
         }
         console.log(filePath)
 
@@ -61,7 +55,32 @@ router.post('/get', isAuthenticated, function(req, res, next) {
         // https://expressjs.com/en/api.html#res.sendFile
     } catch(err) {
         next(err)
+    } 
+})
+
+router.post('/get/image', isAuthenticated, function(req, res, next) {
+
+    const sendFileOptions = {
+        root: path.join(__dirname, '../public/files'),
+        headers: {
+            'x-timestamp': Date.now()
+        }
     }
+
+    try {
+        var filePath = 'welcome/welcome.pdf'
+        if (req.body.name == 'preview') {
+            const uID = req.session.uID
+            filePath = `${uID}/image/preview.png`
+        }
+        console.log(filePath)
+
+        res.sendFile(filePath, sendFileOptions)
+
+        // https://expressjs.com/en/api.html#res.sendFile
+    } catch(err) {
+        next(err)
+    } 
 })
 
 function isAuthenticated(req, res, next) {
@@ -71,14 +90,6 @@ function isAuthenticated(req, res, next) {
         next('route')
     }
     // next('route') tells the router to skip all the remaining route callbacks
-}
-
-function validateFilePresence(filePath) {
-    if (!fs.existsSync(filePath)) {
-        throw new ServerError("Failed to fetch PDF file!", `File ${filePath} does not exist on the system!`)
-    } else {
-        return true
-    }
 }
 
 module.exports = router

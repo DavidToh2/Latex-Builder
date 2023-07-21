@@ -3,6 +3,8 @@ import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
 import UserTab from '@/components/Tab/UserTab.vue'
 import Tab from '@/components/Tab/Tab.vue'
+import LatexInput from '@/components/Latex/LatexInput.vue'
+import LatexPreview from '@/components/Latex/LatexPreview.vue'
 import UserPerms from '@/components/UserPerms/UserPerms.vue'
 
 import type { qn, qnFilters, qnFilterNames } from '@/types/QuestionTypes'
@@ -17,9 +19,11 @@ import { useUserStore } from '@/stores/userStore'
 
 import { questionSave, questionDelete, questionGetPerms, questionUpdatePerms } from '@/post/postQn';
 import { reactive, ref, watch, computed, onActivated, onDeactivated } from 'vue'
+import { getImage } from '@/post/postFile'
 
 const contributeOptionsLeftTab = ['Question', 'Solution', 'Images', 'Contributors']
 const contributeOptionsRightTab = ['Save', 'Delete']
+const containerHeight = ref('300px')
 
 var active : qn = reactive({...emptyQn})
 const activeFilters = computed<qnFilters>(() => {
@@ -29,7 +33,7 @@ const activeFilters = computed<qnFilters>(() => {
         subtopic: active.subtopic,
         difficulty: active.difficulty,
         sourceName: active.sourceName,
-        sourceYear: active.sourceYear,
+        sourceYear: active.sourceYear.toString(),
         tags: active.tags
     }
     return f
@@ -40,6 +44,8 @@ var tabs = reactive([true, false, false, false])
 var tabID = ref<number>(0)
 var IDlist = ref<string[]>(['0'])
 var displayIDlist = ref<string[]>(['0'])
+
+const blobURL = ref('')
 
 const QuestionStore = useQuestionStore()
 const UserStore = useUserStore()
@@ -73,6 +79,13 @@ QuestionStore.$onAction(
             after((result) => {
                 if (result) {
                     updateContributeTab()
+                }
+            })
+        }
+        if ((name == 'updateQn') && (args[0] == 'contribute')) {
+            after((result) => {
+                if (result) {
+                    changeDisplayedQuestion(active.id)
                 }
             })
         }
@@ -110,10 +123,12 @@ function updateQuestionFilters(ss : qnFilters) {
 
 async function changeDisplayedQuestion(newQnID : string) {
 
-    const a = {...active} as qn
+    if (newQnID != active.id) {
+        const a = {...active} as qn
 
-    // Update current displayed question fields into Contribute store
-    QuestionStore.updateQn('contribute', active.id, a)
+        // Update current displayed question fields into Contribute store
+        QuestionStore.updateQn('contribute', active.id, a)
+    }
 
     // Get new displayed question
     const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
@@ -131,7 +146,6 @@ async function changeDisplayedQuestion(newQnID : string) {
 
 async function changeOptionTab(s : string, newTabValue : number) {
 
-    const mainForm = document.getElementById('contribute-container') as HTMLFormElement
     const oldTabValue = tabID.value
     if (newTabValue == oldTabValue) {
         return
@@ -176,7 +190,7 @@ async function changeOptionTab(s : string, newTabValue : number) {
                 
                 // SAVE QUESTION TO SERVER
 
-                const responsejson = await questionSave(mainForm, active.id)
+                const responsejson = await questionSave(active, active.id)
                 if (responsejson.status == -1) {
                     // Error occured
                     const error = responsejson.error as ServerError
@@ -189,14 +203,36 @@ async function changeOptionTab(s : string, newTabValue : number) {
                     UserStore.openPopup(errormsg)
                 } else {
                     // Success
-                    const savedQn = responsejson.body as qn
-                    const ID = savedQn['id']
                     if (active.id == '0') {
+                        const savedQn = responsejson.body as qn
+                        const ID = savedQn['id']
                         removeFromContribute(active.id)
                         QuestionStore.insertIntoContribute(ID, savedQn)
                         changeDisplayedQuestion(ID)
                     } else {
-                        QuestionStore.updateQn('contribute', ID, savedQn)
+                        QuestionStore.updateQn('contribute', active.id, {...active})
+                    }
+
+                    // GET THE COMPILED QUESTION'S SVG IMAGE
+
+                    console.log("Getting SVG image...")
+
+                    const svgResponse = await getImage('preview')
+                    if (svgResponse instanceof Blob) {
+                        blobURL.value = URL.createObjectURL(svgResponse)
+                        console.log("Displaying SVG")
+                    } else {
+                        if (svgResponse.status == -1) {
+                        // Error occured
+                            const error = responsejson.error as ServerError
+                            const errormsg = formatErrorMessage(error)
+                            UserStore.openPopup(errormsg)
+                        } else if (svgResponse.status == 1) {
+                            // Failure
+                            const error = responsejson.body as UserError
+                            const errormsg = error.cause
+                            UserStore.openPopup(errormsg)
+                        }
                     }
                 }
             }
@@ -207,7 +243,10 @@ async function changeOptionTab(s : string, newTabValue : number) {
             if (active.id == '0') {
                 removeFromContribute(active.id)
             } else {
-                const responsejson = await questionDelete(mainForm, active.id)   
+
+                // DELETE QUESTION FROM SERVER
+                
+                const responsejson = await questionDelete(active.id)   
                 if (responsejson.status == -1) {
                     // Error occured
                     const error = responsejson.error as ServerError
@@ -228,7 +267,6 @@ async function changeOptionTab(s : string, newTabValue : number) {
         break
     }
 
-    console.log(tabID.value)
     tabs[tabID.value] = true
 }
 
@@ -341,18 +379,17 @@ function dump() {
             />
             
             <div id="question-container" :class="{ 'inactive-container': !tabs[0] }">
-                <div class="latex">
-                    <textarea class="latex-text latex-question" name="question" placeholder="Type LaTeX here:" v-model="active.question"></textarea>
-                </div>
-                <div class="latex-view" id="question-latex-view" @click="dump">
-                </div>
+                <LatexInput v-model:latex="active.question" 
+                    :height="containerHeight" 
+                    :placeholder="'Type LaTeX here:'"/>
+                <LatexPreview :source="blobURL" :height="containerHeight"/>
             </div>
 
             <div id="solution-container" :class="{ 'inactive-container': !tabs[1] }">
-                <div class="latex">
-                    <textarea class="latex-text latex-solution" name="solution" placeholder="Type solution here:" v-model="active.solution[0]"></textarea>
-                </div>
-                <div class="latex-view" id="solution-latex-view" @click="dump">
+                <LatexInput v-model:latex="active.solution[0]" 
+                    :height="containerHeight" 
+                    :placeholder="'Type LaTeX here:'"/>
+                <div class="latex-preview" id="solution-latex-view" @click="dump">
                 </div>
             </div>
 
@@ -425,28 +462,6 @@ function dump() {
 }
 .inactive-container {
     display: none !important;
-}
-
-.latex {
-	width: 100%;
-	height: 250px;
-	max-height: none;
-}
-
-.latex-view {
-	width: 100%;
-	height: 250px;
-	max-height: none;
-    border: 1px solid #000000;
-
-    overflow-y: scroll;
-}
-
-.latex-question {
-    overflow-y: scroll;
-}
-.latex-solution {
-    overflow-y: scroll;
 }
 
 #question-save-button {

@@ -29,6 +29,11 @@ RUN tlmgr install enumitem \
     && tlmgr install gensymb \
     && tlmgr install multirow \
     && tlmgr install caption \
-    && tlmgr install mathtools
+    && tlmgr install mathtools \
+    && tlmgr install dvisvgm \
+    && tlmgr install dvipng \
+    && tlmgr install pdfcrop
+
+RUN tlmgr path add
 
 RUN tlmgr info --only-installed --data name > latex-packages.txt

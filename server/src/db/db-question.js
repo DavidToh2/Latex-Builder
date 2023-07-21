@@ -1,12 +1,12 @@
-const aux = require('../aux')
-const async = require('async')
 const { mongoose } = require('./db-connection')
 const { questionSchema } = require("./models/question.js")
 const { ServerError, UserError, DatabaseError, newError } = require('../express-classes/error')
 const dbAuth = require('./db-auth')
+const aux = require('../aux')
+const file = require('../file')
 
 const LIMITED_ACCOUNT_QN_LIMIT = 5
-const ACCOUNT_CAN_SET_QN = ['admin', 'active', 'limited']
+const ACCOUNT_CAN_SET_QN = ['admin', 'active', 'limited'] 
 
 // https://forum.freecodecamp.org/t/cant-export-require-a-module-mongoose-model-typeerror-user-is-not-a-constructor/452317/6
 // Exporting the schemas rather than the models works better for some reason.
@@ -61,6 +61,14 @@ async function newQuestion(nQ, userID) {
         nQ['userPerms']['owner'] = userID
         nQ['lastModified'] = new Date()
 
+                // Compile question latex into image
+
+        const question = nQ['question']
+        const qnCompile = await file.buildPreview(question, userID)
+        if (qnCompile) {
+            throw new DatabaseError(errorString, 'Something went wrong during the compilation!')
+        }
+
                 // Insert the question
 
         var qnRaw = await Question.insertMany([nQ])        // Returns a copy of the saved documents
@@ -95,7 +103,10 @@ async function getQuestions(dataDict, userID) {
     try {
         console.log("Finding questions...")
 
-        const qnsAll = await Question.find(dataDict).lean()
+        const d = parseSearchFields(dataDict)
+        console.log(d)
+
+        const qnsAll = await Question.find(d).lean()
         const qns = []
 
                 // Only return questions for which user has viewing permission.
@@ -110,6 +121,7 @@ async function getQuestions(dataDict, userID) {
 
         qnsAll.forEach((qn) => {
             delete qn['_id']
+            qn['sourceYear'] = qn['sourceYear'].toString()
             switch(userID) {
                 case 'public':
                     if (qn.userPerms.canAccessPublic) {
@@ -223,6 +235,14 @@ async function saveQuestion(id, dataDict, userID) {
             q.userPerms.canModifyUsers.indexOf(userID) >= 0 ||
             u.accountStatus == 'admin'
         ) {
+
+                    // Compile question latex into image
+
+            const question = dataDict['question']
+            const qnCompile = await file.buildPreview(question, userID)
+            if (qnCompile) {
+                throw new DatabaseError(errorString, 'Something went wrong during the compilation!')
+            }
 
                     // Edit the question
 
@@ -432,6 +452,20 @@ async function newID() {
     } catch(err) {
         newError(err, errorString)
     }
+}
+
+function parseSearchFields(qn) {
+    for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
+        if (qn[key].length == 0) {
+            delete qn[key]
+        }
+    }
+    for (var key of ['sourceYear', 'question']) {
+        if (qn[key].length == 0) {
+            delete qn[key]
+        }
+    }
+    return qn
 }
 
 module.exports = {
