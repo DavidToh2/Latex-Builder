@@ -8,18 +8,20 @@ In the `.env` file, set the `NODE_ENV` environment variable:
 NODE_ENV=development
 ```
 
-The local database is a `mongo` image, and requires the following variables to be set:
+We define the following environment varibales for our local mongo deployment:
 ```
-MONGO_INITDB_ROOT_USERNAME=admin_user
-MONGO_INITDB_ROOT_PASSWORD=admin_password
+MONGO_INITDB_ROOT_USERNAME
+MONGO_INITDB_ROOT_PASSWORD
+MONGO_DEV_URI
 ```
-The `mongo` image uses these two variables to initialise a root user in a newly created database. The user is stored in the `admin` collection. The documentation can be found [here](https://hub.docker.com/_/mongo), under Environment Variables.
 
-An existing database will not see its root credentials re-initialised. To re-initialise the credentials, wipe the database by removing the volume `server_db-data`.
-
-The connection string is stored as an environment variable in `.env`:
-```
-MONGO_DEV_URI=mongodb://admin_user:admin_password@questiondb:27017
+In `app.js`, we connect to our local deployment in development mode:
+```js
+var mongoURI
+if (process.env.NODE_ENV == 'development') {
+    mongoURI = process.env.MONGO_DEV_URI
+}
+mongoose.connect(mongoURI).then(...)
 ```
 
 # Running 
