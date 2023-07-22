@@ -148,7 +148,6 @@ function parseStringBrackets(s) {
                 break
             }
         }
-        console.log(c)
         if (!good) {
             return false
         } else {

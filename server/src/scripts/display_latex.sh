@@ -1,0 +1,1 @@
+dvipng -T tight -D 150 $1"/preview.dvi" -o $1"/preview.png"

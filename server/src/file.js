@@ -99,8 +99,10 @@ async function buildPreview(data, uID) {
 
     try {
         console.log('Attempting to compile preview...')
-        const res = cp.execSync(`./compile_latex_display.sh preview.tex ${filePath}`, { cwd: scriptroot } )
-        console.log(res.toString())
+        const res1 = cp.execSync(`./compile_latex_display.sh preview.tex ${filePath}`, { cwd: scriptroot } )
+        console.log(res1.toString())
+        const res2 = cp.execSync(`./display_latex.sh ${filePath}`, { cwd: scriptroot } )
+        console.log(res2.toString())
         return 0
     } catch(err) {
         fileError(err)
@@ -298,15 +300,15 @@ function pageOutput(documentPage, templatePage) {
     }
 
     var fleft = templateHeader.left
-    if (aux.parseString(documentHeader.left)) {
+    if (aux.parseString(documentFooter.left)) {
         fleft = documentHeader.left
     }
     var fmiddle = templateHeader.middle
-    if (aux.parseString(documentHeader.middle)) {
+    if (aux.parseString(documentFooter.middle)) {
         fmiddle = documentHeader.middle
     }
     var fright = templateHeader.right
-    if (aux.parseString(documentHeader.right)) {
+    if (aux.parseString(documentFooter.right)) {
         fright = documentHeader.right
     }
     var fthickness = templateFooter.thickness

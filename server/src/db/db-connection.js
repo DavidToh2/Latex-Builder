@@ -6,17 +6,19 @@ var async = require('async')
 
 var mongoURI
 
-if (process.env.NODE_ENV == 'development') {
+console.log(`Node Environment: ${process.env.NODE_ENV}`)
+
+if (process.env.NODE_ENV.trim() == 'development') {
+    console.log("Setting local mongoURI")
     mongoURI = process.env.MONGO_DEV_URI
-} else if (process.env.NODE_ENV == 'production') {
+} else if (process.env.NODE_ENV.trim() == 'production') {
+    console.log("Setting production mongoURI")
     mongoURI = process.env.MONGO_URI
 }
 
 mongoose.connect(mongoURI)
-    .then(console.log(`Connection success! Mongo URI is ${mongoURI}`))
-    .catch((err) => {console.log(err)})
 
 mongoose.connection
     .on("error", console.error.bind(console, "MongoDB connection error:"))
 
-module.exports = { mongoose }
+module.exports = { mongoose, mongoURI }

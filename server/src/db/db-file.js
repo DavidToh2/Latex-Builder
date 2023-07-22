@@ -12,8 +12,7 @@ const DocumentTemplates = templateDB.model('templates', TemplateSchema)
 initTemplates.forEach((template, index) => {
     DocumentTemplates.findOneAndUpdate({ templateName: template.templateName }, template, { upsert: true })
     .then((insertedTemplate) => {
-        console.log("Inserted the following template:")
-        console.log(insertedTemplate)
+        console.log("Inserted a template!")
     })
     .catch((error) => {
         console.log("Error initialising templates:")
