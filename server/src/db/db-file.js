@@ -5,7 +5,7 @@ const { UserError, DatabaseError, newError, ServerError } = require('../express-
 const initTemplates = require('./init/initTemplates.json')
 
 const templateDB = mongoose.connection.useDb('templates', { useCache: true })
-const documentDB = mongoose.connection.useDb('documents', { useCache: true })
+// const documentDB = mongoose.connection.useDb('documents', { useCache: true })
 
 const DocumentTemplates = templateDB.model('templates', TemplateSchema)
 

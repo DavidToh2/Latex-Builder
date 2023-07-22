@@ -23,10 +23,7 @@ Hosting:
 - Backend on AWS EC2
 
 ## Documentation
-- [Setup](./documentation/SETUP.md)
 - [Server Documentation](./server/README.md)
 - [Frontend Documentation](./vue-frontend/README.md)
-- [Development](./documentation/DEVELOPMENT.md)
-- [Data](./documentation/DATA.md)
-- [Staging](./documentation/STAGING.md)
-- [Production](./documentation/PRODUCTION.md)
+- [Development](./documentation/Development.md)
+- [Production](./documentation/production/Production.md)

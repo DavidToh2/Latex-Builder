@@ -67,16 +67,6 @@ async function buildDocument(data, uID) {
         fileError(err)
         throw new UserError('Failed to compile latex!', err.stdout.toString())
 
-        /*
-        // https://stackoverflow.com/questions/32874316/node-js-accessing-the-exit-code-and-stderr-of-a-system-command 
-        // If no err: status guaranteed to be 0
-
-        Error output from bash cp.execSync() works as follows:
-
-        err.message.toString(): 'Command failed'
-        err.stdout.toString(): Returns the raw output to console. In this case, all LaTeX output goes here. (This is what we want.)
-        err.stderr.toString(): Returns the NodeJS Error object. Note that this object also contains stdout as Error.cause.
-        */ 
     }
 }
 
