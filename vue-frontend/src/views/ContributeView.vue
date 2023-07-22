@@ -200,7 +200,7 @@ async function changeOptionTab(s : string, newTabValue : number) {
                     // Failure
                     const error = responsejson.body as UserError
                     const errormsg = error.cause
-                    UserStore.openPopup(errormsg)
+                    UserStore.openBigPopup(errormsg)
                 } else {
                     // Success
                     if (active.id == '0') {
@@ -223,7 +223,7 @@ async function changeOptionTab(s : string, newTabValue : number) {
                         console.log("Displaying SVG")
                     } else {
                         if (svgResponse.status == -1) {
-                        // Error occured
+                            // Error occured
                             const error = responsejson.error as ServerError
                             const errormsg = formatErrorMessage(error)
                             UserStore.openPopup(errormsg)
@@ -389,11 +389,11 @@ function dump() {
                 <LatexInput v-model:latex="active.solution[0]" 
                     :height="containerHeight" 
                     :placeholder="'Type LaTeX here:'"/>
-                <div class="latex-preview" id="solution-latex-view" @click="dump">
+                <div class="latex-preview" id="solution-latex-view">
                 </div>
             </div>
 
-            <div id="image-container" :class="{ 'inactive-container': !tabs[2] }">
+            <div id="image-container" :class="{ 'inactive-container': !tabs[2] }" @click="dump">
                 Image container to be implemented!
             </div>
 

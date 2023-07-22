@@ -115,11 +115,11 @@ UserStore.$onAction(
 				QuestionStore.resetDatabase()
 			})
 		}
-		if (name == 'openPopup') {
+		if ((name == 'openPopup') || (name == 'openBigPopup') || (name == 'closePopup')) {
 			after((result) => {
-				const pH = UserStore.getPopupHTML()
-				popupHTML.value = pH
-				popupActive.value = true
+				const [pSize, pHTML] = UserStore.getPopupStatus()
+				popupHTML.value = pHTML as string
+				popupSize.value = pSize as number
 			})
 		}
 	}
@@ -240,11 +240,9 @@ const transitionMode = computed<"default" | "out-in" | "in-out">(() => {
 })
 
 const popupHTML = ref('')
-const popupActive = ref(false)
+const popupSize = ref(0)
 function closePopup() {
 	UserStore.closePopup()
-	popupHTML.value = ''
-	popupActive.value = false
 }
 
 </script>
@@ -269,7 +267,7 @@ function closePopup() {
 		</Transition>
 	</div>
 
-	<Popup :is-active="popupActive" @close="closePopup">
+	<Popup :size="popupSize" @close="closePopup">
 		<span v-html="popupHTML"></span>
 	</Popup>
 

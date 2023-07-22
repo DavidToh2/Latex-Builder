@@ -94,7 +94,7 @@ async function changeOptionTab(s : string, n : number) {
 				// Failure: LaTeX compilation error
 				const error = responsejson.body as UserError
 				const errormsg = error.cause
-				UserStore.openPopup(errormsg)
+				UserStore.openBigPopup(errormsg)
 				QuestionStore.resetDisplayPDFName()
 
 			} else {

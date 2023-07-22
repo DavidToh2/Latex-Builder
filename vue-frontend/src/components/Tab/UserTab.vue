@@ -5,7 +5,7 @@
 
     const QuestionStore = useQuestionStore()
 
-    export interface Props {
+    interface Props {
         internalList: string[],
         displayList: string[],
         activeTab: string

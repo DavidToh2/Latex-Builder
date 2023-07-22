@@ -6,7 +6,7 @@
     import { useQuestionStore } from '@/stores/questionStore'
     const QuestionStore = useQuestionStore()
 
-    export interface Props {
+    interface Props {
         q : qn,
         internalName: string   
     }

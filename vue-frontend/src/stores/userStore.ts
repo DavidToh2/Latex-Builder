@@ -71,18 +71,22 @@ export const useUserStore = defineStore('UserStore', () => {
     }
 
     const popupHTML = ref('')
-    const popupOpen = ref(false)
+    const popupSize = ref(0)
 
     function openPopup(html : string) {
-        popupOpen.value = true
+        popupSize.value = 1
+        popupHTML.value = html
+    }
+    function openBigPopup(html : string) {
+        popupSize.value = 3
         popupHTML.value = html
     }
     function closePopup() {
-        popupOpen.value = false
+        popupSize.value = 0
         popupHTML.value = ''
     }
-    function getPopupHTML() {
-        return popupHTML.value
+    function getPopupStatus() {
+        return [popupSize.value, popupHTML.value]
     }
 
     return {
@@ -92,7 +96,7 @@ export const useUserStore = defineStore('UserStore', () => {
         setAuthStatus, getAuthStatus,
         setLeftView, setRightView, displayView, getNewView, getViewName, getViewSide,
 
-        openPopup, closePopup, getPopupHTML
+        openPopup, openBigPopup, closePopup, getPopupStatus
     }
     
 },

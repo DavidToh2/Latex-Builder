@@ -114,6 +114,7 @@
         if (name == "sourceYear") {
             activeSelections["sourceYear"] = newYear
         }
+        updateParent(activeSelections)
     }
 
     function updateSelections(filters: string[], name: string) {
@@ -170,7 +171,7 @@
                 @update="updateSelections"
             />
             <Input description="Year" internalName="sourceYear" 
-                :activeInput="activeSelections.sourceYear"
+                :active-input="activeSelections.sourceYear"
                 @update="updateSourceYear"
             />
         </div>

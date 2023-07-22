@@ -106,7 +106,7 @@ const emptyWorksheetPageMargins : worksheetPageMargins = {
     left: '',
     middle: '',
     right: '',
-    thickness: ''
+    thickness: '0pt'
 }
 const emptyWorksheetPageNumber : worksheetPageNumber = {
     display: 'none',
