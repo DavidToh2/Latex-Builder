@@ -54,7 +54,7 @@ RUN wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
 - Texlive is installed at `/usr/local/texlive` using the aforementioned profile
 - The Texlive binary, at `/usr/local/texlive/2023/bin/x86_64-linux/tlmgr`, is added to the system PATH (and can now be executed simply with `tlmgr`)
 
-After this, we need to **install Texlive packages** as well as **add executable Texlive binaries to the PATH**. This is documented under the [LaTeX](./latex.md) file.
+After this, we need to **install Texlive packages** as well as **add executable Texlive binaries to the PATH**. This is documented under the [LaTeX](./LaTeX.md) file.
 
 [Overleaf's base Texlive image](https://github.com/overleaf/overleaf/blob/main/server-ce/Dockerfile-base)
 
