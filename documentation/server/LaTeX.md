@@ -76,7 +76,7 @@ All LaTeX documents can roughly be divided into the following segments:
 
 | Section         | Function                                                                                                                                                   |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| documentClass   | General template dependent on the type of document generated.<br />In most cases, this is just `\documentClass[a4paper,twoside]{article}`.                 |
+| documentClass   | General template dependent on the type of document generated.<br />In most cases, this is just `\documentclass[a4paper,twoside]{article}`.                 |
 | Packages        | List of packages to be used. Usually consists of three parts:<li>Default packages;</li> <li>Template packages;</li> <li>User-added packages.</li>|
 | Page settings   | Settings for page dimensions, including:<li>Settings for the `geometry` package dictating page size;</li> <li>Header and footer settings and content.</li> |
 | Text settings   | Settings for text. For now, this is just paragraph indentation and spacing.                                                                                |
