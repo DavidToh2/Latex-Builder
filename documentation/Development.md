@@ -14,6 +14,7 @@ MONGO_INITDB_ROOT_USERNAME
 MONGO_INITDB_ROOT_PASSWORD
 MONGO_DEV_URI
 ```
+**Note that all string environment variables SHOULD NOT have quotation marks!!!**
 
 In `app.js`, we connect to our local deployment in development mode:
 ```js
@@ -31,7 +32,7 @@ mongoose.connect(mongoURI).then(...)
 - **Code changes in `.vue` files** are automatically updated
 - **Code changes in dependency files** are not automatically updated, and the page needs to be refreshed.
 
-## Starting the Server
+## Starting the Server and Database
 - Run using `docker compose up`
 - **Upon code change,** rebuild images using `docker compose build`
   - Note: This does not reset the database, as the database data is stored inside volumes. Refer to the steps listed below if a change was made to the database store structure.
@@ -42,6 +43,12 @@ mongoose.connect(mongoURI).then(...)
 - Download and install [MongoDB Compass](https://www.mongodb.com/products/compass)
 - Start MongoDB Compass using `mongodb-compass`
 - Connect using the same connection string as above, but replace `questiondb` (name of container) with `localhost`.
+
+## Starting the Server only
+- Run using the following command:
+```sh
+docker run -it --rm -p 3000:3000 --env-file ./.env latexquestionbank
+```
 
 # Development Diagonstics
 

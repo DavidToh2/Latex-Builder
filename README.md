@@ -6,7 +6,7 @@ Latex web-app capable of linking and compiling LaTeX code to build PDF documents
 
 Front-end:
 - NodeJS, Vue
-- Styling: vanilla CSS for now, plan to integrate SASS in the future
+- Styling: vanilla CSS, no libraries :) 
 - Scripting: TypeScript
 
 Server:
@@ -20,7 +20,7 @@ Database:
 
 Hosting:
 - Frontend on AWS S3 + Cloudfront
-- Backend on AWS EC2
+- Backend on AWS Lightsail
 
 ## Documentation
 - [Server Documentation](./server/README.md)
