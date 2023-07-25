@@ -13,6 +13,8 @@ This file describes the steps needed to deploy the app to production.
   - [Deploying to S3](#deploying-to-s3)
   - [Cloudfront](#cloudfront)
 - [Server: Docker + AWS Lightsail](#server-docker--aws-lightsail)
+  - [IAM Profile](#iam-profile-1)
+  - [Deploying to Lightsail](#deploying-to-lightsail)
 - [Database: MongoDB Atlas](#database-mongodb-atlas)
   - [Network Access](#network-access)
 
@@ -95,7 +97,42 @@ We then set up a Cloudfront distribution, with our S3 bucket's website endpoint 
 
 # Server: Docker + AWS Lightsail
 
+We set up an AWS Lightsail container service called **latexbuilder**. This service will host our container, **latexquestionbank**.
 
+## IAM Profile
+
+We create an IAM policy, **Lightsail-latex-builder-full-access**, with full access to our Lightsail resources.
+
+We then configure an IAM user, **lightsail-latex-builder-access**, and assign it to the above permission policy.
+
+We also configure an access key pair for this user, for use in the AWS CLI, in a similar fashion to above.
+
+## Deploying to Lightsail
+
+We now need to [install](https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-install-software) the AWS CLI Lightsail plugin. Once done, we may run the following command to push a *local container image* to AWS Lightsail:
+```
+aws lightsail push-container-image    \
+    --region ap-southeast-1           \
+    --service-name latexbuilder       \
+    --label latest                    \
+    --image latexquestionbank:latest
+```
+
+Alternatively, we may also directly *pull images from Docker Hub* into AWS Lightsail, in the Lightsail Deployment interface. We are required to enter the full image name: `registry.hub.docker.com/<user>/<image>:<label>`
+
+Note that **environment variables need to be manually keyed in**. For the production environment, that would be the following four (actually two) variables:
+```
+MONGO_URI
+COOKIE_SECRET
+MONGO_SESSION_DATABASE (unused)
+NODE_ENV (seems to be automatically set)
+```
+
+[IAM Policy Tutorial](https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-managing-access-for-an-iam-user)
+
+[Access Key Tutorial](https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-how-to-set-up-access-keys-to-use-sdk-api-cli)
+
+[Container Deployment Tutorial](https://aws.amazon.com/tutorials/deploy-webapp-lightsail/module-three/)
 
 # Database: MongoDB Atlas
 
