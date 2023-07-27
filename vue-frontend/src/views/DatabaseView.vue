@@ -117,6 +117,7 @@ async function submitDeleteEvent(ID : string) {
         // Success
         const data = responsejson.body
         QuestionStore.deleteFromContribute(ID)
+        UserStore.openPopup('Delete successful!')
     }
 
     // Refresh the database

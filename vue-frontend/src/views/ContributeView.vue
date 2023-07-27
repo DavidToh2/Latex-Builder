@@ -97,6 +97,7 @@ QuestionStore.$onAction(
                     changeDisplayedQuestion('0')
                     changeOptionTab('Question', 0)
                     Object.assign(activePerms, emptyUserPerms)
+                    blobURL.value = ''
                 }
             })
         }
@@ -140,6 +141,8 @@ async function changeDisplayedQuestion(newQnID : string) {
     }
 
     QuestionStore.setContributeActiveID(newQnID)
+    changeOptionTab('Question', 0)
+    blobURL.value = ''
 }
 
         // When displayed tab is changed, or tab option (SAVE / DELETE) is selected...
@@ -277,7 +280,7 @@ function checkForInvalidFields(q : qn) {
         q.category.length == 0 ||
         q.topic.length == 0 ||
         q.subtopic.length == 0 ||
-        !(q.sourceYear && /^\d+$/.test(q.sourceYear))
+        !(q.sourceYear.length != 0 && /^\d+$/.test(q.sourceYear))
     ) {
         ready = false
     }

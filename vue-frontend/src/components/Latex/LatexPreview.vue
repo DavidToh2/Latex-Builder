@@ -30,8 +30,7 @@
     height: v-bind(height);
     padding: 30px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
     overflow-y: scroll;
 }
 

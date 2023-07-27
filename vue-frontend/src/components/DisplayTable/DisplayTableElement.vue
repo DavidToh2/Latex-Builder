@@ -75,7 +75,7 @@ const QuestionStore = useQuestionStore()
         </div>
         <div class="display-table-options display-table-cell">
             <div class="option-icons">
-                <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteElement()">
+                <img class="icon-sm" src="@/assets/svg/delete-circle.svg" @click="deleteElement">
                 <div class="up-down-buttons">
                     <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="elementUp">
                     <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="elementDown">

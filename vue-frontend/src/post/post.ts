@@ -1,12 +1,11 @@
 import { getFormData } from "@/aux"
 const URL_DEV = 'http://localhost:3000'
-const URL_PROD = import.meta.env.VUE_APP_URL_PRODUCTION as string
-export var BASE_URL : string
+const URL_PROD = import.meta.env.VITE_URL_PRODUCTION as string
+var BASE_URL : string = URL_PROD
 if (import.meta.env.MODE == 'development') {
     BASE_URL = URL_DEV
-} else {
-    BASE_URL = URL_PROD
 }
+export { BASE_URL }
 
 export async function post(s : string, url : string) {
     const response = await fetch(url, {
