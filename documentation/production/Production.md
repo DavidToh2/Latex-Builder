@@ -3,7 +3,6 @@
 This file describes the steps needed to deploy the app to production.
 
 - [Introduction](#introduction)
-  - [Environmental Variables (Server)](#environmental-variables-server)
   - [Frontend](#frontend)
   - [Backend](#backend)
 - [Frontend: AWS S3](#frontend-aws-s3)
@@ -15,21 +14,15 @@ This file describes the steps needed to deploy the app to production.
 - [Server: Docker + AWS Lightsail](#server-docker--aws-lightsail)
   - [IAM Profile](#iam-profile-1)
   - [Deploying to Lightsail](#deploying-to-lightsail)
+  - [Environment Variables](#environment-variables)
 - [Database: MongoDB Atlas](#database-mongodb-atlas)
   - [Network Access](#network-access)
-
-## Environmental Variables (Server)
-
-In the `.env` file, set the `NODE_ENV` environment variable:
-```
-NODE_ENV=production
-```
 
 ## Frontend
 
 The Vue frontend is compiled and minified in `./dist`, so that the site is now essentially static. These static files are then pushed to an **AWS S3 bucket** and served through **Cloudfront CDN**.
 
-External users connect to the website through a Cloudfront URL [d1j3agbahkhud6.cloudfront.net](d1j3agbahkhud6.cloudfront.net).
+External users connect to the website through a Cloudfront URL [d1j3agbahkhud6.cloudfront.net](https://d1j3agbahkhud6.cloudfront.net).
 
 ## Backend
 
@@ -110,29 +103,60 @@ We also configure an access key pair for this user, for use in the AWS CLI, in a
 ## Deploying to Lightsail
 
 We now need to [install](https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-install-software) the AWS CLI Lightsail plugin. Once done, we may run the following command to push a *local container image* to AWS Lightsail:
-```
+```sh
 aws lightsail push-container-image    \
     --region ap-southeast-1           \
     --service-name latexbuilder       \
     --label latest                    \
     --image latexquestionbank:latest
 ```
+Sadly this isn't working as `aws lightsail` cannot detect the Docker daemon.
 
 Alternatively, we may also directly *pull images from Docker Hub* into AWS Lightsail, in the Lightsail Deployment interface. We are required to enter the full image name: `registry.hub.docker.com/<user>/<image>:<label>`
 
-Note that **environment variables need to be manually keyed in**. For the production environment, that would be the following four (actually two) variables:
-```
-MONGO_URI
-COOKIE_SECRET
-MONGO_SESSION_DATABASE (unused)
-NODE_ENV (seems to be automatically set)
-```
+We increase the health check interval in the Lightsail Deployment interface to 300s, to avoid spamming the logs. We also configure the root route to respond with a "Health check successful!" message.
 
 [IAM Policy Tutorial](https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-managing-access-for-an-iam-user)
 
 [Access Key Tutorial](https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-how-to-set-up-access-keys-to-use-sdk-api-cli)
 
 [Container Deployment Tutorial](https://aws.amazon.com/tutorials/deploy-webapp-lightsail/module-three/)
+
+## Environment Variables
+
+There are a few approaches to handling environment variables in a production environment.
+
+1. dotenv + Adding `.env` file into Docker container
+
+**dotenv** is an npm package that lets a NodeJS application read environment variables. Usage:
+```js
+const envpath = path.join(__dirname, '.env')
+require('dotenv').config({ path: envpath })
+```
+The environment file path is the application's root file (i.e. pwd) by default.
+
+Note that, to use this package, you need to remove `.env` from `.dockerignore`, so the `.env` file is also copied into the Docker image. We do not use this approach as `latexquestionbank` is a public Docker image (due to issues with lightsail).
+
+[Using dotenv](https://stackoverflow.com/questions/42335016/dotenv-file-is-not-loading-environment-variables)
+
+2. dotenv-vault
+
+**dotenv-vault** is a cloud version of dotenv that implements encryption. Environment files are encrypted and stored in the dotenv-vault team's own Git repo, and can be pulled or pushed to by different members in a team.
+
+However, dotenv-vault is generally only recommended for use in development and staging environments, not for production settings, due to the inherent risk of data leakage in any cloud platforms.
+
+[Drawbacks of using dotenv-vault](https://stackoverflow.com/questions/52546426/is-module-dotenv-for-development-only)
+
+3. Manually keying variables in the Lightsail Deployment interface
+
+For the production environment, that would be the following four (actually two) variables:
+```
+MONGO_URI
+COOKIE_SECRET
+MONGO_SESSION_DATABASE (unused)
+NODE_ENV (seems to be automatically set)
+```
+The environment variables are remembered across deployments, so hopefully you only need to do this once!
 
 # Database: MongoDB Atlas
 
