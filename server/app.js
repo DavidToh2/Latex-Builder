@@ -2,23 +2,25 @@
 		
 		// Import all relevant JS modules
 
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+const createError = require('http-errors')
+const express = require('express')
+const path = require('path')
+const cookieParser = require('cookie-parser')
+const https = require('https')
+const logger = require('morgan')
 
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
+
+const session = require('express-session')
+const MongoStore = require('connect-mongo')
 const { mongoose, mongoURI } = require('./src/db/db-connection')
 
 		// Import routing files
 
 const dbrouter = require('./routes/db-router')
 const filerouter = require('./routes/file-router')
-const authrouter = require('./routes/auth-router');
-const { UserError, DatabaseError, ServerError } = require('./src/express-classes/error');
-const { ResponseBody, ResponseError } = require('./src/express-classes/response');
+const authrouter = require('./routes/auth-router')
+const { UserError, DatabaseError, ServerError } = require('./src/express-classes/error')
+const { ResponseBody, ResponseError } = require('./src/express-classes/response')
 
 	
 
@@ -26,15 +28,13 @@ const { ResponseBody, ResponseError } = require('./src/express-classes/response'
 
 const app = express();
 
-// (async() => {
-
 		// Add middleware libraries using app.use()
 
-app.use(logger('dev'));		
-app.use(express.json());		// The following two libraries allow us to populate request bodies
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));	// allows us to serve static (i.e. unchanged) files from the /public directory.
+app.use(logger('dev'))
+app.use(express.json())		// The following two libraries allow us to populate request bodies
+app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(express.static(path.join(__dirname, 'public')))	// allows us to serve static (i.e. unchanged) files from the /public directory.
 
 		// Session configuration
 
@@ -63,8 +63,8 @@ mongoose.connection.once('open', () => {
 
 		// CORS Control
 
-	const allowedOrigins = ['placeholder']
-	if ((process.env.NODE_ENV.trim() == 'development') || (process.env.NODE_ENV.trim() == 'production')) {
+	const allowedOrigins = ['https://d1j3agbahkhud6.cloudfront.net']
+	if ((process.env.NODE_ENV.trim() == 'development')) {
 		allowedOrigins.push('http://localhost:5173')
 	}
 	app.use('/*', (req, res, next) => {
@@ -125,9 +125,15 @@ mongoose.connection.once('open', () => {
 		}
 	})
 
+			// Lightsail health check path
+
+	app.use('/', function(req, res, next) {
+		res.send("Health check successful!")
+	})
+
 	// Catch 404 and forward to error handler
 	app.use(function (req, res, next) {
-		next(createError(404));
+		next(createError(404))
 	})
 
 	// Network/Resource Error Handler
@@ -143,5 +149,7 @@ mongoose.connection.once('open', () => {
 })
 
 // })
+
+
 
 module.exports = app

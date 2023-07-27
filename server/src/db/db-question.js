@@ -131,6 +131,7 @@ async function getQuestions(dataDict, userID) {
                 break
                 default:
                     if (
+                        qn.userPerms.canAccessPublic ||
                         qn.userPerms.owner == userID ||
                         qn.userPerms.canModifyUsers.indexOf(userID) >= 0 ||
                         qn.userPerms.canReadUsers.indexOf(userID) >= 0 ||
