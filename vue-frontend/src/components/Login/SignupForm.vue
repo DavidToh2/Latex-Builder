@@ -31,15 +31,20 @@ async function signupUser() {
 
         } else {
             // Success
-            signupFail.value = false
+            signupFailure('')
             emits('signup-success')
         }
     }
 }
 
 function signupFailure(msg : string) {
-    signupFail.value = true
-    signupFailMessage.value = msg
+    if (msg) {
+        signupFail.value = true
+        signupFailMessage.value = msg
+    } else {
+        signupFail.value = false
+        signupFailMessage.value = ''
+    }
 }
 
 const pwdDisplay = ref(false)
@@ -58,9 +63,9 @@ const emits = defineEmits<{
 <template>
     <form id="signup-form" method="post" @submit.prevent="signupUser" autocomplete="off">
 
-        <div id="signup-error" v-if="signupFail">{{ signupFailMessage }}</div>
+        <div class="err-text" v-if="signupFail">{{ signupFailMessage }}</div>
 
-        <label for="signup-user-input">Username</label>
+        <label for="signup-user-input">Username</label> 
         <input id="signup-user-input" name="username" class="input-sm" pattern="[\w\-_]+" autocomplete="off">
 
         <label for="signup-user-input">Email</label>
@@ -83,10 +88,6 @@ const emits = defineEmits<{
 </template>
 
 <style scoped>
-
-#signup-error {
-    color: var(--colour-text-error);
-}
 
 #signup-form {
     border: 1px solid var(--colour-border);

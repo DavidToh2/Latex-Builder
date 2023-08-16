@@ -13,7 +13,7 @@ function pixelsToNumber(s : string) {
 
 function getFormData(f : HTMLFormElement) {
     const formc = f.elements as HTMLFormControlsCollection
-    const form = Array.from(formc) as HTMLTextAreaElement[]
+    const form = Array.from(formc) as HTMLInputElement[]
     var data = {} as { [key : string] : string | number | Date | null }
 
     for (const element of form) {

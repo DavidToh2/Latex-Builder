@@ -31,7 +31,7 @@
 	--vt-c-green-theme-ultradark: #002504;
 	--vt-c-green-theme-light: #00760c;
 
-	--vt-c-green-lighttheme: #aaccbb;
+	--vt-c-green-lighttheme: #b1d1c1;
 	--vt-c-green-lighttheme-dark: #8cb09e;
 	--vt-c-green-lighttheme-light: #cee9db;
 
@@ -44,6 +44,7 @@
 	--colour-background: var(--vt-c-white);
 	--colour-background-soft: var(--vt-c-white-soft);
 	--colour-background-mute: var(--vt-c-white-mute);
+	--colour-background-hover: var(--vt-c-lighttheme-light);
 
 	--colour-background-popup: var(--vt-c-grey-translucent);
 

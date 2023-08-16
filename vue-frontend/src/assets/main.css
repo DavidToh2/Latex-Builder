@@ -45,6 +45,15 @@
     resize: none;
 }
 
+.err-text {
+	color: var(--colour-text-error);
+}
+
+.warn-text {
+	color: var(--colour-text-error);
+	font-weight: bold;
+}
+
 .latex-preview {
 	width: 100%;
 	height: 250px;
@@ -75,7 +84,8 @@
 }
 
 .btn-light {
-	background-color: var(--colour-lighttheme);
+	border: 0;
+	background-color: var(--colour-lighttheme-light);
     padding: 5px 12px;
 	border-radius: 6px;
 	font-size: var(--font-size);

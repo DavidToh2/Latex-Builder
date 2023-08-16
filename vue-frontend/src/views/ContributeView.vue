@@ -40,8 +40,7 @@ const activeFilters = computed<qnFilters>(() => {
 })
 var activePerms : userPerms = reactive({...emptyUserPerms})
 
-var tabs = reactive([true, false, false, false])
-var tabID = ref<number>(0)
+var activeTab = ref<number>(0)
 var IDlist = ref<string[]>(['0'])
 var displayIDlist = ref<string[]>(['0'])
 
@@ -149,24 +148,22 @@ async function changeDisplayedQuestion(newQnID : string) {
 
 async function changeOptionTab(s : string, newTabValue : number) {
 
-    const oldTabValue = tabID.value
+    const oldTabValue = activeTab.value
     if (newTabValue == oldTabValue) {
         return
     }
 
-    for (var i=0; i<4; i++) { tabs[i] = false }
-
     switch(s) {
         case 'Question':
-            tabID.value = newTabValue
+            activeTab.value = newTabValue
 
         break;
         case 'Solution':
-            tabID.value = newTabValue
+            activeTab.value = newTabValue
 
         break;
         case 'Images':
-            tabID.value = newTabValue
+            activeTab.value = newTabValue
 
         break;
         case 'Contributors':
@@ -174,9 +171,9 @@ async function changeOptionTab(s : string, newTabValue : number) {
                 const permsGet = await getActivePerms()
                 if (!permsGet) {
                     resetActivePerms()
-                    tabID.value = oldTabValue
+                    activeTab.value = oldTabValue
                 } else {
-                    tabID.value = newTabValue
+                    activeTab.value = newTabValue
                 }
             }
 
@@ -239,7 +236,7 @@ async function changeOptionTab(s : string, newTabValue : number) {
                     }
                 }
             }
-            tabID.value = oldTabValue
+            activeTab.value = oldTabValue
         break;
 
         case 'Delete':
@@ -266,11 +263,9 @@ async function changeOptionTab(s : string, newTabValue : number) {
                     changeDisplayedQuestion('0')    
                 }
             }
-            tabID.value = 0
+            activeTab.value = 0
         break
     }
-
-    tabs[tabID.value] = true
 }
 
 function checkForInvalidFields(q : qn) {
@@ -377,18 +372,18 @@ function dump() {
             <QuestionFilters func="contribute" :ss="activeFilters" @update="updateQuestionFilters"/>
 
             <Tab :tab-left="contributeOptionsLeftTab" :tab-right="contributeOptionsRightTab" 
-                internal-name="questionOptions" :font-size=21 :active-tab-index="tabID"
+                internal-name="questionOptions" :font-size=21 :active-tab-index="activeTab"
                 @change-tab="changeOptionTab"
             />
             
-            <div id="question-container" :class="{ 'inactive-container': !tabs[0] }">
+            <div id="question-container" v-show="activeTab == 0">
                 <LatexInput v-model:latex="active.question" 
                     :height="containerHeight" 
                     :placeholder="'Type LaTeX here:'"/>
                 <LatexPreview :source="blobURL" :height="containerHeight"/>
             </div>
 
-            <div id="solution-container" :class="{ 'inactive-container': !tabs[1] }">
+            <div id="solution-container" v-show="activeTab == 1">
                 <LatexInput v-model:latex="active.solution[0]" 
                     :height="containerHeight" 
                     :placeholder="'Type LaTeX here:'"/>
@@ -396,11 +391,11 @@ function dump() {
                 </div>
             </div>
 
-            <div id="image-container" :class="{ 'inactive-container': !tabs[2] }" @click="dump">
+            <div id="image-container" v-show="activeTab == 2" @click="dump">
                 Image container to be implemented!
             </div>
 
-            <div id="user-container" :class="{ 'inactive-container': !tabs[3] }">
+            <div id="user-container" v-show="activeTab == 3">
                 <UserPerms 
                     :user-perms="activePerms"
                     @set-perms="setPerms"
@@ -462,9 +457,6 @@ function dump() {
 }
 #user-container {
     width: 100%;
-}
-.inactive-container {
-    display: none !important;
 }
 
 #question-save-button {

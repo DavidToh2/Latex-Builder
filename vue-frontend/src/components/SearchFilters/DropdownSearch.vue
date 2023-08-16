@@ -104,7 +104,7 @@
             {{ description }}
         </div>
         <div class="dropdown-search-container" @mouseenter="search.active = true" @mouseleave="search.active = false">
-            <div class="dropdown-searchbar">
+            <div class="dropdown-searchbar input-sm">
                 <div class="dropdown-active-selections">
                     <template v-for="item in search.activeSelections">
                         <Entry colour="green" :font-size="14" @close="removeItem(item)">
@@ -112,7 +112,7 @@
                         </Entry>
                     </template>
                 </div>
-                <textarea :rows="searchbarRows" class="input-sm dropdown-search" autocomplete="off"
+                <textarea :rows="searchbarRows" class="dropdown-search" autocomplete="off"
                     :name="internalName"
                     v-model="search.searchText">
                 </textarea>
@@ -176,6 +176,8 @@
 
 .dropdown-search {
     width: 100%;
+    border: none;
+    resize: none;
 }
 
 .dropdown-list {

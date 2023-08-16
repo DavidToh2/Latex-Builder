@@ -83,16 +83,16 @@
                         Page margins:
                     </div>
                     <div class="page-margin-inputs">
-                        <Input description="Top" internalName="top" :fontSize="inputFontSize"
+                        <Input description="Top" internalName="top" :fontSize="inputFontSize" :text-dir="'row'"
                             :activeInput="wsPage.dimensions.top"
                             @update="updatePageMargins"/>
-                        <Input description="Left" internalName="left" :fontSize="inputFontSize"
+                        <Input description="Left" internalName="left" :fontSize="inputFontSize" :text-dir="'row'"
                             :activeInput="wsPage.dimensions.left"
                             @update="updatePageMargins"/>
-                        <Input description="Bottom" internalName="bottom" :fontSize="inputFontSize"
+                        <Input description="Bottom" internalName="bottom" :fontSize="inputFontSize" :text-dir="'row'"
                             :activeInput="wsPage.dimensions.bottom"
                             @update="updatePageMargins"/>
-                        <Input description="Right" internalName="right" :fontSize="inputFontSize"
+                        <Input description="Right" internalName="right" :fontSize="inputFontSize" :text-dir="'row'"
                             :activeInput="wsPage.dimensions.right"
                             @update="updatePageMargins"/>
                     </div>
@@ -125,7 +125,7 @@
                 <Input description="Right" internalName="right" :fontSize="inputFontSize"
                     :activeInput="wsPage.header.right"
                     @update="updatePageHeader"/>
-                <Input description="Thickness" internalName="thickness" :fontSize="inputFontSize"
+                <Input description="Thickness" internalName="thickness" :fontSize="inputFontSize" :text-dir="'row'"
                     :activeInput="wsPage.header.thickness"
                     @update="updatePageHeader"/>
             </div>
@@ -142,7 +142,7 @@
                 <Input description="Right" internalName="right" :fontSize="inputFontSize"
                     :activeInput="wsPage.footer.right"
                     @update="updatePageFooter"/>
-                <Input description="Thickness" internalName="thickness" :fontSize="inputFontSize"
+                <Input description="Thickness" internalName="thickness" :fontSize="inputFontSize" :text-dir="'row'"
                     :activeInput="wsPage.footer.thickness"
                     @update="updatePageFooter"/>
             </div>

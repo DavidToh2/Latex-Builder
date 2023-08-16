@@ -15,7 +15,7 @@ export async function post(s : string, url : string) {
         },
         body: s,
         credentials: 'include'
-    })
+    }) 
     .then((response) => {
         if (!response.ok) {
             throw new Error('Network response was not ok')
@@ -49,7 +49,7 @@ export async function postJSON(j : {[key : string] : any}, url : string) {
 }
 
 /*
-        POSTFORM
+        POSTFORM 
 
         function postForm( HTML Form Element, Target URL, Descriptor of form data being posted )
 */

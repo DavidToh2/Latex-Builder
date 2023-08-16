@@ -19,6 +19,8 @@ function popup(msg : string) {
     UserStore.openPopup(msg)
 }
 
+        // Login
+
 async function loginSuccess() {
     popup("Login successful!")
     pageStatusLogin()
@@ -26,6 +28,8 @@ async function loginSuccess() {
 function pageStatusLogin() {
     isLoggedIn.value = true
 }
+
+        // Signup
 
 function signupSuccess() {
     popup("Signup successful!")
@@ -36,14 +40,30 @@ function pageStatusSignupToggle() {
     isSigningUp.value = !t
 }
 
+        // Logout
+
 function pageStatusLogout() {
     isLoggedIn.value = false
     popup("Logged out!")
 }
 
-onActivated(async () => {
-    // const c = await populateUserInfo()
-})
+        // Password change
+
+function pageStatusPasswordChange(b : boolean) {
+    if (b) {
+        popup("Password successfully changed! Please re-login to your account.")
+        isLoggedIn.value = false
+    }
+}
+
+        // User data change
+
+        // User deleted
+
+function pageStatusUserDeleted() {
+    isLoggedIn.value = false
+    popup("Your user has been deleted. We hope to see you again!")
+}
 
 </script>
 
@@ -73,7 +93,11 @@ onActivated(async () => {
 
         </div>
 
-        <Account @logout="pageStatusLogout" v-else/>
+        <Account @logout="pageStatusLogout" 
+            @change-password="pageStatusPasswordChange"
+            @delete-user=""
+            @update-user-data=""
+            v-else/>
     </div>
 
 </template>

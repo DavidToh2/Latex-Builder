@@ -38,20 +38,37 @@ export async function isAuth() {
     return authStatus
 }
 export async function authGetUserInfo() {
-    var j = { fn: 'auth-get' }
-    const response = await postJSON(j, `${BASE_URL}/auth/get`) as Response
+    var j = { fn: 'auth-get-info' }
+    const response = await postJSON(j, `${BASE_URL}/auth/info/get`) as Response
+    const responsejson = await response.json()
+    return responsejson
+}
+export async function authSetUserInfo(j : { [key : string] : any }) {
+    j['fn'] = 'auth-set-info'
+    const response = await postJSON(j, `${BASE_URL}/auth/info/set`) as Response
+    const responsejson = await response.json()
+    return responsejson
+}
+export async function authSetPassword(f : HTMLFormElement) {
+    const response = await postForm(f, `${BASE_URL}/auth/changepassword`, 'set-password') as Response
     const responsejson = await response.json()
     return responsejson
 }
 export async function searchUser(u : string) {
     var j = { fn: 'check-user', username: u }
-    const response = await postJSON(j, `${BASE_URL}/auth/search/user`)
+    const response = await postJSON(j, `${BASE_URL}/auth/search/user`) as Response
     const responsejson = await response.json()
     return responsejson
 }
 export async function searchGroup(u : string) {
     var j = { fn: 'check-group', groupname: u }
-    const response = await postJSON(j, `${BASE_URL}/auth/search/group`)
+    const response = await postJSON(j, `${BASE_URL}/auth/search/group`) as Response
+    const responsejson = await response.json()
+    return responsejson
+}
+export async function authDeleteOwnAccount() {
+    var j = { fn: 'delete-account' } 
+    const response = await postJSON(j, `${BASE_URL}/auth/delete`) as Response
     const responsejson = await response.json()
     return responsejson
 }

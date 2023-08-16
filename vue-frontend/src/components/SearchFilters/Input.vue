@@ -1,18 +1,18 @@
 <script setup lang="ts">
 
-    import { reactive, ref, watch } from 'vue'
+    import { ref, watch } from 'vue'
     import { numberToPixels } from '@/aux'
 
     export interface Props {
         description: string
         internalName: string
         activeInput: string
-        dropdownDir?: "row" | "column"
+        textDir?: "row" | "column"
         fontSize?: number
     }
 
     const props = withDefaults(defineProps<Props>(), {
-        dropdownDir: "row",
+        textDir: "column",
         fontSize: 18
     })
 
@@ -37,8 +37,15 @@
         <div class="dropdown-description textbox">
             {{ description }}
         </div>
-        <div class="dropdown-input-container">
-            <textarea rows="1" class="input-sm dropdown-input" autocomplete="off" :name="internalName" style="resize: none;" v-model="input" @input="updateInput()"></textarea>
+        <div class="dropdown-input-container" v-if="textDir == 'column'">
+            <textarea rows="1" class="input-sm dropdown-input" autocomplete="off" 
+                :name="internalName" style="resize: none;" 
+                v-model="input" @input="updateInput()"></textarea>
+        </div>
+        <div class="dropdown-input-container" v-if="textDir == 'row'">
+            <input class="input-sm dropdown-input" autocomplete="off" 
+                :name="internalName" style="overflow-x: scroll;" 
+                v-model="input" @input="updateInput()">
         </div>
     </div>
 </template>
@@ -47,7 +54,7 @@
 
 .dropdown-container {
     display: flex;
-    flex-direction: v-bind(dropdownDir);
+    flex-direction: row;
     align-items: left;
     gap: 7px;
     padding: 0px 7px;
@@ -66,6 +73,7 @@
 
 .dropdown-input {
     width: 100%;
+    overflow-x: scroll;
 }
 
 </style>

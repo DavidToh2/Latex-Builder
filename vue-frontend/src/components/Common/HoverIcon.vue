@@ -5,33 +5,42 @@ import { numberToPixels } from '@/aux'
 
 const props = withDefaults(defineProps<{
     hoverText : string,
-    light?: boolean,
-    maxWidth?: number,
-    isActive?: boolean
+    theme?: 'normal' | 'light' | 'bg',
+    maxWidth?: number
 }>(), {
-    light: false,
-    maxWidth: 90,
-    isActive: false
+    theme: 'normal',
+    maxWidth: 90
 })
 
 const isHovering = ref(false)
-const isHoveringLight = computed<boolean>(() => {
-    return (isHovering.value && props.light)
-})
-const isHoveringDark = computed<boolean>(() => {
-    return (isHovering.value && !props.light)
+const hovertheme = computed<string>(() => {
+    if (!isHovering.value) {
+        return 'none'
+    }
+    return props.theme
 })
 
 </script>
 <template>
-    <div class="icon-hover" :class="{'icon-hovering': isHoveringDark, 'icon-hovering-light': isHoveringLight}" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
-        <div :class="{'icon-lg': props.light, 'icon-lg-l': !props.light}">
+    <div class="icon-hover" :class="{
+            'icon-hovering': hovertheme == 'normal', 
+            'icon-hovering-light': hovertheme == 'light',
+            'icon-hovering-bg': hovertheme == 'bg'
+        }" 
+        @mouseenter="isHovering = true" @mouseleave="isHovering = false">
+        <div :class="{
+            'icon-lg': ((theme == 'light') || (theme == 'bg')),
+            'icon-lg-l': theme == 'normal'
+        }">
             <slot>
             </slot>
         </div>
         <Transition>
             <div class="hover-text-container" v-if="isHovering">
-                <div :class="{'hover-text': !props.light, 'hover-text-light': props.light}">{{ hoverText }}</div>
+                <div :class="{
+                    'hover-text': hovertheme == 'normal', 
+                    'hover-text-light-bg': (hovertheme == 'light') || (hovertheme == 'bg')
+                }">{{ hoverText }}</div>
             </div>
         </Transition>
     </div>
@@ -50,6 +59,10 @@ const isHoveringDark = computed<boolean>(() => {
     border-radius: 6px;
 }
 
+.icon-hovering-bg {
+    background-color: var(--colour-background-hover);
+}
+
 .icon-hovering-light {
     background-color: var(--colour-lighttheme-hover);
 }
@@ -61,14 +74,15 @@ const isHoveringDark = computed<boolean>(() => {
     cursor: pointer;
     max-width: calc(v-bind(numberToPixels(maxWidth)));
     overflow-x: hidden;
+    font-size: var(--font-size);
+}
+.hover-text-light-bg {
+    width: max-content;
 }
 
 .hover-text {
     width: max-content;
     color: var(--colour-text-light);
-}
-.hover-text-light {
-    width: max-content;
 }
 
 .v-enter-active, .v-leave-active {

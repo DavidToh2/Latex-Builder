@@ -33,20 +33,24 @@ async function loginUser() {
     } else {
         // Success
         
-        loginFail.value = false
+        loginFailure('')
 
         const data = responsejson.body as userData
         UserStore.setUserData(data)
         UserStore.setAuthStatus(true)
-        console.log("LoginView: Set user data")
 
         emits('login-success')
     }
 }
 
 function loginFailure(msg : string) {
-    loginFail.value = true
-    loginFailMessage.value = msg
+    if (msg) {
+        loginFail.value = true
+        loginFailMessage.value = msg
+    } else {
+        loginFail.value = false
+        loginFailMessage.value = ''
+    }
 }
 
 const emits = defineEmits<{
@@ -65,7 +69,7 @@ const pwdInputType = computed<string>(() => {
 <template>
     <form id="login-form" @submit.prevent="loginUser" autocomplete="off">
 
-        <div id="login-error" v-if="loginFail">{{ loginFailMessage }}</div>
+        <div class="err-text" v-if="loginFail">{{ loginFailMessage }}</div>
 
         <label for="login-user-input">Username or Email Address</label>
         <input id="login-user-input" name="username" class="input-sm" autocomplete="off">
@@ -75,7 +79,7 @@ const pwdInputType = computed<string>(() => {
         <div style="display: flex; flex-direction: row; gap: 10px;">
             <label for="login-show-password" style="font-size: 12px">Show password:</label>
             <input type="checkbox" v-model="pwdDisplay">
-        </div>
+        </div> 
 
         <input id="login-submit" type="submit" class="btn" value="Sign in">
     </form>
@@ -83,10 +87,6 @@ const pwdInputType = computed<string>(() => {
 </template>
 
 <style scoped>
-
-#login-error {
-    color: var(--colour-text-error);
-}
 
 #login-form {
     border: 1px solid var(--colour-border);
