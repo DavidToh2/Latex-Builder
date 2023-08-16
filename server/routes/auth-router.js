@@ -87,7 +87,7 @@ router.post('/check', function(req, res, next) {
     res.json(response)
 })
 
-router.post('/get', isAuthenticated, async function(req, res, next) {
+router.post('/info/get', isAuthenticated, async function(req, res, next) {
 
     // Get user data based on session user ID.
 
@@ -105,7 +105,7 @@ router.post('/get', isAuthenticated, async function(req, res, next) {
     }
 })
 
-router.post('/set', isAuthenticated, async function(req, res, next) {
+router.post('/info/set', isAuthenticated, async function(req, res, next) {
 
     // Modify user data.
 
@@ -113,10 +113,36 @@ router.post('/set', isAuthenticated, async function(req, res, next) {
         const uID = req.session.uID
         const data = req.body
 
+        const r = await dbAuth.modifyUser(uID, data)
+
         const response = new ResponseBody(data['fn'])
         response.status = 0
+        response.body = r
 
         res.json(response)
+    } catch(err) {
+        next(err)
+    }
+})
+
+router.post('/changepassword', isAuthenticated, async function(req, res, next) {
+
+    // Change password.
+
+    try {
+        const uID = req.session.uID
+        const data = req.body
+
+        const r = await dbAuth.changePassword(uID, data)
+
+        const response = new ResponseBody(data['fn'])
+        response.status = 0
+        response.body = r
+        // Logs user out as well
+        req.session.destroy(function(err) {
+            if (err) next(err)
+            res.json(response)
+        })
     } catch(err) {
         next(err)
     }

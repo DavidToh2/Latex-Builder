@@ -65,6 +65,24 @@ async function modifyUser(userID, userdata) {
     // Only for modifying social info.
 
     const errorString = 'Failed to modify user info!'
+    try {
+        const name = userdata.username
+        const newBio = userdata.socialData.bio
+        const u = await Users.findOne({ username: name })
+        if (!u) {
+            throw new DatabaseError(errorString, 'User not found!')
+        }
+        if (u.id != userID) {
+            throw new UserError(errorString, 'How did you manage to modify another person\'s data???')
+        }
+
+        u.socialData.bio = newBio
+        await u.save()
+
+        return 0
+    } catch(err) {
+        newError(err, errorString)
+    }
 }
 
 async function findUserIDUsingUsername(username) {
@@ -271,6 +289,59 @@ async function findGroupUsingName(groupname) {
     }
 }
 
+async function changePassword(userID, data) {
+    const errorString = "Password updating failed:"
+    try {
+        const oldPassword = data['oldpassword']
+        if (!oldPassword) {
+            throw new UserError(errorString, 'Old password empty!')
+        }
+
+        const u = await Users.findOne({ id: userID })
+        if (!u) {
+            throw new DatabaseError(errorString, 'User not found!')
+        }
+
+        var userValidated = false
+        const salt = u['salt']
+        const hashedPassword = hashPassword(oldPassword, salt)
+        const expectedPassword = u['hashedPassword']
+
+        if (hashedPassword.length == expectedPassword.length
+            && crypto.timingSafeEqual(Buffer.from(hashedPassword), Buffer.from(expectedPassword))) {
+            userValidated = true
+        }
+
+        if (userValidated) {
+
+            const newPassword = data['newpassword']
+            if (!newPassword) {
+                throw new UserError(errorString, 'New password empty!')
+            }
+            
+            if (newPassword != data['newpassword-2']) {
+                throw new UserError(errorString, 'Your new passwords do not match!')
+            }
+
+            if (newPassword == oldPassword) {
+                throw new UserError(errorString, 'Your new and old passwords cannot be identical!')
+            }
+
+            const newHashedPassword = hashPassword(newPassword, salt)
+            u.hashedPassword = newHashedPassword
+
+            await u.save()
+
+            return 0
+
+        } else {
+            throw new UserError(errorString, 'Invalid old password!')
+        }
+    } catch(err) {
+        newError(err, errorString)
+    }
+}
+
 function hashPassword(pwd, salt) {
     const errorString = "Password hashing failed:"
     try {
@@ -283,13 +354,13 @@ function hashPassword(pwd, salt) {
 }
 
 module.exports = {
-    newUser, 
+    newUser, modifyUser,
 
     findUserInfoUsingID, findUsernameUsingID, convertUserIDsToUsernames,
     findUserIDUsingUsername, 
-    authenticateUser,
+    authenticateUser, setUserQuestions,
 
     findGroupUsingName,
 
-    setUserQuestions
+    changePassword
 }
