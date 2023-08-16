@@ -34,6 +34,13 @@ export const useUserStore = defineStore('UserStore', () => {
         return authStatus.value
     }
 
+    // This function is called when something else is done somewhere else in the system, and userdata needs to be updated.
+    // For example, when a user contributes a new question, and so his questions[] array needs to be updated,
+    // or when a user joins a new group, and so his groups[] array needs to be updated.
+    function queueUserDataUpdate() {
+        return true
+    }
+
     const leftView = ref('HomeView')
     const rightView = ref('AccountView')
     const newView = ref('')
@@ -94,6 +101,9 @@ export const useUserStore = defineStore('UserStore', () => {
         leftView, rightView, newView,
         setUserData, getUserData, clearUserData, getUserDataStatus,
         setAuthStatus, getAuthStatus,
+
+        queueUserDataUpdate,
+        
         setLeftView, setRightView, displayView, getNewView, getViewName, getViewSide,
 
         openPopup, openBigPopup, closePopup, getPopupStatus

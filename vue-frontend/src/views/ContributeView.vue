@@ -204,12 +204,17 @@ async function changeOptionTab(s : string, newTabValue : number) {
                 } else {
                     // Success
                     if (active.id == '0') {
+
+                        // New question
                         const savedQn = responsejson.body as qn
                         const ID = savedQn['id']
                         removeFromContribute(active.id)
                         QuestionStore.insertIntoContribute(ID, savedQn)
                         changeDisplayedQuestion(ID)
+                        UserStore.queueUserDataUpdate()
                     } else {
+
+                        // Modified pre-existing question
                         QuestionStore.updateQn('contribute', active.id, {...active})
                     }
 
@@ -259,6 +264,7 @@ async function changeOptionTab(s : string, newTabValue : number) {
                     UserStore.openPopup(errorMsg)
                 } else {
                     // Success
+                    UserStore.queueUserDataUpdate()
                     removeFromContribute(active.id)
                     changeDisplayedQuestion('0')    
                 }

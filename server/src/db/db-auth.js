@@ -85,6 +85,27 @@ async function modifyUser(userID, userdata) {
     }
 }
 
+async function deleteUser(userID) {
+    const errorString = "Failed to delete user:"
+
+    try {
+        const u = await Users.findOne({ id: userID })
+        if (!u) {
+            throw new DatabaseError(errorString, 'User does not exist!')
+        }
+        
+        const d = await Users.deleteOne({ id: userID })
+        const deletedCount = d.deletedCount
+        if (deletedCount != 1) {
+            throw new DatabaseError(errorString, 'Deletion exception: number of removed users is not 1.')
+        }
+
+        return 0
+    } catch(err) {
+
+    }
+}
+
 async function findUserIDUsingUsername(username) {
 
     // Called when user signs up, to check for uniqueness.
@@ -318,7 +339,7 @@ async function changePassword(userID, data) {
             if (!newPassword) {
                 throw new UserError(errorString, 'New password empty!')
             }
-            
+
             if (newPassword != data['newpassword-2']) {
                 throw new UserError(errorString, 'Your new passwords do not match!')
             }
@@ -354,7 +375,7 @@ function hashPassword(pwd, salt) {
 }
 
 module.exports = {
-    newUser, modifyUser,
+    newUser, modifyUser, deleteUser,
 
     findUserInfoUsingID, findUsernameUsingID, convertUserIDsToUsernames,
     findUserIDUsingUsername, 

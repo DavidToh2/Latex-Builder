@@ -163,4 +163,3 @@ The environment variables are remembered across deployments, so hopefully you on
 We set up a cloud-hosted MongoDB Atlas database `questiondb`, and configure a root username and password. All connections to the database subsequently require authentication.
 
 ## Network Access
-

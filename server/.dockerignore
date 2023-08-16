@@ -21,3 +21,8 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 README.md
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

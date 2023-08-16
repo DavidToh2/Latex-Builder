@@ -438,7 +438,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         getBuildworksheetConfig, setBuildWorksheetPage, setBuildWorksheetTemplate, setBuildWorksheetText, setBuildWorksheetTitle,
 
         // Display PDF state
-        setDisplayPDFName, getDisplayPDFName, resetDisplayPDFName
+        setDisplayPDFName, getDisplayPDFName, resetDisplayPDFName,
     }
 },
 {

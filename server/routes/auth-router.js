@@ -205,6 +205,29 @@ router.post('/search/group', isAuthenticated, async function(req, res, next) {
     }
 })
 
+router.post('/delete', isAuthenticated, async function(req, res, next) {
+
+    // Delete user
+
+    try {
+        const uID = req.session.uID
+        const data = req.body
+
+        const r = await dbAuth.deleteUser(uID)
+
+        const response = new ResponseBody(data['fn'])
+        response.status = 0
+        response.body = r
+
+        req.session.destroy(function(err) {
+            if (err) next(err)
+            res.json(response)
+        })
+    } catch(err) {
+        next(err)
+    }
+})
+
 function isAuthenticated(req, res, next) {
     if (req.session.uID) {
         next()

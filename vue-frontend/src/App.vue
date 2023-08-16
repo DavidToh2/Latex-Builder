@@ -115,7 +115,15 @@ UserStore.$onAction(
 				QuestionStore.resetDatabase()
 			})
 		}
+		if (name == 'queueUserDataUpdate') {
+			// If something happens in other views that requires a user data update,
+			// this function will be triggered.
+			after(async (result) => {
+				await populateUserInfo()
+			})
+		}
 		if ((name == 'openPopup') || (name == 'openBigPopup') || (name == 'closePopup')) {
+			// Popup management
 			after((result) => {
 				const [pSize, pHTML] = UserStore.getPopupStatus()
 				popupHTML.value = pHTML as string

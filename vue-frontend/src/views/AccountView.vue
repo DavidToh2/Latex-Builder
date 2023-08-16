@@ -95,8 +95,7 @@ function pageStatusUserDeleted() {
 
         <Account @logout="pageStatusLogout" 
             @change-password="pageStatusPasswordChange"
-            @delete-user=""
-            @update-user-data=""
+            @delete-user="pageStatusUserDeleted"
             v-else/>
     </div>
 
