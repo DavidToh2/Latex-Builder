@@ -211,7 +211,8 @@ function previewOutput(data) {
     + '\\pagestyle\{empty\}\n'
     + '\\setlength\\parskip\{0.8ex\}\n'
     + '\\setlength\\parindent\{0pt\}\n'
-    + BEGIN_DOCUMENT_STRING 
+    + BEGIN_DOCUMENT_STRING
+    + '\\rule\{\\textwidth\}\{0.1pt\}\n'
     + data 
     + END_DOCUMENT_STRING
 

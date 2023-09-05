@@ -63,7 +63,7 @@ mongoose.connection.once('open', () => {
 
 		// CORS Control
 
-	const allowedOrigins = ['https://d1j3agbahkhud6.cloudfront.net']
+	const allowedOrigins = ['https://towelet.app', 'https://www.towelet.app']
 	if ((process.env.NODE_ENV.trim() == 'development')) {
 		allowedOrigins.push('http://localhost:5173')
 	}
