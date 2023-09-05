@@ -185,13 +185,12 @@
 
 
 .display-table {
-    padding: 0px 10px;
+    padding: 0px 10px 20px 10px;
     --display-table-id-width: 40px;
-    --display-table-topic-width: 130px;
-    --display-table-difficulty-width: 80px;
-    --display-table-source-width: 70px;
-    --display-table-options-width: 80px;
-    --display-table-questions-width: calc(100% - var(--display-table-id-width) - var(--display-table-topic-width) - var(--display-table-difficulty-width) - var(--display-table-source-width) - var(--display-table-options-width));
+    --display-table-topic-width: 240px;
+    --display-table-difficulty-width: 130px;
+    --display-table-source-width: 240px;
+    --display-table-options-width: 120px;
     --display-table-element-width: calc(100% - var(--display-table-id-width) - var(--display-table-options-width));
     flex-grow: 1;
     width: 100%;
@@ -205,16 +204,6 @@
     font-size: 14px;
 }
 
-.display-table :deep(.display-table-entry-row) {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-}
-
-.display-table :deep(.display-table-entry-row-dragged) {
-    font-weight: bold;
-}
-
 .display-table :deep(.display-table-cell) {
     padding: 10px 8px;
     flex-shrink: 0;
@@ -223,7 +212,8 @@
 }
 
 .display-table :deep(.display-table-id) {
-    flex-basis: var(--display-table-id-width);
+    flex: 1 1 var(--display-table-id-width);
+    min-width: 0;
 }
 .display-table :deep(.display-table-question) {
     flex-basis: var(--display-table-questions-width);
@@ -231,16 +221,21 @@
 	white-space: pre-wrap;
 }
 .display-table :deep(.display-table-topic) {
-    flex-basis: var(--display-table-topic-width);
+    flex: 1 1 var(--display-table-topic-width);
+    min-width: 0;
 }
 .display-table :deep(.display-table-difficulty) {
-    flex-basis: var(--display-table-difficulty-width);
+    flex: 1 1 var(--display-table-difficulty-width);
+    min-width: 0;
 }
 .display-table :deep(.display-table-source) {
-    flex-basis: var(--display-table-source-width);
+    flex: 1 1 var(--display-table-source-width);
+    min-width: 0;
 }
 .display-table :deep(.display-table-options) {
-    flex-basis: var(--display-table-options-width);
+    flex: 1 1 var(--display-table-options-width);
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .display-table :deep(.display-table-element) {
@@ -259,6 +254,10 @@
     display: flex;
     flex-direction: column;
     height: 40px;
+}
+
+@media (min-width: 1600px) {
+
 }
 
 </style>

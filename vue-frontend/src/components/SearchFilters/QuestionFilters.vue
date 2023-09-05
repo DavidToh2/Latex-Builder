@@ -141,68 +141,64 @@
 -->
 
 <template>
-    <div class="question-filters-row" :id="func">
-        <div class="question-filters">
-            <DropdownSearch description="Category" internalName="category"
-                :activeSelections="activeSelections.category" 
-                :availableSelections="availableSelections.category" 
-                @update="updateSelections"
-            />
-            <DropdownSearch description="Topic" internalName="topic" 
-                :activeSelections="activeSelections.topic" 
-                :availableSelections="availableSelections.topic" 
-                @update="updateSelections"
-            />
-            <DropdownSearch description="Subtopic" internalName="subtopic" 
-                :activeSelections="activeSelections.subtopic" 
-                :availableSelections="availableSelections.subtopic" 
-                @update="updateSelections"
-            />
-        </div>
-        <div class="question-filters">
-            <DropdownSearch description="Difficulty" internalName="difficulty" 
-                :activeSelections="activeSelections.difficulty" 
-                :availableSelections="availableSelections.difficulty" 
-                @update="updateSelections"
-            />
-            <DropdownSearch description="Source" internalName="sourceName" 
-                :activeSelections="activeSelections.sourceName"
-                :availableSelections="availableSelections.sourceName" 
-                @update="updateSelections"
-            />
-            <Input description="Year" internalName="sourceYear" 
-                :active-input="activeSelections.sourceYear"
-                @update="updateSourceYear"
-            />
-        </div>
-        <div class="question-filters">
-            <DropdownSearch description="Tags" internalName="tags"
-                :dropdown-dir="'column'"
-                :active-selections="activeSelections.tags"
-                :available-selections="availableSelections.tags"
-                @update="updateSelections"
-            />
-        </div>
+    <div class="question-filters" :id="func">
+        <DropdownSearch description="Category" internalName="category"
+            :activeSelections="activeSelections.category" 
+            :availableSelections="availableSelections.category" 
+            @update="updateSelections"
+        />
+        <DropdownSearch description="Topic" internalName="topic" 
+            :activeSelections="activeSelections.topic" 
+            :availableSelections="availableSelections.topic" 
+            @update="updateSelections"
+        />
+        <DropdownSearch description="Subtopic" internalName="subtopic" 
+            :activeSelections="activeSelections.subtopic" 
+            :availableSelections="availableSelections.subtopic" 
+            @update="updateSelections"
+        />
+        <DropdownSearch description="Difficulty" internalName="difficulty" 
+            :activeSelections="activeSelections.difficulty" 
+            :availableSelections="availableSelections.difficulty" 
+            @update="updateSelections"
+        />
+        <DropdownSearch description="Source" internalName="sourceName" 
+            :activeSelections="activeSelections.sourceName"
+            :availableSelections="availableSelections.sourceName" 
+            @update="updateSelections"
+        />
+        <Input description="Year" internalName="sourceYear" 
+            :active-input="activeSelections.sourceYear"
+            @update="updateSourceYear"
+        />
+        <DropdownSearch description="Tags" internalName="tags"
+            :active-selections="activeSelections.tags"
+            :available-selections="availableSelections.tags"
+            @update="updateSelections"
+        />
     </div>
 </template>
 
 <style scoped>
 
-.question-filters-row {
-    display: grid;
-    grid: auto / 33% 33% 33%;
-    padding: 10px;
-    width: 100%
-}
-
 .question-filters {
     height: 100%;
-    width: 100%;
-    display: flex;
+    width: 80%;
+    min-width: 400px;
+
+    display: grid;
+    grid: auto / 50% 50%;
     justify-content: top;
     flex-direction: column;
     padding: 0px 7px;
     gap: 7px;
+}
+
+@media (min-width: 1600px) {
+    .question-filters {
+        width: 100%;
+        grid: auto / 33% 33% 33%;
+    }
 }
 
 </style>

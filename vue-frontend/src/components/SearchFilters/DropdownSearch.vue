@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-    import { reactive, computed, watch } from 'vue'
+    import { reactive, computed, watch, onUpdated } from 'vue'
     import { numberToPixels } from '@/aux' 
     import Entry from '@/components/Common/Entry.vue'
 
@@ -32,12 +32,8 @@
 
     watch(() => props.activeSelections as string[], (newS, oldS) => {
         search.activeSelections = props.activeSelections as string[]
-        search.availableSelections = props.availableSelections as string[]
+        searchAvailableSelections(search.searchText)
     }, {deep: true})
-
-    // watch(() => props.availableSelections, (newS, oldS) => {
-    //     search.availableSelections = newS as string[]
-    // })
 
     const searchbarRows = computed<number>(() => {
         if (search.searchText.length >= 25) {
@@ -118,17 +114,17 @@
                 </textarea>
             </div>
             
-            <select multiple class="dropdown-list" :class="{'dropdown-list-active': search.active}"
-                @change="setActiveSelections()" 
-                v-model="search.activeSelections">
-
-                <option class="dropdown-option" 
-                    v-for="item in props.availableSelections"
-                    v-show="search.availableSelections.includes(item)" 
-                    :value="item">
-                    {{ item }}
-                </option>
-            </select>
+            <ul class="dropdown-list" v-show="search.active">
+                <li v-for="item in props.availableSelections"
+                    v-show="search.availableSelections.includes(item)"
+                    class="dropdown-option-container">
+                    <input type="checkbox" class="dropdown-option" 
+                        :value="item" :id="item"
+                        v-model="search.activeSelections"
+                        @change="setActiveSelections">
+                    <label :for="item" style="flex-grow: 1;">{{ item }}</label>
+                </li>
+            </ul>
         </div>
     </div>
 </template>
@@ -138,7 +134,7 @@
 .dropdown-container {
     display: flex;
     flex-direction: v-bind('dropdownDir');
-    /* align-items: center; */
+    justify-items: center;
     gap: 7px;
     padding: 0px 7px;
     position: relative;
@@ -181,20 +177,29 @@
 }
 
 .dropdown-list {
-    display: none;
-    list-style: none;
+    display: inline;
     position: absolute;
-}
 
-.dropdown-list-active {
-    display: block;
     z-index: 1;
+    background-color: var(--colour-background);
     max-height: 200px;
+    overflow-y: scroll;
     width: 100%;
+
+    list-style: none;
+    padding: 0px;
+    border: 1px solid var(--colour-border);
 }
 
-.dropdown-option {
-    font-size: var(--font-size);
+.dropdown-option-container {
+    padding: 5px 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--colour-border);
+
+    font-size: var(--font-size-sm1);
 }
 
 </style>

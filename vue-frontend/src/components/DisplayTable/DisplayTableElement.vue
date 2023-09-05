@@ -51,7 +51,7 @@ const QuestionStore = useQuestionStore()
 
 </script>
 <template>
-    <div class="display-table-entry-row">
+    <div class="display-table-element-row">
         <div class="display-table-id display-table-cell" style="padding: 8px 0px; text-align: center;">
             
         </div>
@@ -85,8 +85,10 @@ const QuestionStore = useQuestionStore()
     </div>
 </template>
 <style scoped>
-.display-table-entry-row {
+.display-table-element-row {
     background-color: var(--colour-background-soft);
+    display: flex;
+    flex-direction: row;
 }
 .display-table-element :deep(.latex-element-title) {
     font-weight: bold;

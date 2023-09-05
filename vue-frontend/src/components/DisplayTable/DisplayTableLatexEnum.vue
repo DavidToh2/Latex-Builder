@@ -88,6 +88,17 @@
                 </div>
             </div>
         </div>
+        <div class="latex-enum-settings latex-enum-template"
+            v-show="(latexEnumContent.behaviour != 'stop')">
+            <div class="latex-enum-settings-title">
+                Template:
+            </div>
+            <input class="latex-text input-sm" id="latex-enum-settings-template"
+                v-model="latexEnumContent.template" @focusout="updateLatexEnum">
+            <div class="latex-enum-settings-error" v-if="!latexEnumTemplateValid">
+                Template must contain the word LABEL inside it.
+            </div>
+        </div>
         <div class="latex-enum-settings latex-enum-type"
             v-show="(latexEnumContent.behaviour != 'stop')">
             <div class="latex-enum-settings-title">
@@ -98,19 +109,6 @@
                     :selections="enumTypeSelections" :internal-names="enumTypes"
                     :active-selection="latexEnumContent.type"
                     @update="updateEnumType"/>
-            </div>
-        </div>
-        <div class="latex-enum-settings latex-enum-template"
-            v-show="(latexEnumContent.behaviour != 'stop')">
-            <div class="latex-enum-settings-title">
-                Template:
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 7px; width: 100%;">
-                <input class="latex-text input-sm" id="latex-enum-settings-template"
-                    v-model="latexEnumContent.template" @focusout="updateLatexEnum">
-                <div class="latex-enum-settings-error" v-if="!latexEnumTemplateValid">
-                    Template must contain the word LABEL inside it.
-                </div>
             </div>
         </div>
         <!-- <div class="latex-enum-settings latex-enum-options">
@@ -130,7 +128,7 @@
     display: grid;
     column-gap: 30px;
     row-gap: 10px;
-    grid: auto / 50% 45%;
+    grid: auto / 65% 30%;
 }
 
 .latex-enum-settings {
@@ -150,6 +148,14 @@
 }
 
 .latex-enum-settings-type {
+    width: 100%;
+}
+
+.latex-enum-template {
+    display: flex; 
+    flex-direction: column; 
+    align-items: left;
+    gap: 7px; 
     width: 100%;
 }
 

@@ -7,9 +7,6 @@
         <div class="display-table-id display-table-header display-table-cell">
             ID
         </div>
-        <div class="display-table-question display-table-header display-table-cell">
-            
-        </div>
         <div class="display-table-topic display-table-header display-table-cell">
             Topics
         </div>
@@ -30,8 +27,9 @@
 .display-table-header-row {
     display: flex;
     flex-direction: row;
+    overflow: auto;
 }
-
+ 
 .display-table-header {
     background-color: #D9D9D9;
     font-size: 16px;

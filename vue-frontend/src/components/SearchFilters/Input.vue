@@ -55,7 +55,7 @@
 .dropdown-container {
     display: flex;
     flex-direction: row;
-    align-items: left;
+    align-items: center;
     gap: 7px;
     padding: 0px 7px;
     position: relative;

@@ -82,6 +82,13 @@ QuestionStore.$onAction(
                 displayDatabase()
             })
         }
+        if ((name == 'updateQn') && (args[0] == 'database')) {
+            after((result) => {
+                if (result) {
+                    displayDatabase()
+                }
+            })
+        }
     }
 )
 

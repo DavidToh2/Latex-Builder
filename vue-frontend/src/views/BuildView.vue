@@ -146,13 +146,14 @@ function startPlaceholderDrag(elementType : string) {
 	// console.log(QuestionStore.getBuild())
 }
 function swapTwoElements(a: number, b: number) {
+	console.log(`Swapping elements in positions ${a} and ${b}`)
 	QuestionStore.swapTwoElementsInBuild(a, b)
 }
 
 function addElement(e : DragEvent, i : number) {
 	const elementType = (e.dataTransfer as DataTransfer).getData('type')
 	if (latexTypeStrings.includes(elementType)) {
-		console.log(`Inserting element ${elementType} at index ${i}`)
+		// console.log(`Inserting element ${elementType} at index ${i}`)
 		switch(elementType) {
 			case 'latexHeading':
 				const lhi = worksheet.config.latexElements.latexHeadingCount
@@ -210,20 +211,21 @@ onMounted(() => {
 	})
 	document.addEventListener('drop', function(event : DragEvent) {
 		event.preventDefault()
+		event.stopImmediatePropagation()
 		isDragging.value = false
 		const i = worksheet.elements.findIndex(element => (element.type == 'placeholder'))
 		if (i != -1) {
 			QuestionStore.deleteElementFromBuild('placeholder')
-		}
 
-		// If user mouse is outside the build DisplayTable, simply remove the placeholder
-		const bc = document.querySelector('#build-container') as HTMLDivElement
-		const bcrect = bc.getBoundingClientRect()
-		if ((event.clientX < bcrect.left) || (event.clientX > bcrect.right) || (event.clientY < bcrect.top) || (event.clientY > bcrect.bottom)) {
+			// If user mouse is outside the build DisplayTable, simply remove the placeholder
+			const bc = document.querySelector('#build-container') as HTMLDivElement
+			const bcrect = bc.getBoundingClientRect()
+			if ((event.clientX < bcrect.left) || (event.clientX > bcrect.right) || (event.clientY < bcrect.top) || (event.clientY > bcrect.bottom)) {
 
-		// Otherwise, insert the element
-		} else {
-			addElement(event, i)
+			// Otherwise, insert the element
+			} else {
+				addElement(event, i) 
+			}
 		}
 	})
 })

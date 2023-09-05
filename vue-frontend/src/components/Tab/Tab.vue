@@ -40,12 +40,16 @@
 
 <template>
     <div class="options">
-        <div class="options-tab" v-for="(item, index) in tabLeft" :class="{'options-active': (index == activeTabIndex)}"
-            @click="changeActiveTab(index)">{{ item }}
+        <div class="options-side"> 
+            <div class="options-tab" v-for="(item, index) in tabLeft" :class="{'options-active': (index == activeTabIndex)}"
+                @click="changeActiveTab(index)">{{ item }}
+            </div>
         </div>
         <div style="flex-grow: 1;"> </div>
-        <div class="options-tab" v-for="(item, index) in tabRight" :class="{'options-active': (index + l == activeTabIndex)}"
-            @click="changeActiveTab(index + l)">{{ item }}
+        <div class="options-side">
+            <div class="options-tab" v-for="(item, index) in tabRight" :class="{'options-active': (index + l == activeTabIndex)}"
+                @click="changeActiveTab(index + l)">{{ item }}
+            </div>
         </div>
         <!-- <div class="options-tab" @click="debug">Hi</div> -->
     </div>
@@ -60,9 +64,17 @@
 	padding: 0px 10px;
 	gap: 20px;
 }
+
+.options-side {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0px 10px;
+    max-width: 60%;
+}
 .options-tab {
 	font-size: calc(v-bind(numberToPixels(fontSize)));
-	padding: 7px;
+    padding: 0px 7px;
 }
 
 .options-tab:hover {

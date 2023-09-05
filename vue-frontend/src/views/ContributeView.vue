@@ -81,13 +81,14 @@ QuestionStore.$onAction(
                 }
             })
         }
-        if ((name == 'updateQn') && (args[0] == 'contribute')) {
-            after((result) => {
-                if (result) {
-                    changeDisplayedQuestion(active.id)
-                }
-            })
-        }
+        // if ((name == 'updateQn') && (args[0] == 'contribute')) {
+        //     after((result) => {
+        //         if (result) {
+        //             console.log("Questionstore called changeDisplayedQuestion")
+        //             changeDisplayedQuestion(active.id)
+        //         }
+        //     })
+        // }
         if ((name == 'resetContribute')) {
             after((result) => {
                 if (result) {
@@ -134,11 +135,6 @@ async function changeDisplayedQuestion(newQnID : string) {
     const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
     Object.assign(active, newQuestion)
 
-    // Get new displayed question's permissions
-    if (UserStore.getAuthStatus()) {
-        await getActivePerms()
-    }
-
     QuestionStore.setContributeActiveID(newQnID)
     changeOptionTab('Question', 0)
     blobURL.value = ''
@@ -167,16 +163,17 @@ async function changeOptionTab(s : string, newTabValue : number) {
 
         break;
         case 'Contributors':
-            if (active.id != '0') {
-                const permsGet = await getActivePerms()
-                if (!permsGet) {
-                    resetActivePerms()
-                    activeTab.value = oldTabValue
-                } else {
-                    activeTab.value = newTabValue
+            if (UserStore.authStatus) {
+                if (active.id != '0') {
+                    const permsGet = await getActivePerms()
+                    if (!permsGet) {
+                        resetActivePerms()
+                        activeTab.value = oldTabValue
+                    } else {
+                        activeTab.value = newTabValue
+                    }
                 }
             }
-
         break;
 
         case 'Save':
@@ -216,6 +213,7 @@ async function changeOptionTab(s : string, newTabValue : number) {
 
                         // Modified pre-existing question
                         QuestionStore.updateQn('contribute', active.id, {...active})
+                        QuestionStore.updateQn('database', active.id, {...active})
                     }
 
                     // GET THE COMPILED QUESTION'S SVG IMAGE
@@ -279,9 +277,9 @@ function checkForInvalidFields(q : qn) {
     if (
         q.question.trim().length == 0 ||
         q.category.length == 0 ||
-        q.topic.length == 0 ||
-        q.subtopic.length == 0 ||
-        !(q.sourceYear.length != 0 && /^\d+$/.test(q.sourceYear))
+        q.topic.length == 0
+        // q.subtopic.length == 0 ||
+        // !(q.sourceYear.length != 0 && /^\d+$/.test(q.sourceYear))
     ) {
         ready = false
     }
@@ -386,7 +384,7 @@ function dump() {
                 <LatexInput v-model:latex="active.question" 
                     :height="containerHeight" 
                     :placeholder="'Type LaTeX here:'"/>
-                <LatexPreview :source="blobURL" :height="containerHeight"/>
+                <LatexPreview :source="blobURL"/>
             </div>
 
             <div id="solution-container" v-show="activeTab == 1">
