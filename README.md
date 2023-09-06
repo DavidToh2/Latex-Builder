@@ -2,6 +2,8 @@
 
 Latex web-app capable of linking and compiling LaTeX code to build PDF documents from a server-side LaTeX installation and question database.
 
+Website is now live at [towelet.app](towelet.app)!
+
 # Project structure
 
 Front-end:
@@ -26,4 +28,4 @@ Hosting:
 - [Server Documentation](./server/README.md)
 - [Frontend Documentation](./vue-frontend/README.md)
 - [Development](./documentation/Development.md)
-- [Production](./documentation/production/Production.md)
+- [Production](./documentation/production)
