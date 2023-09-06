@@ -36,15 +36,15 @@ We create an IAM policy, **Lightsail-latex-builder-full-access**, with full acce
 
 We then create an IAM user, **lightsail-latex-builder-access**, and assign it to the above permission policy.
 
-We also generate an access key pair for this user, and add the user to the AWS CLI using `aws configure`.
+We also generate an access key pair for this user, and add the user to the AWS CLI using `aws configure --profile lightsail-latex-builder-access`.
 
 Once done, we may run the following command to push a *local container image* to AWS Lightsail:
 ```sh
-aws lightsail push-container-image    \
-    --profile lightsail-latex-builder-access
-    --region ap-southeast-1           \
-    --service-name latexbuilder       \
-    --label latest                    \
+aws lightsail push-container-image           \
+    --profile lightsail-latex-builder-access \
+    --region ap-southeast-1                  \
+    --service-name latexbuilder              \
+    --label latest                           \
     --image latexquestionbank:latest
 ```
 Sadly this isn't working as `aws lightsail` cannot detect the Docker daemon.
@@ -59,14 +59,14 @@ Because our Docker image has to be public for the deployment interface to work, 
 
 1. Insecure method: dotenv + Adding `.env` file into Docker container
 
-**dotenv** is an npm package that lets a NodeJS application read environment variables. Usage:
+**dotenv** is an npm package that lets a NodeJS application read environment variables. We can use it to read a local `.env` file as follows:
 ```js
 const envpath = path.join(__dirname, '.env')
 require('dotenv').config({ path: envpath })
 ```
 The environment file path is the application's root file (i.e. pwd) by default.
 
-Note that, to use this package, you need to remove `.env` from `.dockerignore`, so the `.env` file is also copied into the Docker image.
+Note that this requires the `.env` file to be copied into the Docker image.
 
 [Using dotenv](https://stackoverflow.com/questions/42335016/dotenv-file-is-not-loading-environment-variables)
 

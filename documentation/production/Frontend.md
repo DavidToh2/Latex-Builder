@@ -12,7 +12,6 @@ The Vue frontend is compiled and minified in `./dist`, so that the site is now e
   - [Deploying to S3](#deploying-to-s3)
 - [Configuration](#configuration)
   - [Configuring S3 for Website Hosting](#configuring-s3-for-website-hosting)
-  - [Restricting Public Access](#restricting-public-access)
 
 
 # Deployment
@@ -69,30 +68,3 @@ We need to configure the S3 bucket for static website hosting. This can be done 
 The index document is set to be `index.html`, which is also the root document object compiled by Vite.
 
 We now have access to a public HTTP endpoint, http://towelet.app.s3-website-ap-southeast-1.amazonaws.com, from which we can access the webpage.
-
-## Restricting Public Access
-
-We also need to configure the bucket's policy to restrict direct access via the HTTP endpoint. This is because direct user access via HTTP is insecure and prone to MITM attacks. Hence, users should only access the website via Cloudflare's HTTPS domain endpoint, and direct communication with our S3's HTTP endpoint should be relegated to the Cloudflare DNS.
-
-This is done under the S3 console menu -> Permissions -> Bucket Policy:
-```
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::towelet.app/*",
-            "Condition": {
-                "IpAddress": {
-                    "aws:SourceIp": [
-                        // Paste Cloudflare's official list of IP addresses here.
-                    ]
-                }
-            }
-        }
-    ]
-}
-```
