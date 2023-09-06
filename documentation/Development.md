@@ -2,7 +2,18 @@
 
 This file documents the steps needed to run and test the server in development.
 
-## Environmental Variables (Server)
+- [Introduction](#introduction)
+- [Environmental Variables (Server)](#environmental-variables-server)
+- [Running](#running)
+  - [Starting the Website](#starting-the-website)
+  - [Starting the Server and Database](#starting-the-server-and-database)
+  - [Exploring the Local Database](#exploring-the-local-database)
+  - [Starting the Server only](#starting-the-server-only)
+- [Development Diagonstics](#development-diagonstics)
+  - [Resetting the Server and Database](#resetting-the-server-and-database)
+
+
+# Environmental Variables (Server)
 In the `.env` file, set the `NODE_ENV` environment variable:
 ```
 NODE_ENV=development
