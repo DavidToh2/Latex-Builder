@@ -69,7 +69,7 @@ For Cloudflare to communicate with Lightsail over HTTPS, we need to create and i
 
 We generate an SSL certificate in the AWS Lightsail dashboard, specifying our backend's subdomain as the origin domain.
 
-<img src="Images/dns-config-lightsail-1.png">
+<img src="Images/dns-config-lightsail-1.png" width=50%>
 
 This generates a `key:value` pair in the form
 ```

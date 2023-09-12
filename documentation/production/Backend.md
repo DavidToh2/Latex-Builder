@@ -18,7 +18,7 @@ We set up an AWS Lightsail container service called **latexbuilder**. This servi
 
 ## Deploying to Lightsail using Deployment Interface
 
-<img src="Images/lightsail-deployment.png">
+<img src="Images/lightsail-deployment.png" width=50%>
 
 We can use the Lightsail Deployment Interface to directly *pull images from Docker Hub* into AWS Lightsail. We are required to enter the full image name: `registry.hub.docker.com/<user>/<image>:<label>`. Ensure that the image is public before pulling.
 
