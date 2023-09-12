@@ -47,11 +47,11 @@ $ aws configure --profile latex-builder-deploy
 
 We can then use this profile to issue commands to the S3 bucket, like so:
 ```sh
-aws --region ap-southeast-1 --profile latex-builder-deploy s3 [command]
+aws --region [region] --profile latex-builder-deploy s3 [command]
 ```
 We can now sync up our local repo with the bucket like so:
 ```sh
-aws --region ap-southeast-1 --profile latex-builder-deploy s3 sync ./dist [S3URI]
+aws --region [region] --profile latex-builder-deploy s3 sync ./dist [S3URI]
 ```
 This can be set up as a script `npm run deploy` in `package.json`.
 
@@ -63,4 +63,4 @@ We need to configure the S3 bucket for static website hosting. This can be done 
 
 The index document is set to be `index.html`, which is also the root document object compiled by Vite.
 
-We now have access to a public HTTP endpoint, http://towelet.app.s3-website-ap-southeast-1.amazonaws.com, from which we can access the webpage.
+We now have access to a public HTTP endpoint, http://towelet.app.s3-website-[region].amazonaws.com, from which we can access the webpage.
