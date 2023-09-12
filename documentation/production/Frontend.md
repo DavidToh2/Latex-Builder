@@ -41,10 +41,6 @@ This IAM user requires an access key pair to configure as a profile in the AWS C
 To configure the access key pair as a profile named `latex-deploy`, run `aws configure --profile latex-builder-deploy` and key in your access key pair:
 ```sh
 $ aws configure --profile latex-builder-deploy
-AWS Access Key ID [None]: 
-AWS Secret Access Key [None]: 
-Default region name [None]: ap-southeast-1
-Default output format [None]:
 ```
 
 ## Deploying to S3

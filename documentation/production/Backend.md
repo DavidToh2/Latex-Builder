@@ -7,6 +7,7 @@ This document describes the steps taken to deploy both the server and the databa
   - [Deploying to Lightsail using Deployment Interface](#deploying-to-lightsail-using-deployment-interface)
   - [Deploying to Lightsail using AWS CLI Lightsail Plugin](#deploying-to-lightsail-using-aws-cli-lightsail-plugin)
   - [Environment Variables](#environment-variables)
+  - [Deployment Health Check](#deployment-health-check)
 - [Database: MongoDB Atlas](#database-mongodb-atlas)
   - [Network Access (TBD)](#network-access-tbd)
 
@@ -17,13 +18,13 @@ We set up an AWS Lightsail container service called **latexbuilder**. This servi
 
 ## Deploying to Lightsail using Deployment Interface
 
+<img src="Images/lightsail-deployment.png">
+
 We can use the Lightsail Deployment Interface to directly *pull images from Docker Hub* into AWS Lightsail. We are required to enter the full image name: `registry.hub.docker.com/<user>/<image>:<label>`. Ensure that the image is public before pulling.
 
-We increase the health check interval in the Lightsail Deployment interface to 300s, to avoid spamming the logs. We also configure the root route to respond with a "Health check successful!" message.
-
-The Lightsail container can now be connected to via a public HTTPS URI:
+Once the deployment is live, we can connect to the Lightsail container via a public HTTPS URL:
 ```
-https://latexbuilder.<rng>.ap-southeast-1.cs.amazonlightsail.com/
+https://latexbuilder.<rng>.ap-<region>.cs.amazonlightsail.com/
 ```
 
 [Container Deployment Tutorial](https://aws.amazon.com/tutorials/deploy-webapp-lightsail/module-three/)
@@ -88,6 +89,22 @@ MONGO_SESSION_DATABASE (unused)
 NODE_ENV (seems to be automatically set)
 ```
 The environment variables are remembered across deployments, so hopefully you only need to do this once!
+
+## Deployment Health Check
+
+Lightsail will regularly ping the image, running internally, to ensure that the deployment is still live. We increase the health check interval in the Lightsail Deployment interface to 300s, to avoid spamming the logs.
+
+We add a simple route at the tail end of our server's route middleware stack:
+```
+// Application error handler above
+
+app.use('/', function(req, res, next) {
+    res.send("Health check successful!")
+})
+
+// Routing error handler below
+```
+When we access the server via the aforementioned public HTTPS URL, we should get a response (code 200) that simply says "Health check successful!"
 
 # Database: MongoDB Atlas
 
