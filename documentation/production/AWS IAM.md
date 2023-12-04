@@ -11,6 +11,7 @@ This document serves to be a primer on how AWS IAM works, as well as describe ho
   - [User and Policy Creation](#user-and-policy-creation)
   - [Long-Term Access Keys for Programmatic Access](#long-term-access-keys-for-programmatic-access)
   - [Configuring User Profiles in AWS CLI and SDKs](#configuring-user-profiles-in-aws-cli-and-sdks)
+  - [Using User Profiles Programmatically](#using-user-profiles-programmatically)
 
 
 # What is Identity Access Management?
@@ -95,7 +96,7 @@ aws_access_key_id = AKIA<rest of key here>
 aws_secret_access_key = <secret key here>
 ```
 
-For our use case, we need to generate an access key pair for each IAM user in the AWS IAM console. These key pairs should be kept safe and **not hard-coded into our application**, as anyone with the access keys can view and access our AWS resources through the CLI.
+For our use case, we need to generate an access key pair for each IAM user *in the AWS IAM console.* These key pairs should be kept safe and **not hard-coded into our application**, as anyone with the access keys can view and access our AWS resources through the CLI.
 
 ## Configuring User Profiles in AWS CLI and SDKs
 
@@ -104,7 +105,7 @@ We can configure the AWS CLI to use our IAM user profiles, using the command
 aws configure <options>
 ```
 
-To add a new user with a specific name, we use the following command and key in the required access key and region details:
+To add a new user with a specific name, we use the following command, and *key in the access keys previously generated to us from the AWS IAM console:*
 ```sh
 aws configure --profile <name>
 AWS Access Key ID [None]: 
@@ -120,6 +121,16 @@ aws configure list-profiles
 
 The access and secret keys of all profiles can be viewed and modified under `~/.aws/credentials`.
 
-We can then use the AWS CLI to run commands using our configured profiles, by adding the option `--profile <name>` to our commands. For more details regarding the specific commands being run by the S3 and Lightsail CLIs, refer to their respective documentations.
+## Using User Profiles Programmatically
 
-We can also use the profiles in the AWS SDK by directly supplying the profile's access keys to the SDK. This allows our app's native code to interact with our AWS resources directly. For more details regarding how the IAM user is set up for the SES SDK, refer to the respective documentation.
+We can then use the AWS CLI to run commands using our configured profiles, by adding the option `--profile <name>` to our commands. This requires the configured profiles to be stored locally.
+- For more details regarding the specific commands being run by the S3 and Lightsail CLIs, refer to their respective documentations.
+
+We can also use the profiles in the AWS SDK by directly supplying the profile's access keys to the SDK. This allows our app's native code to interact with our AWS resources directly. 
+- Every AWS SDK rovides a `credential-providers` package which looks for AWS credentials from a variety of sources. The documentation for the `fromEnv()` credential provider is [here](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-credential-providers/#fromenv), and loads the following two variables automatically into the SDK.
+```
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+```
+
+[AWS SDK(JS) Guide: How to set credentials](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html)

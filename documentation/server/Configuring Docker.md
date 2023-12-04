@@ -2,19 +2,21 @@
 
 This file documents how the Docker container service for the server is set up.
 - [Introduction](#introduction)
-- [Building the Base Image](#building-the-base-image)
+- [Dockerfile: latexbase](#dockerfile-latexbase)
   - [Node and Dependencies](#node-and-dependencies)
   - [Latex Installation](#latex-installation)
   - [Configuring the User](#configuring-the-user)
-- [Server Image](#server-image)
+- [Dockerfile: latexquestionbank](#dockerfile-latexquestionbank)
   - [Installing Node Dependencies](#installing-node-dependencies)
   - [Setting the Startup Scripts](#setting-the-startup-scripts)
   - [Startup](#startup)
+- [Build and Runtime](#build-and-runtime)
   - [Build Command](#build-command)
-- [Logs (TBA)](#logs-tba)
+  - [Runtime Properties](#runtime-properties)
+  - [Logs (TBA)](#logs-tba)
 
 
-# Building the Base Image
+# Dockerfile: latexbase
 
 ## Node and Dependencies
 
@@ -78,7 +80,7 @@ RUN adduser --system --home /app node
 ```
 This user does not have sudo privileges, and `node` will run as this user.
 
-# Server Image
+# Dockerfile: latexquestionbank
 
 ## Installing Node Dependencies
 ```
@@ -113,12 +115,20 @@ CMD ["/sbin/my_init", "--", "setuser", "node", "npm", "start"]
 - Run `/sbin/my_init` to start the container. This executes the specified command that appears after the double dashes.
 - `setuser` will execute the specified command `npm start` as the user `node`.
 
+# Build and Runtime
+
 ## Build Command
 
 To build **latexbase**, execute `make latex-base` in `/`.
 
 To build **latexquestionbank**, execute `docker compose build` in `/server`.
 
-# Logs (TBA)
+## Runtime Properties
+
+The **latexquestionbank** container has the following properties during runtime.
+- Active directory: /app
+- User: root
+
+## Logs (TBA)
 
 We use [winston](https://www.npmjs.com/package/winston)
