@@ -22,7 +22,7 @@ router.post('/get', async function(req, res, next) {                  // FIND / 
         const response = new ResponseBody(reqData['fn'])
         response.status = 0
         response.body = fQ
-        console.log(response)
+        // console.log(response)
 
         res.json(response)
 
@@ -53,7 +53,7 @@ router.post('/set/new', async function(req, res, next) {              // SET NEW
         const nQ = await dbQuestion.newQuestion(reqData, userID)
         response.status = 0
         response.body = nQ
-        console.log(response)
+        // console.log(response)
 
         res.json(response)
     } catch(err) {
@@ -79,7 +79,7 @@ router.post('/set/update/:ID', async function(req, res, next) {           // UPD
         const response = new ResponseBody(reqData['fn'])
         response.status = 0
         response.body = sQ
-        console.log(response)
+        // console.log(response)
 
         res.json(response)
     } catch(err) {
@@ -104,7 +104,7 @@ router.post('/set/perms/:ID', async function(req, res, next) {
         const response = new ResponseBody(reqData['fn'])
         response.status = 0
         response.body = sQ
-        console.log(response)
+        // console.log(response)
 
         res.json(response)
     } catch(err) {
@@ -155,7 +155,7 @@ router.post('/delete/:ID', async function(req, res, next) {
         const response = new ResponseBody(reqData['fn'])
         response.status = 0
         response.body = dQ
-        console.log(response)
+        // console.log(response)
 
         res.json(dQ)
         

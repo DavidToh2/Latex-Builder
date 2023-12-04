@@ -80,7 +80,7 @@ async function buildPreview(data, uID) {
     try {
         console.log('Attempting to build preview...')
         output = previewOutput(data)
-        console.log(output)
+        // console.log(output)
     } catch(err) {
         newError(err, 'Failed to parse document data in preview!')
     }

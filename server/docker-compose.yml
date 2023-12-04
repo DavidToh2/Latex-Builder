@@ -24,6 +24,7 @@ services:
       - db-data:/data/db
     env_file:
       - .env
+    command: --quiet
 
 volumes:
   db-data:

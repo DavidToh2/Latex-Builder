@@ -3,6 +3,7 @@ const { mongoose } = require('./db-connection')
 const { userSchema } = require('./models/user')
 const crypto = require('crypto')
 const { UserError, DatabaseError, newError } = require('../express-classes/error')
+const Email = require('../email')
 
 const userDB = mongoose.connection.useDb('users', { useCache: true })
 
@@ -53,6 +54,9 @@ async function newUser(userdata) {
         if (!newUser) {
             throw new DatabaseError(errorString, 'newUser() method failed!')
         }
+
+        // Send welcome email to new user
+        Email.sendWelcomeSignupEmail(new_username, new_email, new_userID)
 
         return newUser
     } catch(err) {

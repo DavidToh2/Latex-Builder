@@ -1,5 +1,4 @@
 var mongoose = require('mongoose')
-var async = require('async')
 
 // Connect to local docker mongo if in dev mode, or connect to Atlas deployment if in prod mode
 // Note: questiondb here is the name of the docker container
@@ -19,6 +18,6 @@ if (process.env.NODE_ENV.trim() == 'development') {
 mongoose.connect(mongoURI)
 
 mongoose.connection
-    .on("error", console.error.bind(console, "MongoDB connection error:"))
+    .on("error", console.error.bind(console, "MongoDB connection error:")) 
 
 module.exports = { mongoose, mongoURI }
