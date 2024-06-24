@@ -3,6 +3,7 @@ const router = express.Router()
 const path = require('path')
 const fs = require('fs')
 const { buildDocument } = require('../src/file')
+const { getPreview } = require('../src/preview_images')
 const { ResponseBody } = require('../src/express-classes/response')
 const { ServerError } = require('../src/express-classes/error')
 
@@ -58,26 +59,16 @@ router.post('/get/pdf', isAuthenticated, function(req, res, next) {
     } 
 })
 
-router.post('/get/image', isAuthenticated, function(req, res, next) {
+// Get a preview
 
-    const sendFileOptions = {
-        root: path.join(__dirname, '../public/files'),
-        headers: {
-            'x-timestamp': Date.now()
-        }
-    }
+router.post('/get/image/:ID', async function(req, res, next) {
 
     try {
-        var filePath = 'welcome/welcome.pdf'
-        if (req.body.name == 'preview') {
-            const uID = req.session.uID
-            filePath = `${uID}/image/preview.png`
-        }
-        // console.log(filePath)
-
-        res.sendFile(filePath, sendFileOptions)
-
-        // https://expressjs.com/en/api.html#res.sendFile
+        const ID = req.params['ID']
+        preview = await getPreview(ID)
+        res.writeHead(200, { 'Content-Type': 'image/jpeg', 'x-timestamp': Date.now() });
+        res.write(preview, 'binary');
+        res.end(null, 'binary');
     } catch(err) {
         next(err)
     } 

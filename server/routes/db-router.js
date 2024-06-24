@@ -157,7 +157,7 @@ router.post('/delete/:ID', async function(req, res, next) {
         response.body = dQ
         // console.log(response)
 
-        res.json(dQ)
+        res.json(response)
         
     } catch(err) {
         next(err)

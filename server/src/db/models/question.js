@@ -18,15 +18,17 @@ const questionSchema = new Schema( {
 
     category: {
         type: [String],
-        required: [true, 'Missing category!']
+        required: [true, 'Missing category!'],
+        validate: [arrayNonEmpty, 'Missing category data!']
     },
     topic: {
         type: [String],
-        required: [true, 'Missing topic data!']
+        required: [true, 'Missing topic!'],
+        validate: [arrayNonEmpty, 'Missing topic data!']
     },
     subtopic: {
         type: [String],
-        required: [true, 'Missing subtopic data!']
+        required: [true, 'Missing subtopic!'],
     },
     difficulty: {
         type: [String]
@@ -36,7 +38,7 @@ const questionSchema = new Schema( {
     },
     sourceYear: {
         type: Number,
-        min: 1800
+        min: [1800, 'Source year must be after 1800!']
     },
     // Question filters: tags
     tags: [String],
@@ -51,7 +53,7 @@ const questionSchema = new Schema( {
 
     // User permission and modification data
 
-    lastModified: Date,
+    lastModified: Number,
     userPerms: {
         type: userPerms,
         required: true
@@ -101,6 +103,10 @@ const worksheetElementSchema = new Schema( {
     latexHeading: latexHeadingSchema,
     latexEnum: latexEnumSchema
 })
+
+function arrayNonEmpty(arr) {
+    return (arr.length > 0)
+}
 
 module.exports = {
     questionSchema: questionSchema,

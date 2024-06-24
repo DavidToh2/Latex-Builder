@@ -4,6 +4,7 @@ const { ServerError, UserError, DatabaseError, newError } = require('../express-
 const dbAuth = require('./db-auth')
 const aux = require('../aux')
 const file = require('../file')
+const preview_images = require('../preview_images')
 
 const LIMITED_ACCOUNT_QN_LIMIT = 5
 const ACCOUNT_CAN_SET_QN = ['admin', 'active', 'limited'] 
@@ -46,6 +47,11 @@ async function newQuestion(nQ, userID) {
             throw new UserError(errorString, `You have reached your account limit of ${user.questions.length} questions!`)
         }
 
+                // Validate question inputs
+
+        aux.validateQuestionInputs(nQ)
+        nQ['sourceYear'] = (nQ['sourceYear'] == '') ? null : parseInt(nQ['sourceYear'])
+
                 // Assign new ID
 
         const i = await newID()
@@ -59,15 +65,7 @@ async function newQuestion(nQ, userID) {
 
         nQ['userPerms'] = emptyUserPerms
         nQ['userPerms']['owner'] = userID
-        nQ['lastModified'] = new Date()
-
-                // Compile question latex into image
-
-        const question = nQ['question']
-        const qnCompile = await file.buildPreview(question, userID)
-        if (qnCompile) {
-            throw new DatabaseError(errorString, 'Something went wrong during the compilation!')
-        }
+        nQ['lastModified'] = Date.now()
 
                 // Insert the question
 
@@ -79,7 +77,14 @@ async function newQuestion(nQ, userID) {
 
                 // Parse IDs to displayIDs before passing to web
 
-        var q = qnRaw[0].toObject()
+        const q = qnRaw[0].toObject()
+
+                // Compile question latex into image
+
+        const qnCompile = await file.buildPreview(q['question'], userID, i)
+        if (qnCompile) {
+            throw new DatabaseError(errorString, 'Something went wrong during the compilation!')
+        }
 
                 // Add the question ID to our user's personal questions[] array
 
@@ -121,7 +126,7 @@ async function getQuestions(dataDict, userID) {
 
         qnsAll.forEach((qn) => {
             delete qn['_id']
-            qn['sourceYear'] = qn['sourceYear'].toString()
+            qn['sourceYear'] = (qn['sourceYear'] == null) ? "" : qn['sourceYear'].toString()
             switch(userID) {
                 case 'public':
                     if (qn.userPerms.canAccessPublic) {
@@ -186,15 +191,16 @@ async function deleteQuestion(id, userID) {
 
                     // If owner or admin, delete the question and remove from owner's question array
 
-            const res = await Question.deleteOne(dQ)        // Returns {deletedCount: 1}
-            if (!res) {
+            const res1 = await Question.deleteOne(dQ)        // Returns {deletedCount: 1}
+            if (!res1) {
                 throw new DatabaseError(errorString, 'deleteOne() method failed!')
             }
+            const res2 = await preview_images.deletePreview(dQ.id)
             const c = await dbAuth.setUserQuestions(owner, 'remove', dQ.id)
             if (!c) {
                 throw new DatabaseError(errorString, 'Failed to set user\'s personal question array!')
             }
-            return res  
+            return res1  
         } else {
             throw new UserError(errorString, 'You must be the question\'s owner to delete it!')
         }
@@ -240,23 +246,23 @@ async function saveQuestion(id, dataDict, userID) {
                     // Compile question latex into image
 
             const question = dataDict['question']
-            const qnCompile = await file.buildPreview(question, userID)
+            const qnCompile = await file.buildPreview(question, userID, id)
             if (qnCompile) {
                 throw new DatabaseError(errorString, 'Something went wrong during the compilation!')
             }
 
                     // Edit the question
 
-            dataDict['lastModified'] = new Date()
+            dataDict['lastModified'] = Date.now()
 
-            const qs = await q.updateOne(dataDict)
+            const qs = await Question.findOneAndUpdate(qID, dataDict, {new: true})
             if (!qs) {
                 throw new DatabaseError(errorString, 'Failed to update question!')
             }
 
             console.log(`Saved question with ID ${id}`)
             delete qs['_id']
-            return qs  
+            return qs
         } else {
             throw new UserError(errorString, 'You do not have sufficient permissions to make changes to this question!')
         }     

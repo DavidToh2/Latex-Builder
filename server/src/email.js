@@ -1,7 +1,13 @@
 const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2')
 
-const client = new SESv2Client({ region: "ap-southeast-1" })
-const sourceEmail = process.env.SES_SOURCE_EMAIL
+const client = new SESv2Client({ 
+    region: "ap-southeast-1",
+    credentials: {
+        accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SES_SECRET_ACCESS_KEY
+    }
+})
+const sourceEmail = process.env.AWS_SES_SOURCE_EMAIL
 
 const HTMLHead = `
 <!DOCTYPE html>
@@ -61,7 +67,7 @@ async function sendEmail(recipientEmail, emailSubject, emailContent) {
     const emailToSend = new SendEmailCommand(params)
     
     try {
-        const data = client.send(emailToSend)
+        const data = await client.send(emailToSend)
         console.log("Email successfully sent!")
         return data
     } catch(err) {

@@ -175,6 +175,25 @@ function parseAlphanumericString(s) {
     }
 }
 
-module.exports = { parseID, parseUserPerms, parseString, parseStringBrackets, parseAlphanumericString }
+function validateQuestionInputs(question) {
+    if (question['question'].length < 1) {
+        throw new UserError("Empty question!")
+    }
+    if (question['category'].length < 1) {
+        throw new UserError("Missing category!")
+    }
+    if (question['topic'].length < 1) {
+        throw new UserError("Missing topic!")
+    }
+    if (question['sourceYear'] != "") {
+        if (!(/^\d{4}$/.test(question['sourceYear']))) {
+            throw new UserError("Source year improperly formatted!")
+        }
+    }
+}
+
+module.exports = { parseID, parseUserPerms, parseString, parseStringBrackets, parseAlphanumericString,
+    validateQuestionInputs
+}
 
 

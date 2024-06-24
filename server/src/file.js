@@ -4,6 +4,7 @@ const fs = require('fs')
 
 const dbTemplate = require('./db/db-file')
 const aux = require('./aux')
+const imageUpload = require('./preview_images')
 
 const { UserError, DatabaseError, ServerError, newError } = require('./express-classes/error')
 
@@ -70,7 +71,7 @@ async function buildDocument(data, uID) {
     }
 }
 
-async function buildPreview(data, uID) {
+async function buildPreview(data, uID, qID) {
 
     var filePath = ''
     var output = ''
@@ -103,10 +104,18 @@ async function buildPreview(data, uID) {
         console.log(res1.toString())
         const res2 = cp.execSync(`./display_latex.sh ${filePath}`, { cwd: scriptroot } )
         console.log(res2.toString())
-        return 0
     } catch(err) {
         fileError(err)
         throw new UserError('Failed to compile latex preview!', err.stdout.toString())
+    }
+
+    // Upload latex preview to S3 bucket
+
+    try {
+        await imageUpload.uploadPreview(filePath, qID)
+        return 0
+    } catch(err) {
+        throw new ServerError('Failed to upload preview image!', err)
     }
 
 }
