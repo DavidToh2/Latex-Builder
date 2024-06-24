@@ -53,13 +53,16 @@ function loginFailure(msg : string) {
     }
 }
 
+function turnOffLoginFailure() {
+    loginFail.value = false
+}
+
 const emits = defineEmits<{
     (e: 'login-success'): void
     (e: 'login-error', error: string): void
 }>()
 
 const pwdDisplay = ref(false)
-
 const pwdInputType = computed<string>(() => {
     if (pwdDisplay.value) {return "text"} else {return "password"}
 })
@@ -67,7 +70,7 @@ const pwdInputType = computed<string>(() => {
 </script>
 
 <template>
-    <form id="login-form" @submit.prevent="loginUser" autocomplete="off">
+    <form id="login-form" @submit.prevent="loginUser" autocomplete="off" @click="turnOffLoginFailure">
 
         <div class="err-text" v-if="loginFail">{{ loginFailMessage }}</div>
 

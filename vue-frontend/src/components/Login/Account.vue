@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { reactive, onMounted, ref } from 'vue'
+import { reactive, onMounted, ref, computed } from 'vue'
 
 import { useUserStore } from '@/stores/userStore'
 import type { userData } from '@/types/UserTypes'
@@ -124,6 +124,10 @@ function changeAccountTab(s : string, newTab : number) {
     activeTab.value = newTab
 }
 
+const pwdDisplay = ref(false)
+const pwdInputType = computed<string>(() => {
+    if (pwdDisplay.value) {return "text"} else {return "password"}
+})
 const changePasswordFail = ref(false)
 const changePasswordFailMessage = ref('')
 
@@ -263,16 +267,20 @@ async function deleteAccount2(b : boolean) {
                     <div class="account-text-sm" id="password-box">
                         <div>
                             <label for="old-password-input">Old password:</label>
-                            <input id="old-password-input" name="oldpassword" class="input-sm" type="password" autocomplete="off">
+                            <input id="old-password-input" name="oldpassword" class="input-sm" :type="pwdInputType" autocomplete="off">
                         </div>
                         <div>
                             <label for="new-password-input" id="change-password-input-prompt">New password:</label>
-                            <input id="new-password-input" name="newpassword" class="input-sm" type="password" autocomplete="off">
+                            <input id="new-password-input" name="newpassword" class="input-sm" :type="pwdInputType" autocomplete="off">
                         </div>
                         <div>
                             <label for="new-password-input-2">Retype new password:</label>
-                            <input id="new-password-input-2" name="newpassword-2" class="input-sm" type="password" autocomplete="off">
+                            <input id="new-password-input-2" name="newpassword-2" class="input-sm" :type="pwdInputType" autocomplete="off">
                         </div>
+                        <div style="display: flex; flex-direction: row; gap: 10px;">
+                            <label for="login-show-password" style="font-size: 12px">Show password:</label>
+                            <input type="checkbox" v-model="pwdDisplay">
+                        </div> 
                         <div v-show="changePasswordFail" class="err-text">
                             {{ changePasswordFailMessage }}
                         </div>
