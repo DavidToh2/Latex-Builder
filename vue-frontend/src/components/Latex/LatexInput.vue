@@ -76,7 +76,8 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 5px;
+    gap: 12px;
+    padding: 10px;
     height: v-bind(height)
 }
 

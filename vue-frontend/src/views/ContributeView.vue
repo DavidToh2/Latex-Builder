@@ -387,10 +387,10 @@ function dump() {
             />
             
             <div id="question-container" v-show="activeTab == 0">
+                <LatexPreview :source="blobURL"/>
                 <LatexInput v-model:latex="active.question" 
                     :height="containerHeight" 
                     :placeholder="'Type LaTeX here:'"/>
-                <LatexPreview :source="blobURL"/>
             </div>
 
             <div id="solution-container" v-show="activeTab == 1">
@@ -426,6 +426,8 @@ function dump() {
     gap: 10px;
     padding: 10px 10px;
     align-items: center;
+
+    --latex-side-padding: 30px;
 }
 
 #contribute-options {
@@ -453,7 +455,6 @@ function dump() {
     padding: 0px 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
 }
 #solution-container {
     width: 100%;

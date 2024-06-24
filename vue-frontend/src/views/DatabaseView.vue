@@ -42,7 +42,9 @@ function updateSearchParameters(ss : qnFilters) {
     QuestionStore.setDatabaseQuestionFilters(searchParameters)
 }
 
-async function submitSearchEvent() { 
+async function submitSearchEvent() {
+    resetDatabase()
+
     if (searchParameters.sourceYear && !(/^\d+$/.test(searchParameters.sourceYear))) {
         UserStore.openPopup('Year must be a numerical value!')
         return
@@ -64,14 +66,18 @@ async function submitSearchEvent() {
     } else {
         // Success
         const data = responsejson.body as qn[]
-        QuestionStore.resetDatabase()
         QuestionStore.populateDatabase(data)
         displayDatabase()
     }
 }
 
+function resetDatabase() {
+    results.qns = []
+}
+
 function displayDatabase() {            // Fetches data from store
     results.qns = [...QuestionStore.getDatabase().slice().reverse()]
+    console.log(results.qns)
 }
 
 QuestionStore.$onAction(
@@ -85,6 +91,8 @@ QuestionStore.$onAction(
         if ((name == 'updateQn') && (args[0] == 'database')) {
             after((result) => {
                 if (result) {
+                    resetDatabase()
+                    console.log("Database reset")
                     displayDatabase()
                 }
             })

@@ -32,8 +32,9 @@
 .latex-preview {
     height: v-bind(height); 
     max-width: 100%;
-
-    padding: 30px;
+    
+    padding-left: var(--latex-side-padding);
+    padding-right: var(--latex-side-padding);
     display: flex;
     flex-direction: column;
     align-items: center;

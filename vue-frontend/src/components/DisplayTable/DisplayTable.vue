@@ -192,6 +192,7 @@
     --display-table-source-width: 240px;
     --display-table-options-width: 120px;
     --display-table-element-width: calc(100% - var(--display-table-id-width) - var(--display-table-options-width));
+    --latex-side-padding: 10%;
     flex-grow: 1;
     width: 100%;
     height: 100%;
@@ -201,7 +202,8 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    font-size: 14px;
+    font-size: var(--font-size);
+    border-bottom: 1px solid var(--colour-border);
 }
 
 .display-table :deep(.display-table-cell) {
@@ -218,6 +220,8 @@
 .display-table :deep(.display-table-question) {
     flex-basis: var(--display-table-questions-width);
     max-width: var(--display-table-questions-width);
+    padding-left: var(--latex-side-padding);
+    padding-right: var(--latex-side-padding);
 	white-space: pre-wrap;
 }
 .display-table :deep(.display-table-topic) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-    import { computed, onActivated, ref } from 'vue'
+    import { computed, onMounted, onUpdated, ref } from 'vue'
     import type { qn } from '@/types/QuestionTypes'
 
     import LatexPreview from '../Latex/LatexPreview.vue'
@@ -49,11 +49,16 @@
     })
 
     const blobURL = ref("")
+    const showRawLatex = ref(true)
+    
+    blobURL.value = getQnPreviewURL(props.q.id, props.q.lastModified)
+    console.log(`Generated blobURL ${blobURL.value}`)
 
-    onActivated(() => {
+    onUpdated(() => {
         blobURL.value = getQnPreviewURL(props.q.id, props.q.lastModified)
         console.log(`Generated blobURL ${blobURL.value}`)
     })
+
 
 </script>
 
@@ -81,6 +86,7 @@
                     <img class="icon-sm" src="@/assets/svg/pencil-edit.svg" v-if="isDatabase" @click="insertQuestion(q.id, 'left')">
                     <img class="icon-sm" src="@/assets/svg/delete-circle.svg" v-if="isBuild" @click="deleteQuestion(q.id)">
                     <img class="icon-sm" src="@/assets/svg/list-edit.svg" v-if="isDatabase" @click="insertQuestion(q.id, 'right')">
+                    <img class="icon-sm" src="@/assets/svg/eye.svg" @click="showRawLatex = !showRawLatex">
                     <div class="up-down-buttons" v-if="isBuild">
                         <img class="icon-sm" src="@/assets/svg/angle-up.svg" @click="questionUp(q.id)">
                         <img class="icon-sm" src="@/assets/svg/angle-down.svg" @click="questionDown(q.id)">
@@ -88,10 +94,10 @@
                 </div>
             </div>
         </div>
-        <div class="display-table-question display-table-cell">
+        <LatexPreview :source="blobURL"/>
+        <div class="display-table-question display-table-cell" v-if="showRawLatex">
             {{ q.question }}
         </div>
-        <LatexPreview :source="blobURL"/>
     </div>
 </template>
 
@@ -103,6 +109,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    gap: 5px;
 }
 
 .display-table-entry-row-dragged {
