@@ -8,6 +8,7 @@
     "serverstart": "DEBUG=latex-question-bank:* npm run devstart"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
     "@aws-sdk/client-sesv2": "^3.413.0",
     "async": "^3.2.4",
     "connect-mongo": "^5.0.0",
