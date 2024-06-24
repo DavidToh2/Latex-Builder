@@ -32,7 +32,12 @@ function getFormData(f : HTMLFormElement) {
     return data
 }
 
+function getQnPreviewURL(qID : string, qLastModified : string) {
+    return `${import.meta.env.VITE_URL_MEDIA}/${qID}.png?${qLastModified}`
+}
+
 export { 
     numberToPixels, pixelsToNumber,
-    getFormData
+    getFormData,
+    getQnPreviewURL
 }

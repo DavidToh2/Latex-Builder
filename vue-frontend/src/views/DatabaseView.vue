@@ -89,6 +89,13 @@ QuestionStore.$onAction(
                 }
             })
         }
+        if ((name == 'deleteFromDatabase')) {
+            after((result) => {
+                if (result) {
+                    displayDatabase()
+                }
+            })
+        }
     }
 )
 

@@ -19,7 +19,7 @@ import { useUserStore } from '@/stores/userStore'
 
 import { questionSave, questionDelete, questionGetPerms, questionUpdatePerms } from '@/post/postQn';
 import { reactive, ref, watch, computed, onActivated, onDeactivated } from 'vue'
-import { getImage } from '@/post/postFile'
+import { getQnPreviewURL } from '@/aux'
 
 const contributeOptionsLeftTab = ['Question', 'Solution', 'Images', 'Contributors']
 const contributeOptionsRightTab = ['Save', 'Delete']
@@ -33,7 +33,7 @@ const activeFilters = computed<qnFilters>(() => {
         subtopic: active.subtopic,
         difficulty: active.difficulty,
         sourceName: active.sourceName,
-        sourceYear: active.sourceYear.toString(),
+        sourceYear: (active.sourceYear == null) ? "" : active.sourceYear.toString(),
         tags: active.tags
     }
     return f
@@ -97,7 +97,7 @@ QuestionStore.$onAction(
                     changeDisplayedQuestion('0')
                     changeOptionTab('Question', 0)
                     Object.assign(activePerms, emptyUserPerms)
-                    blobURL.value = ''
+                    resetQnPreview()
                 }
             })
         }
@@ -135,9 +135,16 @@ async function changeDisplayedQuestion(newQnID : string) {
     const newQuestion = QuestionStore.getQnUsingID('contribute', newQnID) as qn
     Object.assign(active, newQuestion)
 
+    // Get png of new displayed question
+    if (newQnID != '0') {
+        const lastModified = newQuestion['lastModified']
+        displayQnPreview(lastModified)
+    } else {
+        resetQnPreview()
+    }
+
     QuestionStore.setContributeActiveID(newQnID)
     changeOptionTab('Question', 0)
-    blobURL.value = ''
 }
 
         // When displayed tab is changed, or tab option (SAVE / DELETE) is selected...
@@ -199,44 +206,34 @@ async function changeOptionTab(s : string, newTabValue : number) {
                     const errormsg = error.cause
                     UserStore.openBigPopup(errormsg)
                 } else {
+                    console.log(`Successfully saved question ${active.id}`)
+                    const savedQn = responsejson.body as qn
+
                     // Success
                     if (active.id == '0') {
 
                         // New question
-                        const savedQn = responsejson.body as qn
+                        console.log("Displaying new question!")
                         const ID = savedQn['id']
                         removeFromContribute(active.id)
                         QuestionStore.insertIntoContribute(ID, savedQn)
                         changeDisplayedQuestion(ID)
                         UserStore.queueUserDataUpdate()
+
                     } else {
 
                         // Modified pre-existing question
-                        QuestionStore.updateQn('contribute', active.id, {...active})
-                        QuestionStore.updateQn('database', active.id, {...active})
+                        QuestionStore.updateQn('contribute', active.id, savedQn)
+                        QuestionStore.updateQn('database', active.id, savedQn)
                     }
 
-                    // GET THE COMPILED QUESTION'S SVG IMAGE
+                    // GET THE COMPILED QUESTION'S IMAGE
+                    resetQnPreview()
+                    
+                    const lastModified = savedQn['lastModified']
+                    active.lastModified = lastModified
+                    displayQnPreview(lastModified)
 
-                    console.log("Getting SVG image...")
-
-                    const svgResponse = await getImage('preview')
-                    if (svgResponse instanceof Blob) {
-                        blobURL.value = URL.createObjectURL(svgResponse)
-                        console.log("Displaying SVG")
-                    } else {
-                        if (svgResponse.status == -1) {
-                            // Error occured
-                            const error = responsejson.error as ServerError
-                            const errormsg = formatErrorMessage(error)
-                            UserStore.openPopup(errormsg)
-                        } else if (svgResponse.status == 1) {
-                            // Failure
-                            const error = responsejson.body as UserError
-                            const errormsg = error.cause
-                            UserStore.openPopup(errormsg)
-                        }
-                    }
                 }
             }
             activeTab.value = oldTabValue
@@ -264,7 +261,9 @@ async function changeOptionTab(s : string, newTabValue : number) {
                     // Success
                     UserStore.queueUserDataUpdate()
                     removeFromContribute(active.id)
-                    changeDisplayedQuestion('0')    
+                    QuestionStore.deleteFromDatabase(active.id)
+                    changeDisplayedQuestion('0')
+                    UserStore.openPopup("Deletion successful!")    
                 }
             }
             activeTab.value = 0
@@ -344,6 +343,13 @@ async function getActivePerms() {
         return true
 
     }
+}
+
+function displayQnPreview(lastModified : string) {
+    blobURL.value = getQnPreviewURL(active.id, lastModified)
+}
+function resetQnPreview() {
+    blobURL.value = ""
 }
 
 function resetActivePerms() {

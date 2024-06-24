@@ -11,7 +11,6 @@
 
     const popupSize = ref(props.size)
     watch(() => props.size, (newS, oldS) => {
-        console.log(`New popup size: ${newS}`)
         popupSize.value = newS
     })
 

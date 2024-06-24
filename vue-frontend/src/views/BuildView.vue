@@ -34,9 +34,9 @@ const worksheet : ws = reactive({
 })
 
 QuestionStore.$onAction(
-    ({name, store, args, after, onError }) => {
+    ({name, store, args, after, onError } : any) => {
         if ( (name == 'insertQnFromDatabaseToBuild') || (name == 'insertElementIntoBuild') || (name == 'deleteElementFromBuild') || (name == 'updateElement') || (name == 'swapTwoElementsInBuild') ) {
-            after((result) => {
+            after((result : any) => {
                 if (result) {
                     const newBuildQnList = QuestionStore.getBuild() as worksheetElement[]
                     worksheet.elements = newBuildQnList
@@ -44,7 +44,7 @@ QuestionStore.$onAction(
             })
         }
 		if ( (name == 'setBuildWorksheetPage') || (name == 'setBuildWorksheetTemplate') || (name == 'setBuildWorksheetText') || (name == 'setBuildWorksheetTitle')) {
-			after((result) => {
+			after((result : any) => {
 				if (result) {
 					const newBuildwsConfig = QuestionStore.getBuildworksheetConfig() as worksheetConfig
 					worksheet.config = newBuildwsConfig

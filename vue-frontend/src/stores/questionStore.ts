@@ -256,6 +256,16 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
     function populateDatabase(v : qn[]) {
         database.qnArray = v
     }
+    function deleteFromDatabase(ID : string) {
+        // Does not delete or clear local javascript object
+        const i = getQnIndexUsingID(database, ID)
+        if (i > -1) {
+            database.qnArray.splice(i, 1)
+            return true
+        } else {
+            return false
+        }
+    }
 
             // POPULATE CONTRIBUTE (by value)
 
@@ -423,7 +433,7 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         resetDatabase, resetContribute, resetBuild, 
 
         // Database store functions
-        populateDatabase,
+        populateDatabase, deleteFromDatabase,
         // Contribute store functions
         insertIntoContribute, insertFromDatabaseToContribute, deleteFromContribute, setContributeActiveID,
         // Build store functions

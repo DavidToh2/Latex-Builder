@@ -57,9 +57,9 @@ onMounted(() => {
 })
 
 UserStore.$onAction(
-	({name, store, args, after, onError}) => {
+	({name, store, args, after, onError} : any) => {
 		if (name == 'setUserData') {
-			after((result) => {
+			after((result : any) => {
 				setUserData()
 			})
 		}

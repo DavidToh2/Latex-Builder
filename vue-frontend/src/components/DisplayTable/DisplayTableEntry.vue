@@ -1,12 +1,15 @@
 <script setup lang="ts">
 
-    import { computed } from 'vue'
+    import { computed, onActivated, ref } from 'vue'
     import type { qn } from '@/types/QuestionTypes'
 
     import LatexPreview from '../Latex/LatexPreview.vue'
+    import { getQnPreviewURL } from '@/aux'
 
     import { useQuestionStore } from '@/stores/questionStore'
+    import { useUserStore } from '@/stores/userStore'
     const QuestionStore = useQuestionStore()
+    const UserStore = useUserStore()
 
     interface Props {
         q : qn,
@@ -45,6 +48,13 @@
         return QuestionStore.getQnDisplayID(props.q)
     })
 
+    const blobURL = ref("")
+
+    onActivated(() => {
+        blobURL.value = getQnPreviewURL(props.q.id, props.q.lastModified)
+        console.log(`Generated blobURL ${blobURL.value}`)
+    })
+
 </script>
 
 <template>
@@ -81,7 +91,7 @@
         <div class="display-table-question display-table-cell">
             {{ q.question }}
         </div>
-        <LatexPreview :source="'haha'"/>
+        <LatexPreview :source="blobURL"/>
     </div>
 </template>
 
