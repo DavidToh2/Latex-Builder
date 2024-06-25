@@ -3,7 +3,8 @@
 This document describes the steps taken to deploy both the server and the database onto their respective cloud services.
 
 - [Introduction](#introduction)
-- [Server: Docker + AWS Lightsail](#server-docker--aws-lightsail)
+- [Server: Publishing Docker Image](#server-publishing-docker-image)
+- [Server: Deploying to AWS Lightsail](#server-deploying-to-aws-lightsail)
   - [Deploying to Lightsail using Deployment Interface](#deploying-to-lightsail-using-deployment-interface)
   - [Deploying to Lightsail using AWS CLI Lightsail Plugin](#deploying-to-lightsail-using-aws-cli-lightsail-plugin)
   - [Environment Variables](#environment-variables)
@@ -11,8 +12,9 @@ This document describes the steps taken to deploy both the server and the databa
 - [Database: MongoDB Atlas](#database-mongodb-atlas)
   - [Network Access (TBD)](#network-access-tbd)
 
+# Server: Publishing Docker Image
 
-# Server: Docker + AWS Lightsail
+# Server: Deploying to AWS Lightsail
 
 We set up an AWS Lightsail container service called **latexbuilder**. This service will host our container, **latexquestionbank**.
 

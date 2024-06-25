@@ -16,7 +16,6 @@ This document is intended as a guide for people wishing to start their own conta
   - [Docker Compose](#docker-compose)
 - [Part 3: Setting Up Mongoose](#part-3-setting-up-mongoose)
   - [Mongoose](#mongoose)
-  - [Mongo Image (for development)](#mongo-image-for-development)
 
 
 # Part 1. Setting up NodeJS
@@ -213,10 +212,4 @@ mongoose.connection.on('error', callback)
 mongoose.connection.once('open', app logic)
 ```
 
-## Mongo Image (for development)
-
-Download the official Mongo Docker image. This will serve as our local database during development. Documentation for this image can be found [here](https://hub.docker.com/_/mongo)
-- Execute `docker pull mongo:latest`
-- The image stores its database data internally in `/data/db`
-- We should thus create a volume `server_db-data` to persist the database data, so that even if we need to re-build the Mongo container (e.g. if an image update is required), all the data is preserved.
-- This means we do not need to install MongoDB natively on our own machine. 
+For details of how the development database is set up, please refer to the [Development Configuration](../development/Configuration.md) document.

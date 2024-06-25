@@ -1,6 +1,6 @@
 # Introduction
 
-This file documents how the Docker container service for the server is set up.
+This file documents how the server Docker image is built.
 - [Introduction](#introduction)
 - [Dockerfile: latexbase](#dockerfile-latexbase)
   - [Node and Dependencies](#node-and-dependencies)

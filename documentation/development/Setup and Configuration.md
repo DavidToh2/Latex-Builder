@@ -1,19 +1,29 @@
 # Introduction
 
-This file documents how the development environment is configured.
+This file documents how the development environment is setup and configured.
 
 - [Introduction](#introduction)
+- [Mongo Docker Image](#mongo-docker-image)
 - [Docker-Compose](#docker-compose)
 - [Environment Variables](#environment-variables)
   - [Website](#website)
   - [Server](#server)
   - [Database](#database)
 
+# Mongo Docker Image
+
+We use the **official Mongo Docker image** as our local database during development. Documentation for this image can be found [here](https://hub.docker.com/_/mongo)
+- Execute `docker pull mongo:latest`
+- The image stores its database data internally in `/data/db`
+- We should thus create a volume `server_db-data` to persist the database data, so that even if we need to re-build the Mongo container (e.g. if an image update is required), all the data is preserved.
+  - This is done below using Docker-Compose. We could also do it manually though (refer to the [Setup and Basics Tutorial](../server/Setup%20and%20Basics%20Tutorial.md)).
+- This means we do not need to install MongoDB natively on our own machine. 
+
 # Docker-Compose
 
 We use Docker Compose to describe how our two containers (here known as services), housing our backend services, behave and interact with each other.
 
-Every service should have a `container_name` and an `image` (the former is optional but Docker-Compose will generate a default name for you otherwise). By convention we use the same name for all three; nonetheless, the distinction between the three concepts is important and is explained in the [Tutorial document](../server/Setup%20and%20Basics%20Tutorial.md).
+Every service should have a `container_name` and an `image` (the former is optional but Docker-Compose will generate a default name for you otherwise). By convention we use the same name for all three; nonetheless, the distinction between the three concepts is important and is explained in the [Setup and Basics Tutorial](../server/Setup%20and%20Basics%20Tutorial.md).
 ```
 services:
   latexquestionbank:
@@ -49,7 +59,7 @@ Apart from specifing the enviornment file and ports, we also need to specify tha
     volumes:
       - db-data:/data/db
 ```
-The volume name needs to be specified outside in a separate `volumes` category.
+The volume name needs to be specified outside in a separate `volumes` entry.
 ```
 volumes:
   db-data:
@@ -60,23 +70,16 @@ Because everything happens in the `/server` folder, Docker Compose automagically
 # Environment Variables
 
 ## Website
-Vite environment variables must be prefixed with a `VITE_` in front of their names. These environment variables must then be accessed with `import.meta.env`. 
 
-For example,
-```
-VITE_URL_PRODUCTION=https://server.towelet.app
-```
-
-In particular, the environment type (dev/prod) may be accessed with `import.meta.env.MODE`. This variable is built-in and lets us provide different functionalities for production and development purposes:
+The environment type (dev/prod) may be accessed with `import.meta.env.MODE`. This variable is built-in and lets us provide different functionalities for production and development purposes:
 ```js
 if (import.meta.env.MODE == 'production') {
     url = import.meta.env.VITE_URL_PRODUCTION
 }
 ```
 
-**Note that all string environment variables SHOULD NOT have quotation marks!!!**
-
 ## Server
+
 To enable development mode, set the `NODE_ENV` environment variable in our `.env` file:
 ```
 NODE_ENV=development
@@ -84,16 +87,19 @@ NODE_ENV=development
 
 The following dev-specific environment variables are also stored:
 ```
-MONGO_DEV_URI
+MONGO_DEV_URI=mongodb://admin_user:admin_password@questiondb:27017/?authSource=admin
 ```
 
 ## Database
-The following environment variables are required for our local mongo deployment. Refer to [the official Mongo image README](https://hub.docker.com/_/mongo) -> Environment variables for more information.
+
+The `mongo` image uses these two variables to initialise a root user in a newly created database:
 ```
-MONGO_INITDB_ROOT_USERNAME
-MONGO_INITDB_ROOT_PASSWORD
+MONGO_INITDB_ROOT_USERNAME=admin_user
+MONGO_INITDB_ROOT_PASSWORD=admin_password
 ```
-**Note that all string environment variables SHOULD NOT have quotation marks!!!**
+The user is stored in the `admin` collection. The documentation can be found [here](https://hub.docker.com/_/mongo), under Environment Variables.
+
+An existing database will not see its root credentials re-initialised. To re-initialise the credentials, wipe the database by removing the volume `server_db-data`.
 
 In `app.js`, we connect to our local deployment in development mode:
 ```js

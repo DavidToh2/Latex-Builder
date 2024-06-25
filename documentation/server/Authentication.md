@@ -4,9 +4,9 @@ This file documents how authentication is implemented.
 
 - [Introduction](#introduction)
 - [Authentication and Login Systems](#authentication-and-login-systems)
-  - [Session Store](#session-store)
-  - [Logging In](#logging-in)
-  - [Authentication Check (Backend)](#authentication-check-backend)
+	- [Session Store](#session-store)
+	- [Logging In](#logging-in)
+	- [Authentication Check (Backend)](#authentication-check-backend)
 - [Email Verification (TBA)](#email-verification-tba)
 
 

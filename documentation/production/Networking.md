@@ -52,7 +52,7 @@ This is done under the S3 console menu -> Permissions -> Bucket Policy:
             "Condition": {
                 "IpAddress": {
                     "aws:SourceIp": [
-                        // Paste Cloudflare's official list of IP addresses here.
+                        // Cloudflare's IP address list here
                     ]
                 }
             }
@@ -60,6 +60,8 @@ This is done under the S3 console menu -> Permissions -> Bucket Policy:
     ]
 }
 ```
+
+This was taken from [Cloudflare's official guide](https://developers.cloudflare.com/support/third-party-software/others/configuring-an-amazon-web-services-static-site-to-use-cloudflare/). I guess this is secure enough?
 
 # Backend 
 
