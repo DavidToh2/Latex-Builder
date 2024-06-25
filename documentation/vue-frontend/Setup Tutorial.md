@@ -99,7 +99,7 @@ We can also provide multiple components to each path, although this requires all
 ```
 
 We would then need to add `name` attributes to each of our `RouterView` objects. At most one of them can be un-named, and it will be assigned to the `default` component.
-```html
+```vue
 <RouterView name="c1" />
 <RouterView />
 <RouterView name="Footer" />
@@ -107,7 +107,7 @@ We would then need to add `name` attributes to each of our `RouterView` objects.
 
 We should use `<RouterLink />` objects in our component files to navigate between different routes. These can specify their target routes verbatim, or using their names:
 
-```html
+```vue
 <RouterLink :to="/">Home</RouterLink>
 <RouterLink :to="{name: 'profile', params: {username: 'David'}}">
     Profile
@@ -127,7 +127,7 @@ app.use(router)
 ## Single-file Component Structure
 
 Every SFC file, or `.vue` file, has three parts to it:
-```html
+```vue
 <script setup lang="ts">
     Javascript logic goes here.
 </script>
@@ -145,17 +145,25 @@ Our root component, `App.vue`, is where we control which pages are being display
 
 Child components can be used in parent components simply by importing them in the setup script, and using them as DOM objects in the template.
 
-```ts
-import Navbar from './components/Navbar.vue'
-<Navbar />
+```vue
+<script setup lang="ts">
+  import Navbar from './components/Navbar.vue'
+</script>
+<template>
+  <Navbar />
+</template>
 ```
 
 We can also manipulate them programmatically using the `<component>` object:
 
-```ts
-views = {HomeView, DocsView, AccountView} as {[id: string] : Component}
-currentView = ref("HomeView")
-<component :is="views[currentView]"></component>
+```vue
+<script setup lang="ts">
+  views = {HomeView, DocsView, AccountView} as {[id: string] : Component}
+  currentView = ref("HomeView")
+</script>
+<template>
+  <component :is="views[currentView]"></component>
+</template>
 ```
 
 # Project Configuration
@@ -166,7 +174,7 @@ All the official documentation can be found [here](https://vuejs.org/guide/quick
 
 **Vite** is Vue's default build tool. The [Vite Configuration Reference](https://vitejs.dev/config/) can be found here.
 
-For convenience, the default `vite.config.ts` file comes with a path alias which we may use to refer to the *source code root* in all our codefiles:
+For convenience, the default `vite.config.ts` file comes with a *path alias* which we may use to refer to the *source code root* in all our codefiles:
 
 ```
   resolve: {
@@ -180,6 +188,7 @@ All environment variables may be stored in your conventional `.env` file, but mu
 ```
 VITE_URL_PRODUCTION=https://server.towelet.app
 ```
+can be accessed with `import.meta.env.VITE_URL_PRODUCTION`.
 
 I believe these environment variables are baked into your program on build. Hence, they should be treated as public from the very beginning.
 
@@ -197,7 +206,7 @@ The *include* parameter specifies an array of filenames to be included in the pr
 "include": ["env.d.ts", "src/router.ts", "src/**/*", "src/**/*.vue"],
 ```
 
-Under *compilerOptions*, we may also specify custom path maps, relative to the `baseUrl`, that apply to all `import` statements:
+Under *compilerOptions*, we may also specify *path aliases*, relative to the `baseUrl`, that apply to all `import` statements:
 
 ```json
 "compilerOptions": {
@@ -208,6 +217,7 @@ Under *compilerOptions*, we may also specify custom path maps, relative to the `
     "types": ["node"]
 },
 ```
+(Note that any path aliases have to be specified in both the Vite and TS config files, as detailed in [this link](https://dev.to/tilly/aliasing-in-vite-w-typescript-1lfo).)
 
 The *types* parameter above is more complicated and I don't really get it either. [Full explanation here](https://stackoverflow.com/questions/39826848/typescript-2-0-types-field-in-tsconfig-json)
 
