@@ -14,9 +14,9 @@ This document is intended as a guide for people wishing to start their own conta
   - [Images and Containers](#images-and-containers)
   - [Volumes and Volume Mounts](#volumes-and-volume-mounts)
   - [Docker Compose](#docker-compose)
-- [Part 3: Setting Up Mongo Docker Image](#part-3-setting-up-mongo-docker-image)
-  - [Mongo Image](#mongo-image)
-  - [MongoDB with Docker Compose](#mongodb-with-docker-compose)
+- [Part 3: Setting Up Mongoose](#part-3-setting-up-mongoose)
+  - [Mongoose](#mongoose)
+  - [Mongo Image (for development)](#mongo-image-for-development)
 
 
 # Part 1. Setting up NodeJS
@@ -123,6 +123,8 @@ COPY . .
 CMD [ 'npm', 'start' ]
 ```
 
+Docker optimises the build procedure by treating every line/instruction in the Dockerfile as a single "layer" of the container. This allows it to skip re-building layers that were not modified since the last build (e.g. no changes to Node dependencies).
+
 ## Images and Containers
 
 3. Build the Docker image
@@ -148,10 +150,9 @@ CMD [ 'npm', 'start' ]
 
 ## Volumes and Volume Mounts
 
-A **volume** is a 'bucket' of data, stored on a local filesystem, that are *mounted* onto Docker containers.
+A **volume** is a 'bucket' of data, stored on a local filesystem, that are *mounted* onto Docker containers. Volumes are necessary because they are **persistent**: even if a container needs to be deleted to re-build its image, the volume may be re-attached to the same container later on.
 
-6. Volumes have a *name*, as well as a *target/destination directory* for mounting inside the container.
-    - For our MongoDB container, the default `target=/data/db`
+1. Volumes have a *name*, as well as a *target/destination directory* inside the container.
     - Execute `docker run [container] --mount source=[name] target=[dest]` or `docker run [container] --volume [name]:[dest]` to create a volume
     - Volumes are actually stored somewhere on the local system! Execute `docker volume inspect` and refer to the `Mountpoint` for the mounted location.
 
@@ -191,28 +192,31 @@ services:
 volumes:
     [source/name]: (uses default options)
 ```
-Our app will have two services - one for the server, and one for the database. Both services will need to be configured in the `docker-compose.yml`.
+Our app will have two services - one for the server, and one for the database. Both services will need to be configured in the `docker-compose.yml`. More details are in the [Development Configuration](../development/Configuration.md) file.
 
-# Part 3: Setting Up Mongo Docker Image
+# Part 3: Setting Up Mongoose
 
 We use the NoSQL database framework Mongo, as well as its NodeJS extension Mongoose. For more information, refer to [Database](./Database.md).
 
-## Mongo Image
+## Mongoose
 
-1. Install the Mongoose NodeJS extension
-    - Execute `npm install mongoose`
+Install the Mongoose NodeJS extension:
+- Execute `npm install mongoose`
 
-2. Download the official Mongo Docker image. This will serve as our local database during development.
-    - Execute `docker pull mongo:latest`
-    - We do not need to install MongoDB natively on our own machine. Anyway, the MongoDB Community Edition Server doesn't support Ubuntu 22.04, and MongoDB Atlas is paid
-    - The `mongo` image requires environment variables to be set up.
+Connect to a database programmatically:
 
-## MongoDB with Docker Compose
+```js
+const mongoose = require('mongoose')
 
-3. To configure the MongoDB database using Docker-Compose:
-    - Include the names of the container and image used
-    - Port: `27017:27017`, the MongoDB default
-    - Create a mounted volume `<host-dir>:/data/db`. This allows the database data, normally stored under `/data/db`, to be persistent across container start/stops.
-    - Add a reference to the `env_file`
-    - Add a link from our app service to the database service
-    - Copy the `MONGO_URI` over to our `.env` file
+mongoose.connect(mongo_url)
+mongoose.connection.on('error', callback)
+mongoose.connection.once('open', app logic)
+```
+
+## Mongo Image (for development)
+
+Download the official Mongo Docker image. This will serve as our local database during development. Documentation for this image can be found [here](https://hub.docker.com/_/mongo)
+- Execute `docker pull mongo:latest`
+- The image stores its database data internally in `/data/db`
+- We should thus create a volume `server_db-data` to persist the database data, so that even if we need to re-build the Mongo container (e.g. if an image update is required), all the data is preserved.
+- This means we do not need to install MongoDB natively on our own machine. 
