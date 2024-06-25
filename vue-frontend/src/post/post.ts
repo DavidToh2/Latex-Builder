@@ -1,6 +1,6 @@
 import { getFormData } from "@/aux"
-const URL_DEV = 'http://localhost:3000'
-const URL_PROD = import.meta.env.VITE_URL_PRODUCTION as string
+const URL_DEV = import.meta.env.VITE_URL_SERVER_DEV as string
+const URL_PROD = import.meta.env.VITE_URL_SERVER_PROD as string
 var BASE_URL : string = URL_PROD
 if (import.meta.env.MODE == 'development') {
     BASE_URL = URL_DEV
