@@ -76,3 +76,4 @@ router.post(route1, <function to execute if unauthenticated>){}
 [Using `express-session` and MongoDB to manage sessions](https://developer.okta.com/blog/2021/06/07/session-mgmt-node)
 
 # Email Verification (TBA)
+

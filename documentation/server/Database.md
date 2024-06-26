@@ -8,6 +8,7 @@ This file serves to document our database implementation, as well as how it inte
 - [Schemas](#schemas)
 - [Database Operations](#database-operations)
   - [File Functions](#file-functions)
+  - [Mongoose: save() vs findOneAndUpdate()](#mongoose-save-vs-findoneandupdate)
 
 ## What is Mongo?
 
@@ -41,3 +42,12 @@ Each file corresponds to a specific database and model which its Mongoose connec
 const templateDB = mongoose.connection.useDb('templates', { useCache: true })
 const DocumentTemplates = templateDB.model('templates', TemplateSchema)
 ```
+
+## Mongoose: save() vs findOneAndUpdate()
+
+Mongoose provides a variety of different ways to perform document updates. A summary can be found [here](https://masteringjs.io/tutorials/mongoose/update).
+
+| Function                   | Use Case                                                                                                                           | Examples                      |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
+| `findOne()`, then `save()` | <li>Non-atomic</li> <li>Explicitly check for presence of document</li> <li>Check other document fields before updating</li> <li>Load document into program memory</li> <li>Automatic validation</li>| `modifyUser`, `admin_modifyAccountStatus` |
+| `findOneAndUpdate()`       | <li>Atomic</li> <li>Returns `(err, document) = (null, null)` if document missing</li> <li>Returns updated document with `{new: true}`</li> <li>Run validators with `{runValidators: true}`</li>| `setQuestionPerms`, `saveQuestion`, `changePassword` |

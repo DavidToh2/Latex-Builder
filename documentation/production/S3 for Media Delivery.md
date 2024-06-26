@@ -181,6 +181,10 @@ There are three main options available to us:
 
 ## Solution
 
-We affix a timestamp to every image request, representing the `lastModified` time of that question. This way, the image displayed changes if and only if the `lastModified` value of a question changes.
+We affix a timestamp to every image URL as a request parameter, representing the `lastModified` time of that question. This way, the image displayed changes if and only if the `lastModified` value of a question changes:
+
+```
+https://media.towelet.app/1.png?1719381234567
+```
 
 Turns out our solution bypasses Cloudfront's caching mechanism nicely as well.

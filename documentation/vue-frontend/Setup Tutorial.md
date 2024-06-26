@@ -120,7 +120,7 @@ import router from "./router"
 app.use(router)
 ```
 
-**Note that our app does not use routers at all as we use a two-sided screen design.**
+**Note that our app doesn't really use routers at all as we use a two-sided screen design.**
 
 [Official Vue Router Guide](https://router.vuejs.org/guide/)
 
