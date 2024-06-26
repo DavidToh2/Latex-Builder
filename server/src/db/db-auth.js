@@ -1,4 +1,3 @@
-
 const { mongoose } = require('./db-connection')
 const { userSchema } = require('./models/user')
 const crypto = require('crypto')
@@ -39,7 +38,7 @@ async function newUser(userdata) {
             salt: new_salt,
             hashedPassword: new_hashedpassword,
             socialData: nU_social,
-            accountStatus: 'limited'
+            accountStatus: 'inactive'
         }
 
         // User error: user already exists
@@ -66,9 +65,9 @@ async function newUser(userdata) {
 
 async function modifyUser(userID, userdata) {
 
-    // Only for modifying social info.
+    // Only for modifying social bio.
 
-    const errorString = 'Failed to modify user info!'
+    const errorString = 'Failed to modify social bio!'
     try {
         const name = userdata.username
         const newBio = userdata.socialData.bio
@@ -322,7 +321,8 @@ async function changePassword(userID, data) {
             throw new UserError(errorString, 'Old password empty!')
         }
 
-        const u = await Users.findOne({ id: userID })
+        uID = { id: userID }
+        const u = await Users.findOne(uID)
         if (!u) {
             throw new DatabaseError(errorString, 'User not found!')
         }
@@ -353,9 +353,8 @@ async function changePassword(userID, data) {
             }
 
             const newHashedPassword = hashPassword(newPassword, salt)
-            u.hashedPassword = newHashedPassword
-
-            await u.save()
+            
+            await Users.findOneAndUpdate(uID, {hashedPassword: newHashedPassword})
 
             return 0
 
@@ -373,6 +372,30 @@ function hashPassword(pwd, salt) {
         const hashedPasswordBlob = crypto.pbkdf2Sync(pwd, salt, 100000, 64, 'sha512')
         const hashedPassword = hashedPasswordBlob.toString('hex')
         return hashedPassword
+    } catch(err) {
+        newError(err, errorString)
+    }
+}
+
+async function admin_modifyAccountStatus(userID, targetStatus) {
+
+    // Only for modifying account status.
+    const errorString = 'Failed to modify social bio!'
+    try {
+        const name = userdata.username
+        const newBio = userdata.socialData.bio
+        const u = await Users.findOne({ username: name })
+        if (!u) {
+            throw new DatabaseError(errorString, 'User not found!')
+        }
+        if (u.id != userID) {
+            throw new UserError(errorString, 'How did you manage to modify another person\'s data???')
+        }
+
+        u.socialData.bio = newBio
+        await u.save()
+
+        return 0
     } catch(err) {
         newError(err, errorString)
     }

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const dbAuth = require('../src/db/db-auth')
+const dbToken = require('../src/db/db-token')
 const { ResponseBody, ResponseError } = require('../src/express-classes/response')
 const { UserError, DatabaseError, ServerError } = require('../src/express-classes/error')
 
@@ -23,6 +24,17 @@ router.post('/signup', async function(req, res, next) {
         next(err)
     }
 
+})
+
+router.post('/validate/:token', async function(req, res, next) {
+
+    try {
+        const t = req.params['token']
+
+        const res = await dbToken.validateToken(t)
+    } catch(err) {
+        next(err)
+    }
 })
 
 router.post('/login', async function(req, res, next) {
