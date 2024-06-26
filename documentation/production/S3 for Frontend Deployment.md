@@ -5,16 +5,17 @@ This file describes the steps taken to deploy the web-app's frontend to producti
 The Vue frontend is compiled and minified in `./dist`, so that the site is now essentially static. These static files are then pushed to an **AWS S3 bucket**, which is proxied through **Cloudflare**.
 
 - [Introduction](#introduction)
-- [Configuring S3](#configuring-s3)
+- [S3](#s3)
   - [Creating S3 Bucket](#creating-s3-bucket)
-  - [IAM Profile](#iam-profile)
+  - [IAM User for Website Deployment](#iam-user-for-website-deployment)
   - [Configuring S3 for Website Hosting](#configuring-s3-for-website-hosting)
+  - [Restricting Public Access to S3 Bucket](#restricting-public-access-to-s3-bucket)
 - [Deployment](#deployment)
   - [Compiling Vue](#compiling-vue)
   - [Deploying to S3](#deploying-to-s3)
 
 
-# Configuring S3
+# S3
 
 ## Creating S3 Bucket
 
@@ -22,7 +23,7 @@ We set up an AWS S3 bucket, **towelet.app**, for hosting the static front-end we
 
 An S3 bucket is a way of hosting static files, and works especially well with one-page web applications such as Vue.bucket.
 
-## IAM Profile
+## IAM User for Website Deployment
 
 We create an IAM policy, **S3-sync-to-latex-builder-bucket**, with _read, write and list_ permissions to our S3 bucket, then assign it to the **towelet.app** bucket resource.
 
@@ -43,7 +44,34 @@ The index document is set to be `index.html`, which is also the root document ob
 
 We now have access to a public HTTP endpoint, http://towelet.app.s3-website-[region].amazonaws.com, from which we can access the webpage.
 
-The bucket needs to be further configured to ensure that it is secure. Details are in the [Networking](./Networking.md) document.
+## Restricting Public Access to S3 Bucket
+
+We need to configure our S3 frontend bucket's policy to restrict direct access via the HTTP endpoint. This is because direct user access via HTTP is insecure and prone to MITM attacks. Hence, users should only access the website via Cloudflare's HTTPS domain endpoint, and direct communication with our S3's HTTP endpoint should be relegated to the Cloudflare DNS.
+
+This is done under the S3 console menu -> Permissions -> Bucket Policy:
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::towelet.app/*",
+            "Condition": {
+                "IpAddress": {
+                    "aws:SourceIp": [
+                        // Cloudflare's IP address list here
+                    ]
+                }
+            }
+        }
+    ]
+}
+```
+
+This was taken from [Cloudflare's official guide](https://developers.cloudflare.com/support/third-party-software/others/configuring-an-amazon-web-services-static-site-to-use-cloudflare/). I guess this is secure enough?
 
 # Deployment
 

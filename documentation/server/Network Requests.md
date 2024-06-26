@@ -70,8 +70,23 @@ In `app.js`,
 
 1. Set an array of allowed origins.
 2. Check if the request is coming from an allowed origin. If it is, set the `Access-Control-Allow-Origin`, `-Headers` and `-Methods` headers in your response object.
-3. The response can only be sent if the request parameters adhere to the restrictions imposed by the three headers above.
+3. The response will only be sent if the request parameters adhere to the restrictions imposed by the three headers above. (I think this check is automatically done by Express and our browser.)
 4. To allow session cookies to be received and set by the server, set the `Access-Control-Allow-Credentials` header as well.
+```js
+	app.use('/*', (req, res, next) => {
+		const origin = req.get('origin')
+		if (allowedOrigins.includes(origin)) {
+			res.header("Access-Control-Allow-Origin", origin)
+			res.header("Access-Control-Allow-Headers", "Content-Type")
+			res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
+			res.header("Access-Control-Allow-Credentials", true)
+		}
+		if (req.method == "OPTIONS") {
+			return res.status(200).end()
+		}
+		next()
+	})
+```
 
 In the front-end,
 
@@ -83,8 +98,11 @@ In the front-end,
 We describe the procedure by which the front-end fetches a resource, or submits data, to the back-end.
 
 1. The front-end initiates a **pre-flight request** using the `OPTIONS` method.
-2. The back-end identifies the OPTIONS method as a pre-flight request, and sends back a `200 OK` response.
+   - The pre-flight request contains the relevant `Access-Control-Request-Headers`, `-Methods`, and the `Origin` headers. 
+2. The back-end identifies the OPTIONS method as a pre-flight request, and sends back a `200 OK` response if the origin and header checks are passed.
 3. The front-end sends the main resource request or submission using the `POST` method.
 4. The routing middleware `isAuthenticated` checks for the presence of a valid user ID in the session cookie, and if so, validates that the user is authenticated.
 5. Backend functions are called.
 6. The back-end sends the response payload according to the format described above.
+
+[Pre-flight Request Tutorial](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request)
