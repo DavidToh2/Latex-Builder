@@ -33,8 +33,11 @@
     const latexEnumStartNumber = ref(1)
     const latexEnumStartValid = computed(() => {
         if (/^\d{0,3}$/.test(latexEnumStart.value)) {
-            latexEnumStartNumber.value = Number(latexEnumStart.value)
-            updateLatexEnum()
+            const c = Number(latexEnumStart.value)
+            if (c != latexEnumStartNumber.value) {
+                latexEnumStartNumber.value = c
+                updateLatexEnum()
+            }
             return true
         } else {
             return false

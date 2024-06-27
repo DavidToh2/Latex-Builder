@@ -21,6 +21,7 @@
         (e: 'updateHeading', newHeading: latexHeading): void
     }>()
     function updateLatexHeading() {
+        console.log("Updating heading")
         emits('updateHeading', latexHeadingContent)
     }
 

@@ -49,7 +49,7 @@
     })
 
     const blobURL = ref("")
-    const showRawLatex = ref(true)
+    const showRawLatex = ref(false)
     
     blobURL.value = getQnPreviewURL(props.q.id, props.q.lastModified)
     console.log(`Generated blobURL ${blobURL.value}`)
