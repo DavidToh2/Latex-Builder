@@ -463,12 +463,12 @@ async function newID() {
 
 function parseSearchFields(qn) {
     for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
-        if (qn[key].length == 0) {
+        if (qn[key] == null) {
             delete qn[key]
         }
     }
     for (var key of ['sourceYear', 'question']) {
-        if (qn[key].length == 0) {
+        if (qn[key] == null) {
             delete qn[key]
         }
     }

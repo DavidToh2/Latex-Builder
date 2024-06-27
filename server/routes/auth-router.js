@@ -14,24 +14,28 @@ router.post('/signup', async function(req, res, next) {
         const userData = req.body
         console.log(userData)
 
-        const nU = await dbAuth.newUser(userData)
         const response = new ResponseBody(userData['fn'])
-        response.status = 0
+        response.status = await dbAuth.newUser(userData)
 
-        req.session.regenerate((err) => {if(err) next(err)})
-        res.json(response)
+        // Logs user out as well
+        req.session.destroy(function(err) {
+            if (err) next(err)
+            res.json(response)
+        })
     } catch(err) {
         next(err)
     }
 
 })
 
-router.post('/validate/:token', async function(req, res, next) {
+router.get('/validate/:token', async function(req, res, next) {
 
     try {
+        console.log("Validating token...")
         const t = req.params['token']
 
-        const res = await dbToken.validateToken(t)
+        const r = await dbToken.validateToken(t)    // Returns a response string
+        res.send(r)
     } catch(err) {
         next(err)
     }
@@ -145,11 +149,9 @@ router.post('/changepassword', isAuthenticated, async function(req, res, next) {
         const uID = req.session.uID
         const data = req.body
 
-        const r = await dbAuth.changePassword(uID, data)
-
         const response = new ResponseBody(data['fn'])
-        response.status = 0
-        response.body = r
+        response.status = await dbAuth.changePassword(uID, data)
+
         // Logs user out as well
         req.session.destroy(function(err) {
             if (err) next(err)
@@ -225,11 +227,8 @@ router.post('/delete', isAuthenticated, async function(req, res, next) {
         const uID = req.session.uID
         const data = req.body
 
-        const r = await dbAuth.deleteUser(uID)
-
         const response = new ResponseBody(data['fn'])
-        response.status = 0
-        response.body = r
+        response.status = await dbAuth.deleteUser(uID)
 
         req.session.destroy(function(err) {
             if (err) next(err)

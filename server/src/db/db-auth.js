@@ -3,10 +3,15 @@ const { userSchema } = require('./models/user')
 const crypto = require('crypto')
 const { UserError, DatabaseError, newError } = require('../express-classes/error')
 const Email = require('../email')
+const { newToken } = require('./db-token')
 
 const userDB = mongoose.connection.useDb('users', { useCache: true })
 
 const Users = userDB.model('users', userSchema)
+
+const SIGNUP_TOKEN_AGE = 30*60*1000
+const CHANGE_PASSWORD_TOKEN_AGE = 5*60*1000
+const DELETE_USER_TOKEN_AGE = 5*60*1000
 
 async function newUser(userdata) {
 
@@ -54,10 +59,16 @@ async function newUser(userdata) {
             throw new DatabaseError(errorString, 'newUser() method failed!')
         }
 
-        // Send welcome email to new user
-        Email.sendWelcomeSignupEmail(new_username, new_email, new_userID)
+        // Generate new token 
+        const t = await newToken(new_userID, "signup", SIGNUP_TOKEN_AGE)
+        if (!t) {
+            throw new UserError(errorString, "You have already submitted a signup request! Please check your email where you should have received a confirmation link. If the email is missing, please contact an administrator.")
+        }
 
-        return newUser
+        // Send welcome email to new user
+        Email.sendWelcomeSignupEmail(new_username, new_email, t)
+
+        return 0
     } catch(err) {
         newError(err, errorString)
     }
@@ -89,23 +100,28 @@ async function modifyUser(userID, userdata) {
 }
 
 async function deleteUser(userID) {
-    const errorString = "Failed to delete user:"
+    const errorString = "Failed to submit delete request:"
 
     try {
-        const u = await Users.findOne({ id: userID })
+        const u = await Users.findOne({ id: userID }).lean()
         if (!u) {
             throw new DatabaseError(errorString, 'User does not exist!')
         }
         
-        const d = await Users.deleteOne({ id: userID })
-        const deletedCount = d.deletedCount
-        if (deletedCount != 1) {
-            throw new DatabaseError(errorString, 'Deletion exception: number of removed users is not 1.')
+        // Generate new token
+        const t = await newToken(u['id'], "deleteAccount", DELETE_USER_TOKEN_AGE)
+        if (!t) {
+            throw new UserError(errorString, "You've already submitted an account deletion request. Please check your email where you should have received a confirmation link. If the email is missing, please contact an administrator.")
         }
 
+        u.accountStatus = "for-deletion"
+        u.save()
+
+        // Send confirmation email to user
+        Email.sendDeleteAccountEmail(u['username'], u['socialData']['email'], t)
         return 0
     } catch(err) {
-
+        newError(err, errorString)
     }
 }
 
@@ -244,6 +260,13 @@ async function authenticateUser(userdata) {
         const user = userArr[0]
         var userValidated = false
 
+        if (user.accountStatus == 'inactive') {
+            throw new UserError(errorString, 'You cannot log in until your account is activated!')
+        }
+        if (user.accountStatus == "for-deletion") {
+            throw new UserError(errorString, 'Your account has been slated for deletion. Contact an administrator if you believe this was in error.')
+        }
+
         const hashedPassword = hashPassword(password, user['salt'])
         const expectedPassword = user['hashedPassword']
 
@@ -322,7 +345,7 @@ async function changePassword(userID, data) {
         }
 
         uID = { id: userID }
-        const u = await Users.findOne(uID)
+        const u = await Users.findOne(uID).lean()
         if (!u) {
             throw new DatabaseError(errorString, 'User not found!')
         }
@@ -352,9 +375,15 @@ async function changePassword(userID, data) {
                 throw new UserError(errorString, 'Your new and old passwords cannot be identical!')
             }
 
+            // Hash the new password and create a token that stores it
             const newHashedPassword = hashPassword(newPassword, salt)
-            
-            await Users.findOneAndUpdate(uID, {hashedPassword: newHashedPassword})
+            const t = await newToken(userID, "changePassword", CHANGE_PASSWORD_TOKEN_AGE, [newHashedPassword])
+            if (!t) {
+                throw new UserError(errorString, 'You already previously requested for a password change. Please check your email where you should have received a confirmation link. If the email is missing, please contact and administrator.')
+            }
+
+            // Send a confirmation email to the client
+            Email.sendChangePasswordEmail(u['username'], u['socialData']['email'], t)
 
             return 0
 
@@ -377,30 +406,6 @@ function hashPassword(pwd, salt) {
     }
 }
 
-async function admin_modifyAccountStatus(userID, targetStatus) {
-
-    // Only for modifying account status.
-    const errorString = 'Failed to modify social bio!'
-    try {
-        const name = userdata.username
-        const newBio = userdata.socialData.bio
-        const u = await Users.findOne({ username: name })
-        if (!u) {
-            throw new DatabaseError(errorString, 'User not found!')
-        }
-        if (u.id != userID) {
-            throw new UserError(errorString, 'How did you manage to modify another person\'s data???')
-        }
-
-        u.socialData.bio = newBio
-        await u.save()
-
-        return 0
-    } catch(err) {
-        newError(err, errorString)
-    }
-}
-
 module.exports = {
     newUser, modifyUser, deleteUser,
 
@@ -410,5 +415,5 @@ module.exports = {
 
     findGroupUsingName,
 
-    changePassword
+    changePassword,
 }

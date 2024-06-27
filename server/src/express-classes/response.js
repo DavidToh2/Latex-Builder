@@ -1,5 +1,5 @@
 class ResponseBody {
-    constructor(fn = "undefined", status = "Success", body = {}) {
+    constructor(fn = "undefined", status = 0, body = {}) {
         this.fn = fn
         this.status = status
         this.body = body
@@ -7,7 +7,7 @@ class ResponseBody {
 }
 
 class ResponseError {
-    constructor(fn = "undefined", status = "Error", error = {}) {
+    constructor(fn = "undefined", status = -1, error = {}) {
         this.fn = fn
         this.status = status
         this.error = error

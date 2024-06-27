@@ -13,12 +13,15 @@ const tokenSchema = new Schema( {
     },
     purpose: {
         type: String,
-        enum: ['signup' | 'changePassword' | 'deleteAccount'],
+        enum: ['signup', 'changePassword', 'deleteAccount'],
         required: true
     },
     expiry: {
         type: Number,
         required: true
+    },
+    data: {
+        type: [String]
     }
 })
 

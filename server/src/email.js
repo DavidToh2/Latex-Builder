@@ -68,7 +68,7 @@ async function sendEmail(recipientEmail, emailSubject, emailContent) {
     
     try {
         const data = await client.send(emailToSend)
-        console.log("Email successfully sent!")
+        console.log(`Email successfully sent to ${recipientEmail}!`)
         return data
     } catch(err) {
         console.log("Email error occured:")
@@ -76,7 +76,7 @@ async function sendEmail(recipientEmail, emailSubject, emailContent) {
     }
 }
 
-async function sendWelcomeSignupEmail(username, email, userID) {
+async function sendWelcomeSignupEmail(username, email, token) {
 
     emailContent = `
     <body>
@@ -84,15 +84,67 @@ async function sendWelcomeSignupEmail(username, email, userID) {
             <h1>Welcome to Latex Builder!</h1>
             <p>Thank you for signing up, ${username}. To confirm your email address, click on the following link to activate your account:</p>
             <div style="display: flex; justify-content: center; width: 100%;">
-                <div class="link">Hello there!</div>
+                <a href="${formatLink(token)}">
+                    <div class="link">Click Here</div>
+                </a>
             </div>
+            <p>Please note that this should be done within 30 minutes of receipt of this email, otherwise you will have to sign up again.</p>
+            <p>You may ignore this email if you believe it was sent in error.</p>
         </div>
     </body>
     `
 
-    await sendEmail(email, "Latex Builder: Verify your Email", HTMLHead + emailContent + HTMLFoot)
+    await sendEmail(email, "Latex Builder: Verify your signup email", HTMLHead + emailContent + HTMLFoot)
+}
+
+async function sendChangePasswordEmail(username, email, token) {
+    emailContent = `
+    <body>
+        <div class="box">
+            <h1>Hello, ${username}.</h1>
+            <p>You are receiving this email because we believe you requested a password change.</p>
+            <p>To complete the change, click on the following link:</p>
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <a href="${formatLink(token)}">
+                    <div class="link">Click Here</div>
+                </a>
+            </div>
+            <p>Please note that this should be done within 5 minutes of receipt of this email, otherwise you will have to perform the request again.</p>
+            <p>You may ignore this email if you believe it was sent in error.</p>
+        </div>
+    </body>
+    `
+
+    await sendEmail(email, "Latex Builder: Verify your password change", HTMLHead + emailContent + HTMLFoot)
+}
+
+async function sendDeleteAccountEmail(username, email, token) {
+    emailContent = `
+    <body>
+        <div class="box">
+            <h1>Hello, ${username}.</h1>
+            <p>You are receiving this email because we believe you requested to delete your account.</p>
+            <p>To complete the account deletion, click on the following link:</p>
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <a href="${formatLink(token)}">
+                    <div class="link">Click Here</div>
+                </a>
+            </div>
+            <p>Please note that this should be done within 5 minutes of receipt of this email, otherwise you will have to perform the request again.</p>
+            <p>You may ignore this email if you believe it was sent in error.</p>
+        </div>
+    </body>
+    `
+
+    await sendEmail(email, "Latex Builder: Verify your password change", HTMLHead + emailContent + HTMLFoot)
+}
+
+function formatLink(token) {
+    return `https://server.towelet.app/auth/validate/${token}`
 }
 
 module.exports = {
-    sendWelcomeSignupEmail
+    sendWelcomeSignupEmail,
+    sendChangePasswordEmail,
+    sendDeleteAccountEmail
 }

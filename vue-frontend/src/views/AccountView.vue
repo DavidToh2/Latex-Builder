@@ -32,7 +32,7 @@ function pageStatusLogin() {
         // Signup
 
 function signupSuccess() {
-    popup("Signup successful!")
+    popup("Please check your email and open the confirmation link to complete the signup procedure, then login to your account. Your account will remain inactive until you do so!")
     pageStatusSignupToggle()
 }
 function pageStatusSignupToggle() {
@@ -51,7 +51,7 @@ function pageStatusLogout() {
 
 function pageStatusPasswordChange(b : boolean) {
     if (b) {
-        popup("Password successfully changed! Please re-login to your account.")
+        popup("Please check your email and open the confirmation link to complete the password change, then re-login to your account.")
         isLoggedIn.value = false
     }
 }
@@ -62,7 +62,7 @@ function pageStatusPasswordChange(b : boolean) {
 
 function pageStatusUserDeleted() {
     isLoggedIn.value = false
-    popup("Your user has been deleted. We hope to see you again!")
+    popup("Please check your email and open the confirmation link to complete account deletion. We hope to see you again!")
 }
 
 </script>
