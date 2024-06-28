@@ -259,7 +259,7 @@ function closePopup() {
 
 	<Navbar class="navbar" :active-views="activeViews" @update-view="updateView"/>
 
-	<div class="container-main" id="container-left">
+	<div class="container-main no-scrollbar" id="container-left">
 		<Transition :name="transitionType" :mode="transitionMode">
 			<KeepAlive>
 				<component :is="views[currentLeftView]"></component>
@@ -267,7 +267,7 @@ function closePopup() {
 		</Transition>
 	</div>
 
-	<div class="container-main" id="container-right">
+	<div class="container-main no-scrollbar" id="container-right">
 		<Transition :name="transitionType" :mode="transitionMode">
 			<KeepAlive>
 				<component :is="views[currentRightView]"></component>

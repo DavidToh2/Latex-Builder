@@ -16,6 +16,7 @@
 	border: 1px solid var(--colour-border);
 	padding: 5px 12px;
 	border-radius: 6px;
+	min-height: calc(var(--font-size) + 12px);
 }
 
 .input {
@@ -26,6 +27,7 @@
 	border: 1px solid var(--colour-border);
 	padding: 5px 12px;
 	border-radius: 6px;
+	min-height: calc(var(--font-size) + 12px);
 }
 
 .textbox {
@@ -200,6 +202,12 @@
 		align-items: center;
 		overflow-x: hidden;
 		overflow-y: scroll;
+
+		-ms-overflow-style: inherit;  /* Internet Explorer 10+ */
+		scrollbar-width: inherit;  /* Firefox */
+	}
+	.viewport::webkit-scrollbar {
+		display: inherit;
 	}
 
 	.tooltip::after {
@@ -210,3 +218,10 @@
 	}
 }
   
+.no-scrollbar {
+	-ms-overflow-style: none;  /* Internet Explorer 10+ */
+	scrollbar-width: none;  /* Firefox */
+}
+.no-scrollbar::webkit-scrollbar {
+	display: none;  /* Safari and Chrome */
+}

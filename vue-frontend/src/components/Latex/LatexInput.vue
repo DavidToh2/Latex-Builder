@@ -63,7 +63,7 @@
 
 </script>
 <template>
-    <div class="latex-container">
+    <div class="latex-container no-scrollbar">
         <textarea class="latex-text" v-model="latexContent" :placeholder="placeholder"
             @focusin="latexShow($event)" @keydown="latexUpdate($event)"
             @focusout="latexUpdateDone()">

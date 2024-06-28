@@ -96,7 +96,7 @@
 
 <template>
     <div class="dropdown-container">
-        <div class="dropdown-description textbox">
+        <div class="textbox dropdown-description">
             {{ description }}
         </div>
         <div class="dropdown-search-container" @mouseenter="search.active = true" @mouseleave="search.active = false">
@@ -108,13 +108,13 @@
                         </Entry>
                     </template>
                 </div>
-                <textarea :rows="searchbarRows" class="dropdown-search" autocomplete="off"
-                    :name="internalName"
-                    v-model="search.searchText">
-                </textarea>
             </div>
             
             <ul class="dropdown-list" v-show="search.active">
+                <textarea :rows="searchbarRows" class="dropdown-search" autocomplete="off"
+                    :name="internalName" placeholder="Search here"
+                    v-model="search.searchText">
+                </textarea>
                 <li v-for="item in props.availableSelections"
                     v-show="search.availableSelections.includes(item)"
                     class="dropdown-option-container">
@@ -134,7 +134,8 @@
 .dropdown-container {
     display: flex;
     flex-direction: v-bind('dropdownDir');
-    justify-items: center;
+    align-items: flex-start;
+    justify-content: center;
     gap: 7px;
     padding: 0px 7px;
     position: relative;
@@ -149,12 +150,16 @@
 }
 
 .dropdown-description {
+    padding-top: 5px;
     font-size: var(--font-size-lg1);
-    height: 100%;
 }
 
 .dropdown-search-container {
     width: 100%;
+}
+
+.dropdown-searchbar {
+    min-height: 32px;
 }
 
 .dropdown-active-selections {
@@ -172,7 +177,9 @@
 
 .dropdown-search {
     width: 100%;
-    border: none;
+    padding: 5px 8px;
+    
+    border-bottom: 1px solid var(--colour-border);
     resize: none;
 }
 

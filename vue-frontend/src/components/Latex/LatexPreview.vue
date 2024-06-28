@@ -22,7 +22,7 @@
 
 </script>
 <template>
-    <div class="latex-preview" v-show="imageDisplayed">
+    <div class="latex-preview no-scrollbar" v-show="imageDisplayed">
         <span class="latex-preview-black-line-hotfix"></span>
         <img :src="source" class="latex-preview-img">
     </div>
