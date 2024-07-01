@@ -1,10 +1,4 @@
-<script setup lang="ts">
-
-</script>
 <template>
-    <div class="viewport">
-        DocsView
-    </div>
+    <!-- <div class="viewport">
+    </div> -->
 </template>
-<style scoped>
-</style>

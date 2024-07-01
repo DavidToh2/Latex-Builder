@@ -33,7 +33,7 @@ function getFormData(f : HTMLFormElement) {
 }
 
 function getQnPreviewURL(qID : string, qLastModified : string) {
-    return `${import.meta.env.VITE_URL_MEDIA}/${qID}.png?${qLastModified}`
+    return `${import.meta.env.VITE_URL_FILES}/${import.meta.env.VITE_URL_QN}/${qID}.png?${qLastModified}`
 }
 
 export { 

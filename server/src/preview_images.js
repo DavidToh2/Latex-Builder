@@ -1,6 +1,8 @@
 const { S3Client, DeleteObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3")
 const fs = require('fs')
 
+const QN_PATH = 'qn'
+
 const client = new S3Client({ 
     region: "ap-southeast-1",
     credentials: {
@@ -12,7 +14,7 @@ const previewBucket = process.env.AWS_S3_BUCKET
 
 async function uploadPreview(filePath, qID) {
     imagePath = `${filePath}/preview.png`
-    imageName = `${qID}.png`
+    imageName = `${QN_PATH}/${qID}.png`
     image = fs.createReadStream(imagePath)
     image.on('error', (err) => { if (err) throw err })
 
@@ -36,7 +38,7 @@ async function uploadPreview(filePath, qID) {
 }
 
 async function deletePreview(qID) {
-    imageName = `${qID}.png`
+    imageName = `${QN_PATH}/${qID}.png`
 
     const params = {
         "Bucket": previewBucket,
