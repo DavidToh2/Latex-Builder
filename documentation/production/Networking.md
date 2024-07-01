@@ -2,7 +2,7 @@
 
 This document serves to be a primer on DNS, Routing and Web protocol concepts. It also details the steps taken to configure the app's web communications correctly in a production environment.
 
-<img src="Images/dns-flowchart.png">
+<img src="./Images/dns-flowchart.png">
 
 - [Introduction](#introduction)
 - [Networking Primer](#networking-primer)
@@ -71,13 +71,13 @@ Technically, SSL certificates can be self-signed. However, most browsers do not 
 
 ## Domain and Routing
 
-We purchase a domain, [towelet.app](towelet.app), from the Cloudflare registrar. This domain will be registered within the Cloudflare DNS.
+We purchase a domain, [towelet.app](https://towelet.app), from the Cloudflare registrar. This domain will be registered within the Cloudflare DNS.
 
 We add the following entries to our domain's lookup table:
 - a CNAME record for the domain root, pointing to our S3 frontend;
 - a CNAME record for the `server` subdomain, pointing to our Lightsail backend.
 
-<img src="Images/dns-config.png">
+<img src="./Images/dns-config.png">
 
 ## Configuring HTTP/HTTPS
 

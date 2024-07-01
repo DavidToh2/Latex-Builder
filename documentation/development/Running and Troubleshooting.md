@@ -94,7 +94,7 @@ Changing "external" code, such as those in `.ts` files imported by multiple view
 
 We may use **Docker Desktop** to view the files, as well as start a new terminal, in an existing running container:
 
-<img src="Images/docker-desktop.png">
+<img src="./Images/docker-desktop.png">
 
 We may also use the command
 

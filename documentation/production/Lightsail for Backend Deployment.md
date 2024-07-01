@@ -30,7 +30,7 @@ We set up an AWS Lightsail container service called **latexbuilder**. This servi
 
 We can use the Lightsail Deployment Interface to directly *pull images from Docker Hub* into AWS Lightsail. We are required to enter the full image name: `registry.hub.docker.com/<user>/<image>:<tag>`. Ensure that the image is public before pulling.
 
-<img src="Images/lightsail-deployment.png" width=50%>
+<img src="./Images/lightsail-deployment.png" width=50%>
 
 Once the deployment is live, we can connect to the Lightsail container via a public HTTPS URL:
 ```
@@ -123,7 +123,7 @@ For Cloudflare to communicate with Lightsail over HTTPS, we need to create and i
 
 We generate an SSL certificate in the AWS Lightsail dashboard, specifying our backend's subdomain as the origin domain.
 
-<img src="Images/dns-config-lightsail-1.png" width=50%>
+<img src="./Images/dns-config-lightsail-1.png" width=50%>
 
 This generates a `key:value` pair in the form
 ```
@@ -132,7 +132,7 @@ value: _RNG2.RNG3.acm-validations.aws
 ```
 which we will have to add as `name:target` to Cloudflare's domain lookup table, in order to verify that we own the domain we specified. (Remove the dots at the end of both strings.)
 
-<img src="Images/dns-config-lightsail-2.png">
+<img src="./Images/dns-config-lightsail-2.png">
 
 Once verification is complete, we will be able to access our Lightsail deployment using our domain.
 

@@ -24,7 +24,7 @@ await fetch(url, {
 
 ## Response Handling
 
-Exact response format can be found in the [Server Networking](/documentation/server/Networking.md) documentation.
+Exact response format can be found in the [Server Networking](../server/Network%20Requests.md) documentation.
 
 On receipt of a response, `post.ts` will pass the response data back to the helper functions, which then parse the response data back into `JSON` or `BLOB` (for files) format, before passing the data back to the components that requested said data.
 

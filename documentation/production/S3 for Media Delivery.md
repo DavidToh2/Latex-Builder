@@ -86,15 +86,15 @@ Example:
 
 We will serve our images through Cloudfront to reduce the volume of data transfer that S3 has to handle.
 
-To do so, we first create a new Cloudfront distribution. This distribution will usually have the URL format [https://[gibberish].cloudfront.net]().
+To do so, we first create a new Cloudfront distribution. This distribution will usually have the URL format `https://[gibberish].cloudfront.net`.
 
 We add our S3 bucket as the origin. (Note that Amazon will automatically create an _Origin Access Control_ (OAC) for us. This may be viewed in the Security -> Origin Access section of the Cloudfront console.)
 
 ## Custom SSL Certificate using Amazon Certificate Manager
 
-We will then route all traffic to this distribution through our domain, `media.towelet.app`. An SSL certificate associated with our domain is required for us to be able to do so.
+We will then route all traffic to this distribution through our domain, `files.towelet.app`. An SSL certificate associated with our domain is required for us to be able to do so.
 
-<img src="Images/acm-cert-1.png">
+<img src="./Images/acm-cert-1.png">
 
 Because Cloudflare uses their own suite of universal SSL certificates (and requires us to pay for private ones), we must request for our own private certificate through ACM. Similar to custom domain validation for Lightsail, this generates a key:value pair in the form
 ```
@@ -103,7 +103,7 @@ value: _RNG2.RNG3.acm-validations.aws
 ```
 which we will have to add as `name:target` to Cloudflare's domain lookup table.
 
-<img src="Images/acm-cert-2.png">
+<img src="./Images/acm-cert-2.png">
 
 Once domain verification has succeeded, our cloudfront distribution is now accessible through our domain.
 
@@ -143,7 +143,7 @@ We should only allow resource sharing with requests originating from our website
     "Origin", "Range"
 ],
 "AllowedMethods": ["GET"],
-"AllowedOrigins": ["media.towelet.app"]
+"AllowedOrigins": ["files.towelet.app"]
 ```
 
 [S3 Cors Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ManageCorsUsing.html)
@@ -177,14 +177,14 @@ There are three main options available to us:
 - Caching disabled: No caching
 - Use Origin Cache Control Headers: Cloudfront adheres to the expiry time/age specified in the `Cache-Control` header of our origin request.
 
-<img src="Images/cloudfront-cache.png" width='70%'>
+<img src="./Images/cloudfront-cache.png" width='70%'>
 
 ## Solution
 
 We affix a timestamp to every image URL as a request parameter, representing the `lastModified` time of that question. This way, the image displayed changes if and only if the `lastModified` value of a question changes:
 
 ```
-https://media.towelet.app/1.png?1719381234567
+https://files.towelet.app/1.png?1719381234567
 ```
 
 Turns out our solution bypasses Cloudfront's caching mechanism nicely as well.

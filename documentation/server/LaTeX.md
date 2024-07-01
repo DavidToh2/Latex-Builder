@@ -6,7 +6,7 @@ Following the `latexbase` installation,
 - Texlive 2023 is now installed at `/usr/local/texlive/2023`;
 - Local Texlive settings, as well as custom classes and stylesheets, can be configured at `/usr/local/texlive/texmf-local`.
 
-For more details, refer to the [Containers](./Containers.md) documentation.
+For more details, refer to the [Dockerfile Build](./Dockerfile%20Build.md) documentation.
 
 - [Introduction](#introduction)
 - [LaTeX Packages](#latex-packages)
