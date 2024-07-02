@@ -31,18 +31,19 @@
 
     const latexEnumStart = ref('1')
     const latexEnumStartNumber = ref(1)
-    const latexEnumStartValid = computed(() => {
+    const latexEnumStartValid = ref(true)
+    function updateLatexEnumStart() {
         if (/^\d{0,3}$/.test(latexEnumStart.value)) {
             const c = Number(latexEnumStart.value)
             if (c != latexEnumStartNumber.value) {
                 latexEnumStartNumber.value = c
-                updateLatexEnum()
             }
-            return true
+            latexEnumStartValid.value = true
+            updateLatexEnum()
         } else {
-            return false
+            latexEnumStartValid.value = false
         }
-    })
+    }
 
     const latexEnumTemplateValid = computed(() => {
         if (latexEnumContent.template.includes('LABEL')) {
@@ -84,7 +85,7 @@
                 <div style="display: flex; flex-direction: row; gap: 20px;">
                     <div style="width: min-content;">Starting index:</div>
                     <input class="input-sm latex-enum-settings-startindex" 
-                        v-model="latexEnumStart" @focusout="updateLatexEnum">
+                        v-model="latexEnumStart" @focusout="updateLatexEnumStart">
                 </div>
                 <div class="latex-enum-settings-error" v-if="!latexEnumStartValid">
                     Starting index should be between 0 and 999.

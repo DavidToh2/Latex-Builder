@@ -16,8 +16,11 @@ const QuestionStore = useQuestionStore()
     }>()
 
     const itemContent = reactive(props.item.body)
-    const itemType = ref(props.item.type)
-    const id = ref(itemContent.id)
+    const itemType = ref("" as "placeholder" | "qn" | latexTypeNames)
+    const id = ref()
+
+    itemType.value = props.item.type
+    id.value = itemContent.id
 
     const emits = defineEmits<{
         (e: 'delete', ID: string): void
