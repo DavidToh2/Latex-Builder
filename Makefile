@@ -3,8 +3,11 @@ latex-base:
 
 copy-docs:
 	( \
-	rmdir ./vue-frontend/public/docs; \
-	cp -r ./documentation ./vue-frontend/public/docs \
+	rm -r ./vue-frontend/docs/{development,production,server,vue-frontend}; \
+	rm ./documentation/docs-hierarchy.json; \
+	./scripts/generateDocHierarchy.sh $(PWD) && \
+	cp -a ./documentation/. ./vue-frontend/docs && \
+	./scripts/formatDocNames.sh $(PWD) \
 	)
 
 .PHONY: latex-base copy-docs
