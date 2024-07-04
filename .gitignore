@@ -132,3 +132,5 @@ dist
 
 .vscode/
 *.code-workspace
+
+scripts/base.sh
