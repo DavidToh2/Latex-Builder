@@ -49,7 +49,7 @@ router.post('/get/pdf', isAuthenticated, function(req, res, next) {
             const uID = req.session.uID
             filePath = `${uID}/document/output.pdf`
         }
-        // console.log(filePath)
+        console.log(`Fetching file ${filePath}...`)
 
         res.sendFile(filePath, sendFileOptions)
 

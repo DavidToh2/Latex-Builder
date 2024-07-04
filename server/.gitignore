@@ -1,8 +1,4 @@
-
 .env*
 .flaskenv*
 !.env.project
 !.env.vault
-
-documentation
-public/docs
