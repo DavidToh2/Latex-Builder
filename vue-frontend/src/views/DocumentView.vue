@@ -3,7 +3,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import Title from '@/components/PageTitle.vue'
 import Tab from '@/components/Tab/Tab.vue'
-import pdf from 'vue-pdf-embed'
+import VuePdfEmbed from 'vue-pdf-embed'
 import { useQuestionStore } from '@/stores/questionStore'
 import { getPDF } from '@/post/postFile'
 import { useUserStore } from '@/stores/userStore'
@@ -14,6 +14,8 @@ const activeTabID = ref(0)
 const documentTab = ['Document', 'Console Output']
 
 const blobURL = ref('')
+
+const pdfDisplayWidth = ref(300)
 
 const QuestionStore = useQuestionStore()
 const UserStore = useUserStore()
@@ -42,11 +44,12 @@ async function displayPDF(pdfName : string) {
         return false
     }
     try {
+        console.log(`Getting pdf ${pdfName}...`)
         const pdfResponse = await getPDF(pdfName)
         if (pdfResponse instanceof Blob) {
             // PDF successfully fetched
             blobURL.value = URL.createObjectURL(pdfResponse)
-            console.log(`Displaying PDF ${pdfName}`)
+            console.log(`Displaying PDF at URL ${blobURL.value} with width ${pdfDisplayWidth.value}`)
             return true
         } else {
             console.log(pdfResponse)
@@ -71,8 +74,6 @@ async function displayPDF(pdfName : string) {
     }
 }
 
-const pdfDisplayWidth = ref(300)
-
 function getPDFDisplayWidth() {
     const d = document.querySelector('#document-viewer') as HTMLDivElement
     const rect = d.getBoundingClientRect()
@@ -89,7 +90,7 @@ function getPDFDisplayWidth() {
         </div>
         <Tab internal-name="DocumentViewTab" :tab-left=documentTab :active-tab-index=activeTabID :tab-right="[]" />
         <div id="document-viewer">
-            <pdf
+            <VuePdfEmbed
                 :source="blobURL"
                 :width="pdfDisplayWidth"
                 :scale="3"
@@ -102,7 +103,7 @@ function getPDFDisplayWidth() {
 <style>
 
 #document-viewer {
-    border: 0px solid black;
+    border: 1px solid black;
     width: 90%;
 }
 

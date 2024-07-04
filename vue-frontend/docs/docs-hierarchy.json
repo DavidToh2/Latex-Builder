@@ -1,0 +1,41 @@
+[
+{
+"text": "development",
+ "items": [{ "text": "Running and Troubleshooting", "link": "/development/running-and-troubleshooting" }
+,{ "text": "Setup and Configuration", "link": "/development/setup-and-configuration" }
+]
+},
+{
+"text": "old",
+ "items": [{ "text": "*", "link": "/old/dockerfile-documentation-latex-builder.code-workspace-makefile-readme.md-scripts-server-vue-frontend" }
+]
+},
+{
+"text": "production",
+ "items": [{ "text": "AWS IAM", "link": "/production/aws-iam" }
+,{ "text": "Lightsail for Backend Deployment", "link": "/production/lightsail-for-backend-deployment" }
+,{ "text": "Networking", "link": "/production/networking" }
+,{ "text": "S3 for Frontend Deployment", "link": "/production/s3-for-frontend-deployment" }
+,{ "text": "S3 for Media Delivery", "link": "/production/s3-for-media-delivery" }
+,{ "text": "SES for Email Service", "link": "/production/ses-for-email-service" }
+]
+},
+{
+"text": "server",
+ "items": [{ "text": "Authentication", "link": "/server/authentication" }
+,{ "text": "Database", "link": "/server/database" }
+,{ "text": "Dockerfile Build", "link": "/server/dockerfile-build" }
+,{ "text": "Error Handling", "link": "/server/error-handling" }
+,{ "text": "Latex", "link": "/server/latex" }
+,{ "text": "Network Requests", "link": "/server/network-requests" }
+,{ "text": "Setup and Basics Tutorial", "link": "/server/setup-and-basics-tutorial" }
+]
+},
+{
+"text": "vue-frontend",
+ "items": [{ "text": "Authentication", "link": "/vue-frontend/authentication" }
+,{ "text": "Networking", "link": "/vue-frontend/networking" }
+,{ "text": "Setup Tutorial", "link": "/vue-frontend/setup-tutorial" }
+,{ "text": "(TBA) Draggable Search Table", "link": "/vue-frontend/(tba)-draggable-search-table" }
+]
+}]

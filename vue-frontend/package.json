@@ -8,7 +8,10 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "deploy": "aws --region ap-southeast-1 --profile latex-builder-deploy s3 sync ./dist s3://towelet.app"
+    "deploy": "aws --region ap-southeast-1 --profile latex-builder-deploy s3 sync ./dist s3://towelet.app",
+    "docs:dev": "vitepress dev --port 6174 docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "pinia": "^2.1.7",
@@ -31,6 +34,7 @@
     "prettier": "^2.7.1",
     "typescript": "~4.7.4",
     "vite": "^3.1.8",
+    "vitepress": "^1.2.3",
     "vue-tsc": "^1.0.8"
   }
 }
