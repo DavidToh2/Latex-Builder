@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+const docs_url = ref("https://docs.towelet.app/")
+if (import.meta.env.MODE == 'development') {
+    docs_url.value = "http://localhost:6174/"
+}
 
 </script>
 <template>
-    <iframe src="http://localhost:6174/" class="docs-page"></iframe>
+    <iframe :src="docs_url" class="docs-page"></iframe>
 </template>
 <style>
 
