@@ -34,6 +34,7 @@
 {
 "text": "vue-frontend",
  "items": [{ "text": "Authentication", "link": "/vue-frontend/authentication" }
+,{ "text": "Documentation Subsite", "link": "/vue-frontend/documentation-subsite" }
 ,{ "text": "Networking", "link": "/vue-frontend/networking" }
 ,{ "text": "Setup Tutorial", "link": "/vue-frontend/setup-tutorial" }
 ,{ "text": "(TBA) Draggable Search Table", "link": "/vue-frontend/(tba)-draggable-search-table" }
