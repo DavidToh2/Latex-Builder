@@ -190,11 +190,11 @@ services:
 volumes:
     [source/name]: (uses default options)
 ```
-Our app will have two services - one for the server, and one for the database. Both services will need to be configured in the `docker-compose.yml`. More details are in the [Development Configuration](../development/Setup%20and%20Configuration.md) file.
+Our app will have two services - one for the server, and one for the database. Both services will need to be configured in the `docker-compose.yml`. More details are in the [Development Configuration](../development/setup-and-configuration.md) file.
 
 # Part 3: Setting Up Mongoose
 
-We use the NoSQL database framework Mongo, as well as its NodeJS extension Mongoose. For more information, refer to [Database](./Database.md).
+We use the NoSQL database framework Mongo, as well as its NodeJS extension Mongoose. For more information, refer to [Database](./database.md).
 
 Install the Mongoose NodeJS extension:
 - Execute `npm install mongoose`
@@ -209,4 +209,4 @@ mongoose.connection.on('error', callback)
 mongoose.connection.once('open', app logic)
 ```
 
-For details of how the development database is set up, please refer to the [Development Configuration](../development/Setup%20and%20Configuration.md) document.
+For details of how the development database is set up, please refer to the [Development Configuration](../development/setup-and-configuration.md) document.

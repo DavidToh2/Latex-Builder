@@ -18,7 +18,7 @@ This file serves to document our database implementation, as well as how it inte
 
 **MongoDB Atlas** is MongoDB's cloud-hosted database service. We use its free tier for our production database.
 
-For more details on how the development database is set up, please refer to the [Development Configuration](../development/Setup%20and%20Configuration.md) document.
+For more details on how the development database is set up, please refer to the [Development Configuration](../development/setup-and-configuration.md) document.
 
 # Connecting
 

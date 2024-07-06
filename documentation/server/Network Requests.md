@@ -28,7 +28,7 @@ When a request is received, it will be passed through the chain of middlewares, 
 - The `next()` callback passes control onto the next triggered middleware.
 - The process terminates when some middleware `send()`s the `res`ponse back to the client.
 
-Authentication middleware specifications are described in [Authentication](./Authentication.md).
+Authentication middleware specifications are described in [Authentication](./authentication.md).
 
 ## Response Format
 
