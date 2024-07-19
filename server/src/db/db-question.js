@@ -102,16 +102,37 @@ async function newQuestion(nQ, userID) {
 
         // Returns all questions viewable by user.
 
-async function getQuestions(dataDict, userID) {
+async function getQuestions(dataDict, userID, page) {
     
     const errorString = 'db-question/getQuestions: Failed to find question:'
     try {
         console.log("Finding questions...")
 
-        const d = parseSearchFields(dataDict)
-        console.log(d)
+        const [dict, qnText] = parseSearchFields(dataDict)
+        console.log(dict)
+        console.log(`qnText: ${qnText}`)
+        var qnsAll
 
-        const qnsAll = await Question.find(d).lean()
+        // Question.find(d).lean()
+        if (qnText == "") {
+            qnsAll = await Question.find(dict).lean()
+        } else {
+            qnsAll = await Question.aggregate([
+                { $match: dict },
+                { $search: {
+                    index: "question-search",
+                    text: {
+                        query: qnText,
+                        path: "question"
+                    }
+                }},
+                { 
+                    $addFields: {
+                        paginationToken : { $meta : "searchSequenceToken" }
+                    }
+                },
+            ]).lean()
+        }
         const qns = []
 
                 // Only return questions for which user has viewing permission.
@@ -389,7 +410,7 @@ async function setQuestionPerms(id, data, userID) {
 
 async function getQuestionPerms(id, userID) {
 
-    const errorString = 'db-question/getQuestions: Failed to get question permissions:'
+    const errorString = 'db-question/getQuestionPerms: Failed to get question permissions:'
     try {
         console.log("Fetching question permissions...")
 
@@ -462,9 +483,12 @@ async function newID() {
 }
 
 function parseSearchFields(qn) {
+    qnText = qn['question']
     for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
         if (qn[key].length == 0) {
             delete qn[key]
+        } else {
+            qn[key] = { $in: qn[key] }
         }
     }
     for (var key of ['sourceYear', 'question']) {
@@ -472,7 +496,7 @@ function parseSearchFields(qn) {
             delete qn[key]
         }
     }
-    return qn
+    return [qn, qnText]
 }
 
 module.exports = {
