@@ -83,7 +83,9 @@ We add the following entries to our domain's lookup table:
 
 Traffic between end users and Cloudflare is served over HTTPS, and encrypted using Cloudflare's own shared SSL certificates.
 
-Traffic between Cloudflare and the frontend has to be served over HTTP, as the S3 frontend's endpoint uses HTTP. Hence, all requests to the frontend should be served using the *Flexible* encryption scheme.
+Traffic between Cloudflare and the frontend has to be served over HTTP, as the S3 frontend's endpoint uses HTTP. Hence, all requests to **both the frontend and the documentation subsite** should be served using the *Flexible* encryption scheme. (If this is not done, then the requests will time out with error code 522.)
+
+<img src="./Images/ssl-config.png">
 
 Traffic between Cloudflare and the backend has to be served over HTTPS, as Lightsail's endpoint uses HTTPS. Hence, all requests to the backend should be served using the *Full* encryption scheme.
 
