@@ -259,21 +259,22 @@ function closePopup() {
 
 	<Navbar class="navbar" :active-views="activeViews" @update-view="updateView"/>
 
-	<div class="container-main no-scrollbar" id="container-left">
-		<Transition :name="transitionType" :mode="transitionMode">
-			<KeepAlive>
-				<component :is="views[currentLeftView]"></component>
-			</KeepAlive>
-		</Transition>
-	</div>
-
-	<div class="container-main no-scrollbar" id="container-right">
-		<Transition :name="transitionType" :mode="transitionMode">
-			<KeepAlive>
-				<component :is="views[currentRightView]"></component>
-			</KeepAlive>
-		</Transition>
-	</div>
+	<main>
+		<div class="container-main no-scrollbar" id="container-left">
+			<Transition :name="transitionType" :mode="transitionMode">
+				<KeepAlive>
+					<component :is="views[currentLeftView]"></component>
+				</KeepAlive>
+			</Transition>
+		</div>
+		<div class="container-main no-scrollbar" id="container-right">
+			<Transition :name="transitionType" :mode="transitionMode">
+				<KeepAlive>
+					<component :is="views[currentRightView]"></component>
+				</KeepAlive>
+			</Transition>
+		</div>
+	</main>
 
 	<Popup :size="popupSize" @close="closePopup">
 		<span v-html="popupHTML"></span>
@@ -288,6 +289,7 @@ function closePopup() {
 	background-color: var(--colour-theme);
 	width: 100%;
 	height: 64px;
+	flex-shrink: 0;
 	padding-left: 10%;
 	padding-right: 10%;
 	

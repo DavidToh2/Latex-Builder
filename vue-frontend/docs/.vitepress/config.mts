@@ -20,6 +20,11 @@ export default defineConfig({
     ]
   },
   vite: {
+    server: {
+      headers: {
+        "Content-Security-Policy": "frame-ancestors 'self' https://*.towelet.app/*;",
+      }
+    },
     resolve: {
       alias: [
         {

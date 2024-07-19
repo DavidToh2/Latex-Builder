@@ -186,11 +186,9 @@
 	#app {
 		width: 100%;
 		height: 100vh;
-		display: grid;
-		grid-template:
-		"a a" 64px
-		"b c" / 50% 50%;
-		grid-row-gap: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0px;
 	}
 
 	.viewport {
@@ -215,6 +213,11 @@
 		background-color: var(--colour-background-soft);
 		padding: 6px;
 		border-radius: 6px;
+	}
+
+	main {
+		display: grid;
+		grid-template-columns: 50% 50%;
 	}
 }
   
