@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
-import type { qn, qnFilters } from '@/types/QuestionTypes'
+import type { pageData, qn, qnFilters } from '@/types/QuestionTypes'
 import type { latex, latexEnum, latexHeading, latexTypes, worksheetElement, worksheetConfig, worksheetPage, worksheetTitle, worksheetText } from '@/types/WorksheetTypes'
-import { emptyQn, emptyFilters } from '@/types/QuestionTypes'
+import { emptyQn, emptyFilters, emptyPageData } from '@/types/QuestionTypes'
 import { emptyWorksheetConfig } from '@/types/WorksheetTypes'
 
 import { latexTypeStrings } from '@/types/WorksheetTypes' 
@@ -29,7 +29,8 @@ interface contributeStore {
 }
 interface databaseStore {
     qnArray: qn[],
-    filters: qnFilters
+    filters: qnFilters,
+    pageData: pageData
 }
 interface buildStore {
     wsArray: worksheetElement[],
@@ -41,7 +42,8 @@ const initContributeStore : contributeStore = {
 }
 const initDatabaseStore : databaseStore = {
     qnArray: [],
-    filters: emptyFilters
+    filters: emptyFilters,
+    pageData: emptyPageData
 }
 const initBuildStore : buildStore = {
     wsArray: [],
@@ -414,6 +416,18 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
         return true
     }
 
+                // DATABASE PAGE INFORMATION
+
+    function setDatabasePage(page : pageData) {
+        Object.assign(database.pageData, page)
+    }
+    function getDatabasePage() {
+        return database.pageData
+    }
+    function resetDatabasePage() {
+        Object.assign(database.pageData, emptyPageData)
+    }
+
     return { 
         // Workspace view stores
         database, contribute, build,
@@ -449,6 +463,9 @@ export const useQuestionStore = defineStore('QuestionStore', () => {
 
         // Display PDF state
         setDisplayPDFName, getDisplayPDFName, resetDisplayPDFName,
+
+        // Database page information
+        setDatabasePage, getDatabasePage, resetDatabasePage
     }
 },
 {

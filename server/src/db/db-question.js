@@ -111,30 +111,62 @@ async function getQuestions(dataDict, userID, page) {
         const [dict, qnText] = parseSearchFields(dataDict)
         console.log(dict)
         console.log(`qnText: ${qnText}`)
-        var qnsAll
 
-        // Question.find(d).lean()
-        if (qnText == "") {
-            qnsAll = await Question.find(dict).lean()
-        } else {
-            qnsAll = await Question.aggregate([
-                { $match: dict },
-                { $search: {
+        // page: {pageNo, direction, searchBefore, searchAfter}
+
+        const query = [{ $match: dict }]
+        if (qnText != "") {
+            if (page.direction == "new") {
+                query.append({ $search: {
                     index: "question-search",
                     text: {
                         query: qnText,
                         path: "question"
                     }
-                }},
-                { 
-                    $addFields: {
-                        paginationToken : { $meta : "searchSequenceToken" }
-                    }
-                },
-            ]).lean()
+                }})
+            } else if (page.direction == "prev") {
+                query.append({ $search: {
+                    index: "question-search",
+                    text: {
+                        query: qnText,
+                        path: "question"
+                    },
+                    searchBefore: page.searchBefore
+                }})
+            } else if (page.direction == "next") {
+                query.append({ $search: {
+                    index: "question-search",
+                    text: {
+                        query: qnText,
+                        path: "question"
+                    },
+                    searchAfter: page.searchAfter
+                }})
+            } 
+        } else {
+            if (page.direction == "prev") {
+                query.append({ $search: {
+                    searchBefore: page.searchBefore
+                }})
+            } else if (page.direction == "next") {
+                query.append({ $search: {
+                    searchAfter: page.searchAfter
+                }})
+            } 
         }
-        const qns = []
+        query.append({ $limit: 10 })
+        query.append({ $addFields: {
+            paginationToken : { $meta : "searchSequenceToken" },
+            score: { $meta: "searchScore" }
+        }})
 
+        var qnsAll = await Question.aggregate(query).lean()
+
+        if (page.direction == "prev") {
+            qnsAll = qnsAll.reverse()
+        }
+
+        const qns = []
                 // Only return questions for which user has viewing permission.
                 // Parse question IDs to displayIDs before passing to web
         var u = 'public'

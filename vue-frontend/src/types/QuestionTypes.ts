@@ -30,6 +30,13 @@ export interface qns {
     // Required for typescript to correctly parse reactive qn[] arrays
 }
 
+export interface pageData {
+    pageNo: number,
+    direction: "new" | "prev" | "next",
+    searchBefore: string,
+    searchAfter: string
+}
+
 const emptyFilters = { 
     category: <string[]> [],
     topic: <string[]> [],
@@ -57,8 +64,14 @@ const emptyQn = {
     solutionImages: [[]],
 
     lastModified: ''
-    
 } as qn
 
+const emptyPageData = {
+    pageNo: 1,
+    direction: "new",
+    searchBefore: "",
+    searchAfter: ""
+} as pageData
 
-export { emptyFilters, emptyQn }
+
+export { emptyFilters, emptyQn, emptyPageData }
