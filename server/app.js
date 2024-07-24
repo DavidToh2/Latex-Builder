@@ -19,7 +19,6 @@ const { mongoose, mongoURI } = require('./src/db/db-connection')
 const dbrouter = require('./routes/db-router')
 const filerouter = require('./routes/file-router')
 const authrouter = require('./routes/auth-router')
-const docsrouter = require('./routes/docs-router')
 const { UserError, DatabaseError, ServerError } = require('./src/express-classes/error')
 const { ResponseBody, ResponseError } = require('./src/express-classes/response')
 

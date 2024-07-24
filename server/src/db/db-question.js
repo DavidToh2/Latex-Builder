@@ -11,6 +11,7 @@ const ACCOUNT_CAN_SET_QN = ['admin', 'active', 'limited']
 
 // https://forum.freecodecamp.org/t/cant-export-require-a-module-mongoose-model-typeerror-user-is-not-a-constructor/452317/6
 // Exporting the schemas rather than the models works better for some reason.
+questionSchema.index({ question: "text" })
 const questionDB = mongoose.connection.useDb('questions', { useCache: true} )
 const Question = questionDB.model("questions", questionSchema)
 
@@ -102,71 +103,72 @@ async function newQuestion(nQ, userID) {
 
         // Returns all questions viewable by user.
 
-async function getQuestions(dataDict, userID, page) {
+async function getQuestions(dataDict, page, userID) {
     
     const errorString = 'db-question/getQuestions: Failed to find question:'
     try {
         console.log("Finding questions...")
 
-        const [dict, qnText] = parseSearchFields(dataDict)
-        console.log(dict)
+        const [filters, qnText] = parseSearchFields(dataDict)
+        console.log(filters)
         console.log(`qnText: ${qnText}`)
 
-        // page: {pageNo, direction, searchBefore, searchAfter}
+        // page: {skip, display}
+        // Stores the current page, not the target page
 
-        const query = [{ $match: dict }]
-        if (qnText != "") {
-            if (page.direction == "new") {
-                query.append({ $search: {
-                    index: "question-search",
-                    text: {
-                        query: qnText,
-                        path: "question"
-                    }
-                }})
-            } else if (page.direction == "prev") {
-                query.append({ $search: {
-                    index: "question-search",
-                    text: {
-                        query: qnText,
-                        path: "question"
-                    },
-                    searchBefore: page.searchBefore
-                }})
-            } else if (page.direction == "next") {
-                query.append({ $search: {
-                    index: "question-search",
-                    text: {
-                        query: qnText,
-                        path: "question"
-                    },
-                    searchAfter: page.searchAfter
-                }})
-            } 
-        } else {
-            if (page.direction == "prev") {
-                query.append({ $search: {
-                    searchBefore: page.searchBefore
-                }})
-            } else if (page.direction == "next") {
-                query.append({ $search: {
-                    searchAfter: page.searchAfter
-                }})
-            } 
+        var newSkip = page.skip
+        switch(page.direction) {
+            case "prev":
+                newSkip -= page.display
+                if (newSkip < 0) {
+                    newSkip = 0
+                }
+            break
+            case "next":
+                newSkip += page.display
+            break
+            case "new":
+                newSkip = 0
+            break
         }
-        query.append({ $limit: 10 })
-        query.append({ $addFields: {
-            paginationToken : { $meta : "searchSequenceToken" },
-            score: { $meta: "searchScore" }
-        }})
 
-        var qnsAll = await Question.aggregate(query).lean()
+        var qnsAll
+        
+        if (process.env.NODE_ENV.trim() == 'development') {
+            // qnsAll = await Question.find({
+            //     $and: [
+            //         { $text: { $search: qnText } },
+            //         dict
+            //     ]
+            // }).skip(newSkip).limit(page.display).lean()
+            var query = []
+            query.push({
+                $search: {
+                    index: "question-search",
+                    compound: {
+                        must: filters,
+                        should: {
+                            text: {
+                                query: qnText,
+                                path: "question"
+                            },
+                        }
+                    }
+                }
+            })
+            query.push({ $skip: newSkip }) 
+            query.push({ $limit: page.display })
+            qnsAll = await Question.aggregate(query)
+        } else {
+            
+            // TBA
+            
+        }
 
         if (page.direction == "prev") {
             qnsAll = qnsAll.reverse()
         }
 
-        const qns = []
                 // Only return questions for which user has viewing permission.
                 // Parse question IDs to displayIDs before passing to web
         var u = 'public'
@@ -177,32 +179,9 @@ async function getQuestions(dataDict, userID, page) {
             }
         }
 
-        qnsAll.forEach((qn) => {
-            delete qn['_id']
-            qn['sourceYear'] = (qn['sourceYear'] == null) ? "" : qn['sourceYear'].toString()
-            switch(userID) {
-                case 'public':
-                    if (qn.userPerms.canAccessPublic) {
-                        delete qn.userPerms
-                        qns.push(qn)
-                    }
-                break
-                default:
-                    if (
-                        qn.userPerms.canAccessPublic ||
-                        qn.userPerms.owner == userID ||
-                        qn.userPerms.canModifyUsers.indexOf(userID) >= 0 ||
-                        qn.userPerms.canReadUsers.indexOf(userID) >= 0 ||
-                        u.accountStatus == 'admin'
-                    ) {
-                        delete qn.userPerms
-                        qns.push(qn)
-                    }
-                break
-            }
-        })
+        const res = formatQnsReturned(qnsAll, userID, page.display, newSkip)
 
-        return qns
+        return res
     } catch(err) {
         newError(err, errorString)
     }
@@ -516,19 +495,63 @@ async function newID() {
 
 function parseSearchFields(qn) {
     qnText = qn['question']
+    filters = []
     for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
         if (qn[key].length == 0) {
             delete qn[key]
         } else {
-            qn[key] = { $in: qn[key] }
+            filters.push({
+                in: {
+                    path: key,
+                    value: qn[key]
+                }
+            })
         }
     }
-    for (var key of ['sourceYear', 'question']) {
+    delete qn['question']
+    for (var key of ['sourceYear']) {
         if (qn[key] == '') {
             delete qn[key]
+        } else {
+            filters.push({
+                equals: {
+                    path: key,
+                    value: qn[key]
+                }
+            })
         }
     }
-    return [qn, qnText]
+    return [filters, qnText]
+}
+
+function formatQnsReturned(qns, userID, display, newSkip) {
+    const res = {qns: []}
+    qns.forEach((qn) => {
+        delete qn['_id']
+        qn['sourceYear'] = (qn['sourceYear'] == null) ? "" : qn['sourceYear'].toString()
+        switch(userID) {
+            case 'public':
+                if (qn.userPerms.canAccessPublic) {
+                    delete qn.userPerms
+                    res["qns"].push(qn)
+                }
+            break
+            default:
+                if (
+                    qn.userPerms.canAccessPublic ||
+                    qn.userPerms.owner == userID ||
+                    qn.userPerms.canModifyUsers.indexOf(userID) >= 0 ||
+                    qn.userPerms.canReadUsers.indexOf(userID) >= 0 ||
+                    u.accountStatus == 'admin'
+                ) {
+                    delete qn.userPerms
+                    res["qns"].push(qn)
+                }
+            break
+        }
+    })
+    res.page = { skip: newSkip, display: display }
+    return res
 }
 
 module.exports = {

@@ -11,13 +11,15 @@ router.post('/get', async function(req, res, next) {                  // FIND / 
 
     try {
         const reqData = req.body
+        const qns = reqData['qns']
+        const page = reqData['page']
 
         var userID = 'public'
         if (req.session.uID) {
             userID = req.session.uID
         }
 
-        const fQ = await dbQuestion.getQuestions(reqData, userID)
+        const fQ = await dbQuestion.getQuestions(qns, page, userID)
 
         const response = new ResponseBody(reqData['fn'])
         response.status = 0

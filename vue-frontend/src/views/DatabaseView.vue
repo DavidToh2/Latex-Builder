@@ -3,7 +3,7 @@ import Title from '@/components/PageTitle.vue'
 import QuestionFilters from '@/components/SearchFilters/QuestionFilters.vue'
 import DisplayTable from '@/components/DisplayTable/DisplayTable.vue'
 
-import type { qn, qns, qnFilters, qnFilterNames } from '@/types/QuestionTypes'
+import type { qn, qns, qnFilters, qnFilterNames, pageData } from '@/types/QuestionTypes'
 import { emptyFilters } from '@/types/QuestionTypes'
 import { useQuestionStore } from '@/stores/questionStore'
 import { useUserStore } from '@/stores/userStore'
@@ -42,7 +42,7 @@ function updateSearchParameters(ss : qnFilters) {
     QuestionStore.setDatabaseQuestionFilters(searchParameters)
 }
 
-async function submitSearchEvent() {
+async function submitSearchEvent(s : string) {
     resetDatabase()
 
     if (searchParameters.sourceYear && !(/^\d+$/.test(searchParameters.sourceYear))) {
@@ -50,7 +50,7 @@ async function submitSearchEvent() {
         return
     }
 
-    const responsejson = await questionGet(searchParameters, searchString.value)
+    const responsejson = await questionGet(searchParameters, searchString.value, QuestionStore.getDatabasePage(), s)
     if (responsejson.status == -1) {
         // Error occured
         const error = responsejson.error
@@ -65,8 +65,10 @@ async function submitSearchEvent() {
 
     } else {
         // Success
-        const data = responsejson.body as qn[]
-        QuestionStore.populateDatabase(data)
+        const qns = responsejson.body.qns as qn[]
+        const page = responsejson.body.page as pageData
+        QuestionStore.populateDatabase(qns)
+        QuestionStore.setDatabasePage(page)
         displayDatabase()
     }
 }
@@ -143,7 +145,7 @@ async function submitDeleteEvent(ID : string) {
     }
 
     // Refresh the database
-    submitSearchEvent()
+    submitSearchEvent('new')
 }
 
 
@@ -152,14 +154,24 @@ async function submitDeleteEvent(ID : string) {
 <template>
     <div class="viewport">
         <Title title="Database" />
-        <form id="question-search-container" autocomplete="false" @submit.prevent="submitSearchEvent">
+        <form id="question-search-container" autocomplete="false" @submit.prevent="">
             <QuestionFilters :ss="searchParameters" func="database" @update="updateSearchParameters"/>
             <div id="question-search-bar">
+                <button type="submit" class="question-search-button" name="prev" @click="submitSearchEvent('prev')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="450 450 1050 1050" class="icon-sm">
+                    <path d="M1203 544q0 13-10 23l-393 393 393 393q10 10 10 23t-10 23l-50 50q-10 10-23 10t-23-10l-466-466q-10-10-10-23t10-23l466-466q10-10 23-10t23 10l50 50q10 10 10 23z">
+                    </path></svg>
+                </button>
                 <textarea rows="1" id="question-search" name="question" placeholder="Search question text" class="latex-text" v-model="searchString"></textarea>
-                <button type="submit" id="question-search-button">
+                <button type="submit" class="question-search-button" name="new" @click="submitSearchEvent('new')">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon-sm">
                     <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
                     </svg>
+                </button>
+                <button type="submit" class="question-search-button" name="next" @click="submitSearchEvent('next')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="450 450 1050 1050" class="icon-sm">
+                    <path d="M1171 960q0 13-10 23l-466 466q-10 10-23 10t-23-10l-50-50q-10-10-10-23t10-23l393-393-393-393q-10-10-10-23t10-23l50-50q10-10 23-10t23 10l466 466q10 10 10 23z">
+                    </path></svg>
                 </button>
             </div>
         </form>
@@ -198,7 +210,7 @@ async function submitDeleteEvent(ID : string) {
     text-align: center;
 }
 
-#question-search-button {
+.question-search-button {
     background-color: white;
     border: 0;
     cursor: pointer;

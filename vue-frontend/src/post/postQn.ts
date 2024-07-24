@@ -1,7 +1,7 @@
 
 import { postForm, postJSON } from '@/post/post'
 import { BASE_URL } from '@/post/post'
-import type { qn, qnFilters } from '@/types/QuestionTypes'
+import type { pageData, qn, qnFilters } from '@/types/QuestionTypes'
 
 /*
         DATABASE FUNCTIONS
@@ -13,12 +13,13 @@ import type { qn, qnFilters } from '@/types/QuestionTypes'
         questionSave(): Save question edits to the database. This includes both new and existing questions
 */
 
-export async function questionGet(filters : qnFilters, s : string) {         // Submits search query and uses it to populate store
+export async function questionGet(filters : qnFilters, s : string, pageData: pageData, dir: string) {         // Submits search query and uses it to populate store
     const j = filters as {[key : string] : any}
     j['question'] = s
-    j['fn'] = 'qn-get'
-    console.log(j)
-    const response = await postJSON(j, `${BASE_URL}/database/get`) as Response
+    const p = pageData as {[key: string] : any}
+    p['direction'] = dir
+    const req = { qns: j, page: p, fn: 'qn-get' }
+    const response = await postJSON(req, `${BASE_URL}/database/get`) as Response
     const responsejson = await response.json()
     return responsejson
 }

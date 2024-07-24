@@ -31,10 +31,8 @@ export interface qns {
 }
 
 export interface pageData {
-    pageNo: number,
-    direction: "new" | "prev" | "next",
-    searchBefore: string,
-    searchAfter: string
+    skip: number,
+    display: number
 }
 
 const emptyFilters = { 
@@ -67,10 +65,8 @@ const emptyQn = {
 } as qn
 
 const emptyPageData = {
-    pageNo: 1,
-    direction: "new",
-    searchBefore: "",
-    searchAfter: ""
+    skip: 0,
+    display: 10
 } as pageData
 
 
