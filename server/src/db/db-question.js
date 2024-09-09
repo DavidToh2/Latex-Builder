@@ -146,13 +146,18 @@ async function getQuestions(dataDict, page, userID) {
                 $search: {
                     index: "question-search",
                     compound: {
-                        must: filters,
-                        should: {
+                        must: [{
+                            in: {
+                                path: "topic",
+                                value: ["Geometry", "Number Theory"]
+                            }
+                        }],
+                        should: [{
                             text: {
                                 query: qnText,
                                 path: "question"
                             },
-                        }
+                        }]
                     }
                 }
             })
