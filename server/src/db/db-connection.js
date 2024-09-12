@@ -9,7 +9,7 @@ console.log(`Node Environment: ${process.env.NODE_ENV}`)
 
 if (process.env.NODE_ENV.trim() == 'development') {
     console.log("Setting local mongoURI")
-    mongoURI = process.env.MONGO_URI
+    mongoURI = process.env.MONGO_DEV_URI
 } else if (process.env.NODE_ENV.trim() == 'production') {
     console.log("Setting production mongoURI")
     mongoURI = process.env.MONGO_URI

@@ -6,8 +6,13 @@ const aux = require('../aux')
 const file = require('../file')
 const preview_images = require('../preview_images')
 
+const fields = require('./init/fields.json')
+const VALID_TOPICS = Object.keys(fields["Mathematics"]["topic"]) //.concat(Object.keys(fields["Computer Science"]["topic"]))
+
 const LIMITED_ACCOUNT_QN_LIMIT = 5
 const ACCOUNT_CAN_SET_QN = ['admin', 'active', 'limited'] 
+
+const MODE = process.env.NODE_ENV.trim()
 
 // https://forum.freecodecamp.org/t/cant-export-require-a-module-mongoose-model-typeerror-user-is-not-a-constructor/452317/6
 // Exporting the schemas rather than the models works better for some reason.
@@ -106,16 +111,17 @@ async function newQuestion(nQ, userID) {
 async function getQuestions(dataDict, page, userID) {
     
     const errorString = 'db-question/getQuestions: Failed to find question:'
+
     try {
         console.log("Finding questions...")
+        var [filters, qnText] = parseSearchFields(dataDict)
+    } catch(err) {
+        newError(err, 'db-question/getQuestions: Failed to parse search fields:')
+    }
 
-        const [filters, qnText] = parseSearchFields(dataDict)
-        console.log(filters)
-        console.log(`qnText: ${qnText}`)
-
+    try {
         // page: {skip, display}
         // Stores the current page, not the target page
-
         var newSkip = page.skip
         switch(page.direction) {
             case "prev":
@@ -131,45 +137,59 @@ async function getQuestions(dataDict, page, userID) {
                 newSkip = 0
             break
         }
-
-        var qnsAll
         
-        if (process.env.NODE_ENV.trim() == 'development') {
-            // qnsAll = await Question.find({
-            //     $and: [
-            //         { $text: { $search: qnText } },
-            //         dict
-            //     ]
-            // }).skip(newSkip).limit(page.display).lean()
+        var qnsAll
+
+        if (MODE == 'development') {
+
+            // We cannot use Mongo Atlas Search on the developmental database, so we stick to the 'basic' version:
+            
+            var searchFilter = filters
+            if (qnText) {
+                searchFilter = [{ "$text": { "$search": qnText } }].concat(filters)
+            }
+            console.log(searchFilter)
+            qnsAll = await Question.find({ "$and": searchFilter }).skip(newSkip).limit(page.display).lean()
+            
+        } else if (MODE == 'production') {
+            
             var query = []
-            query.push({
-                $search: {
-                    index: "question-search",
-                    compound: {
-                        must: [{
-                            in: {
-                                path: "topic",
-                                value: ["Geometry", "Number Theory"]
-                            }
-                        }],
-                        should: [{
-                            text: {
-                                query: qnText,
-                                path: "question"
-                            },
-                        }]
+            var searchFilter = [{
+                "in": { "path": "topic", "value": VALID_TOPICS }
+            }].concat(filters)
+
+            if (qnText) {
+                query.push({
+                    "$search": {
+                        "index": "question-search",
+                        "compound": {
+                            "must": searchFilter,
+                            "should": [{
+                                "text": { "query": qnText, "path": "question" },
+                            }]
+                        }
                     }
-                }
-            })
+                })
+            } else {
+                query.push({
+                    "$search": {
+                        "index": "question-search",
+                        "compound": {
+                            "must": searchFilter
+                        }
+                    }
+                })
+            }
+            
             query.push({ $skip: newSkip }) 
             query.push({ $limit: page.display })
             qnsAll = await Question.aggregate(query)
-        } else {
-            
-            // TBA
-            
         }
+    } catch(err) {
+        newError(err, `db-question/getQuestions: Failed to build search query in ${MODE} mode:`)
+    }
 
+    try {
         if (page.direction == "prev") {
             qnsAll = qnsAll.reverse()
         }
@@ -185,10 +205,10 @@ async function getQuestions(dataDict, page, userID) {
         }
 
         const res = formatQnsReturned(qnsAll, userID, page.display, newSkip)
-
         return res
+
     } catch(err) {
-        newError(err, errorString)
+        newError(err, 'db-question/getQuestions: Failed to find question:')
     }
 }
 
@@ -499,33 +519,32 @@ async function newID() {
 }
 
 function parseSearchFields(qn) {
-    qnText = qn['question']
-    filters = []
-    for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
-        if (qn[key].length == 0) {
-            delete qn[key]
-        } else {
-            filters.push({
-                in: {
-                    path: key,
-                    value: qn[key]
-                }
-            })
+    const qnText = qn['question']
+    var filters = []
+    if (MODE == 'production') {
+        for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
+            if (qn[key].length == 0) { delete qn[key] }
+            else { 
+                filters.push({ "in": { "path": key, "value": qn[key] } }) 
+            }
+        }
+        delete qn['question']
+        for (var key of ['sourceYear']) {
+            if (qn[key] == '') { delete qn[key] } 
+            else { filters.push({ "equals": { "path": key, "value": qn[key] } }) }
+        }
+    } else if (MODE == 'development') {
+        for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
+            if (qn[key].length == 0) { delete qn[key] }
+            else { filters.push({ [key]: { "$all": qn[key] } })}
+        }
+        delete qn['question']
+        for (var key of ['sourceYear']) {
+            if (qn[key] == '') { delete qn[key] } 
+            else { filters.push({ [key]: { "$eq": qn[key] } }) }
         }
     }
-    delete qn['question']
-    for (var key of ['sourceYear']) {
-        if (qn[key] == '') {
-            delete qn[key]
-        } else {
-            filters.push({
-                equals: {
-                    path: key,
-                    value: qn[key]
-                }
-            })
-        }
-    }
+    
     return [filters, qnText]
 }
 

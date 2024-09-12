@@ -9,8 +9,8 @@ const templateDB = mongoose.connection.useDb('templates', { useCache: true })
 
 const DocumentTemplates = templateDB.model('templates', TemplateSchema)
 
-initTemplates.forEach((template, index) => {
-    DocumentTemplates.findOneAndUpdate({ templateName: template.templateName }, template, { upsert: true })
+initTemplates.forEach(async (template, index) => {
+    await DocumentTemplates.findOneAndUpdate({ templateName: template.templateName }, template, { upsert: true })
     .catch((error) => {
         console.log("Error initialising templates:")
         console.log(error)
