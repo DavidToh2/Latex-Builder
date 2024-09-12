@@ -149,7 +149,11 @@ async function getQuestions(dataDict, page, userID) {
                 searchFilter = [{ "$text": { "$search": qnText } }].concat(filters)
             }
             console.log(searchFilter)
-            qnsAll = await Question.find({ "$and": searchFilter }).skip(newSkip).limit(page.display).lean()
+            if (searchFilter.length == 0) {
+                qnsAll = await Question.find({}).skip(newSkip).limit(page.display).lean()
+            } else {
+                qnsAll = await Question.find({ "$and": searchFilter }).skip(newSkip).limit(page.display).lean()
+            }
             
         } else if (MODE == 'production') {
             
@@ -531,7 +535,7 @@ function parseSearchFields(qn) {
         delete qn['question']
         for (var key of ['sourceYear']) {
             if (qn[key] == '') { delete qn[key] } 
-            else { filters.push({ "equals": { "path": key, "value": qn[key] } }) }
+            else { filters.push({ "equals": { "path": key, "value": qn[key].toString() } }) }
         }
     } else if (MODE == 'development') {
         for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
@@ -541,7 +545,7 @@ function parseSearchFields(qn) {
         delete qn['question']
         for (var key of ['sourceYear']) {
             if (qn[key] == '') { delete qn[key] } 
-            else { filters.push({ [key]: { "$eq": qn[key] } }) }
+            else { filters.push({ [key]: { "$eq": qn[key].toString() } }) }
         }
     }
     

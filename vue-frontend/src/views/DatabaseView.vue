@@ -78,8 +78,7 @@ function resetDatabase() {
 }
 
 function displayDatabase() {            // Fetches data from store
-    results.qns = [...QuestionStore.getDatabase().slice().reverse()]
-    console.log(results.qns)
+    results.qns = [...QuestionStore.getDatabase()]
 }
 
 QuestionStore.$onAction(
