@@ -140,7 +140,11 @@ async function sendDeleteAccountEmail(username, email, token) {
 }
 
 function formatLink(token) {
-    return `https://server.towelet.app/auth/validate/${token}`
+    if (process.env.NODE_ENV.trim() == 'development') {
+        return `localhost:3000/auth/validate/${token}`
+    } else if (process.env.NODE_ENV.trim() == 'production') {
+        return `https://server.towelet.app/auth/validate/${token}`
+    }
 }
 
 module.exports = {
