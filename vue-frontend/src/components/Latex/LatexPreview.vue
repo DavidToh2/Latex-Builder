@@ -12,10 +12,10 @@
 
     const imageDisplayed = computed<boolean>(() => {
         if (props.source){
-            console.log("Showing latex preview")
+            // console.log("Showing latex preview")
             return true
         } else {
-            console.log("Hiding latex preview")
+            // console.log("Hiding latex preview")
             return false
         }
     })

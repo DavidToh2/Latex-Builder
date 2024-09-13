@@ -161,6 +161,7 @@ async function getQuestions(dataDict, page, userID) {
             var searchFilter = [{
                 "in": { "path": "topic", "value": VALID_TOPICS }
             }].concat(filters)
+            console.log(searchFilter)
 
             if (qnText) {
                 query.push({
@@ -535,7 +536,7 @@ function parseSearchFields(qn) {
         delete qn['question']
         for (var key of ['sourceYear']) {
             if (qn[key] == '') { delete qn[key] } 
-            else { filters.push({ "equals": { "path": key, "value": qn[key].toString() } }) }
+            else { filters.push({ "equals": { "path": key, "value": Number(qn[key]) } }) }
         }
     } else if (MODE == 'development') {
         for (var key of ['category', 'topic', 'subtopic', 'difficulty', 'sourceName', 'tags']) {
@@ -545,7 +546,7 @@ function parseSearchFields(qn) {
         delete qn['question']
         for (var key of ['sourceYear']) {
             if (qn[key] == '') { delete qn[key] } 
-            else { filters.push({ [key]: { "$eq": qn[key].toString() } }) }
+            else { filters.push({ [key]: { "$eq": Number(qn[key]) } }) }
         }
     }
     

@@ -79,6 +79,7 @@ function resetDatabase() {
 
 function displayDatabase() {            // Fetches data from store
     results.qns = [...QuestionStore.getDatabase()]
+    // console.log(results.qns)
 }
 
 QuestionStore.$onAction(
@@ -93,7 +94,7 @@ QuestionStore.$onAction(
             after((result) => {
                 if (result) {
                     resetDatabase()
-                    console.log("Database reset")
+                    // console.log("Database reset")
                     displayDatabase()
                 }
             })

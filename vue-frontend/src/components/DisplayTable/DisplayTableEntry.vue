@@ -52,10 +52,12 @@
     const showRawLatex = ref(false)
     
     blobURL.value = getQnPreviewURL(props.q.id, props.q.lastModified)
+    console.log(props.q)
     // console.log(`Generated blobURL ${blobURL.value}`)
 
     onUpdated(() => {
         blobURL.value = getQnPreviewURL(props.q.id, props.q.lastModified)
+        console.log(props.q)
         // console.log(`Generated blobURL ${blobURL.value}`)
     })
 
@@ -78,8 +80,8 @@
             <div class="display-table-source display-table-cell">
                 <div v-for="sn in q.sourceName">
                     <p>{{ sn }}</p>
-                    <p>{{ q.sourceYear }}</p>
                 </div>
+                <p>{{ q.sourceYear }}</p>
             </div>
             <div class="display-table-options display-table-cell">
                 <div class="option-icons">
