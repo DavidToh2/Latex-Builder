@@ -24,9 +24,5 @@ Database:
 Cloud Services:
 - Frontend on AWS S3 + Cloudfront
 - Backend on AWS Lightsail
-- Documentation at static subsite [https://docs.towelet.app](https://docs.towelet.app) hosted on S3
+- Documentation at static subsite [https://docs.towelet.app](https://docs.towelet.app) hosted on S3 (now live and embedded in main site!)
 - Email service using AWS SES
-
-# Documentation
-
-Documentation will be live on the website shortly.
