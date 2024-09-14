@@ -78,7 +78,7 @@ if (responsejson.status == -1) {
 
 Cross-Origin Resource Sharing is a mechanism that prevents external webpages, or scripts, from accessing your website or server's resources. The CORS standard is enforced for all webpage or script requests invoked using `fetch()` or `XMLHttpRequest`.
 
-Since our entire app is reliant on the functions in `post`, which use `fetch()`, we need to configure CORS to allow our front-end to communicate with our server. In `app.js`,
+Since our entire app is reliant on the functions in `post`, which use `fetch()`, we need to configure CORS to allow our front-end to communicate with our server. In `app.js`,	
 
 1. Set an array of allowed origins.
 2. Check if the request is coming from an allowed origin. If it is, set the `Access-Control-Allow-Origin`, `-Headers` and `-Methods` headers in your response object.
