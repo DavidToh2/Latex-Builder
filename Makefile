@@ -10,4 +10,8 @@ copy-docs:
 	./scripts/formatDocNames.sh $(PWD) \
 	)
 
-.PHONY: latex-base copy-docs
+copy-schema:
+	cp schema.json vue-frontend/src/assets/dropdown.json && \
+	cp schema.json server/src/db/init/fields.json
+
+.PHONY: latex-base copy-docs copy-schema

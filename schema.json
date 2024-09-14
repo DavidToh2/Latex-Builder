@@ -1,0 +1,82 @@
+{
+    "Mathematics": {
+        "topic": {
+            "Algebra": [
+                "Inequalities", "Sequences", "Polynomials", "Functions", "Analysis"
+            ],
+            "Combinatorics": [
+                "Counting", "Enumerative Combi", "Invariance and Monovariance", "Extremal Principle", "Bijection"
+            ],
+            "Geometry": [
+                "Linear Geometry", "Circular Geometry", "Config Geometry", "Projective Geometry"
+            ],
+            "Number Theory": [
+                "Divisibility", "Modular Arithmetic", "Diophantine Equations", "Residue Classes"
+            ]
+        },
+        "difficulty": [
+            "Primary", "Junior", "Senior", "Open", "IMO 1/4", "IMO 2/5", "IMO 3/6",
+
+            "Round 1 Junior", "Round 1 Senior", "Round 1 Open"
+        ],
+        "sourceName": [
+            "SMO Junior Round 1", "SMO Senior Round 1", "SMO Open Round 1", 
+            "SMO Junior Round 2", "SMO Senior Round 2", "SMO Open Round 2", 
+            "EGMO", "Zhautykov", "Baltic Way", "Balkan MO", 
+            "USAMO", "USAJMO", "USA TST", "USA TSTST", "ELMO",
+            "CWMI", "CSEMO", "China First Round", "China Second Round", "China MO (CMO)", "CHKMO", "China TST", "Taiwan TST", "HKMO Round 1",
+            "RMM", "Romania TST", 
+            "Iran MO Round 2", "Iran MO Round 3",
+            "All-Russian MO (ARMO)", "Sharygin", "St. Petersburg MO", 
+            "Canada MO (CMO)", "BMO1", "BMO2", "France TST", "Germany TST", "Turkey MO", "Switzerland MO", "Japan MO Finals (JMO)",
+            "Australian MO (AMO)",
+
+            "IMO", "ISL",
+            "National Team Training", "Senior Team Training"
+        ],
+        "tags": [
+            "Algebraic Manipulation", 
+            "Quadratic Equations", "Vieta's Formulae", "Intermediate Value Theorem", "Integer Polynomials", "Complex Polynomials",
+            "Sum of Squares", "AM-GM", "QM-AM-GM-HM", "Cauchy-Schwarz", "Rearrangement", "Holder", "Power Mean Inequality", "Weighted AM-GM", "Muirhead",
+            "Graphical Method", "Analysis", "Differentiation", "Integration", "Limits", "Continuity",
+            "Functions on R", "Functions on R+", "Functions on Q", "Functions on Z", "Functions on N",
+            "Integer Sequences",
+
+            "Permutations and Combinations", "Stars and Bars",
+            "Pigeonhole", "Colouring", "Grid Combi", "Double Counting", 
+            "Combinatorial Sequences",
+
+            "Congruent Triangles", "Similar Triangles", "Menelaus and Ceva", 
+            "Cyclic Quadrilaterals", "Power of a Point", "Radical Axis", "Alternate Segment Theorem",
+            "Circumcenter-Orthocenter Configs", "Incenter Configs", "Incenter-Excenter Configs", "Symmedian Configs", "Harmonic Configs",
+            "Spiral Similarities", "Corresponding Points",
+            "Length Chasing", "Trigo Bash", "Complex Bash",
+
+            "Variable Ordering", "gcd and lcm", "Prime Powers", 
+            "Fermat's Little Theorem (FLT)", "Euler's Theorem", 
+            "Order", "Lifting the Exponent (LTE)", 
+            "Chinese Remainder Theorem", 
+            "Rational Expressions", "Sets",
+
+            "Bounding", "Combi-flavoured", "Construction", "Induction", "Weed"
+        ]
+    },
+    "Computer Science": {
+        "topic": {
+            "Graph Theory": [
+                "Graph Traversal", "Minimum Spanning Tree"
+            ],
+            "Second Topic": [
+                "Placeholder"
+            ]
+        },
+        "difficulty": [
+            "NOI", "University"
+        ],
+        "sourceName": [
+            "NOI", "IOI", "ICPC"
+        ],
+        "tags": [
+        ]
+    }
+}
