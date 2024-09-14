@@ -1,42 +1,38 @@
 [
 {
-"text": "development",
- "items": [{ "text": "Running and Troubleshooting", "link": "/development/running-and-troubleshooting" }
-,{ "text": "Setup and Configuration", "link": "/development/setup-and-configuration" }
+"text": "Development",
+ "items": [{ "text": "Dev Scripts", "link": "/Development/dev-scripts" }
+,{ "text": "Running and Troubleshooting", "link": "/Development/running-and-troubleshooting" }
+,{ "text": "Setup and Configuration", "link": "/Development/setup-and-configuration" }
 ]
 },
 {
-"text": "old",
- "items": [{ "text": "*", "link": "/old/dockerfile-documentation-latex-builder.code-workspace-makefile-readme.md-scripts-server-vue-frontend" }
+"text": "Frontend",
+ "items": [{ "text": "Authentication", "link": "/Frontend/authentication" }
+,{ "text": "Documentation Subsite", "link": "/Frontend/documentation-subsite" }
+,{ "text": "Draggable Search Table", "link": "/Frontend/draggable-search-table" }
+,{ "text": "Networking", "link": "/Frontend/networking" }
+,{ "text": "Setup Tutorial", "link": "/Frontend/setup-tutorial" }
 ]
 },
 {
-"text": "production",
- "items": [{ "text": "AWS IAM", "link": "/production/aws-iam" }
-,{ "text": "Lightsail for Backend Deployment", "link": "/production/lightsail-for-backend-deployment" }
-,{ "text": "Networking", "link": "/production/networking" }
-,{ "text": "S3 for Frontend Deployment", "link": "/production/s3-for-frontend-deployment" }
-,{ "text": "S3 for Media Delivery", "link": "/production/s3-for-media-delivery" }
-,{ "text": "SES for Email Service", "link": "/production/ses-for-email-service" }
+"text": "Production",
+ "items": [{ "text": "AWS IAM", "link": "/Production/aws-iam" }
+,{ "text": "Lightsail for Backend Deployment", "link": "/Production/lightsail-for-backend-deployment" }
+,{ "text": "Networking", "link": "/Production/networking" }
+,{ "text": "S3 for Frontend Deployment", "link": "/Production/s3-for-frontend-deployment" }
+,{ "text": "S3 for Media Delivery", "link": "/Production/s3-for-media-delivery" }
+,{ "text": "SES for Email Service", "link": "/Production/ses-for-email-service" }
 ]
 },
 {
-"text": "server",
- "items": [{ "text": "Authentication", "link": "/server/authentication" }
-,{ "text": "Database", "link": "/server/database" }
-,{ "text": "Dockerfile Build", "link": "/server/dockerfile-build" }
-,{ "text": "Error Handling", "link": "/server/error-handling" }
-,{ "text": "Latex", "link": "/server/latex" }
-,{ "text": "Network Requests", "link": "/server/network-requests" }
-,{ "text": "Setup and Basics Tutorial", "link": "/server/setup-and-basics-tutorial" }
-]
-},
-{
-"text": "vue-frontend",
- "items": [{ "text": "Authentication", "link": "/vue-frontend/authentication" }
-,{ "text": "Documentation Subsite", "link": "/vue-frontend/documentation-subsite" }
-,{ "text": "Networking", "link": "/vue-frontend/networking" }
-,{ "text": "Setup Tutorial", "link": "/vue-frontend/setup-tutorial" }
-,{ "text": "(TBA) Draggable Search Table", "link": "/vue-frontend/(tba)-draggable-search-table" }
+"text": "Server",
+ "items": [{ "text": "Authentication", "link": "/Server/authentication" }
+,{ "text": "Database", "link": "/Server/database" }
+,{ "text": "Dockerfile Build", "link": "/Server/dockerfile-build" }
+,{ "text": "Error Handling", "link": "/Server/error-handling" }
+,{ "text": "Latex", "link": "/Server/latex" }
+,{ "text": "Networking", "link": "/Server/networking" }
+,{ "text": "Setup and Basics Tutorial", "link": "/Server/setup-and-basics-tutorial" }
 ]
 }]

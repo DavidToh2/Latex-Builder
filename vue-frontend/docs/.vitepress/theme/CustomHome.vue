@@ -34,10 +34,10 @@ const hrefs = [
     '',
     '',
 
-    "/vue-frontend/setup-tutorial",
-    "/server/setup-and-basics-tutorial",
-    "/development/running-and-troubleshooting",
-    "/production/aws-iam"
+    "/Frontend/setup-tutorial",
+    "/Server/setup-and-basics-tutorial",
+    "/Development/running-and-troubleshooting",
+    "/Production/aws-iam"
 ]
 </script>
 
