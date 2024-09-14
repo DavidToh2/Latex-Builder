@@ -7,6 +7,15 @@
 ]
 },
 {
+"text": "Frontend",
+ "items": [{ "text": "Authentication", "link": "/Frontend/authentication" }
+,{ "text": "Documentation Subsite", "link": "/Frontend/documentation-subsite" }
+,{ "text": "Networking", "link": "/Frontend/networking" }
+,{ "text": "Setup Tutorial", "link": "/Frontend/setup-tutorial" }
+,{ "text": "(TBA) Draggable Search Table", "link": "/Frontend/(tba)-draggable-search-table" }
+]
+},
+{
 "text": "Production",
  "items": [{ "text": "AWS IAM", "link": "/Production/aws-iam" }
 ,{ "text": "Lightsail for Backend Deployment", "link": "/Production/lightsail-for-backend-deployment" }
@@ -25,15 +34,5 @@
 ,{ "text": "Latex", "link": "/Server/latex" }
 ,{ "text": "Network Requests", "link": "/Server/network-requests" }
 ,{ "text": "Setup and Basics Tutorial", "link": "/Server/setup-and-basics-tutorial" }
-]
-},
-{
-"text": "Vue",
- "items": [{ "text": "*", "link": "/Vue/dockerfile-documentation-latex-builder.code-workspace-makefile-readme.md-schema.json-scripts-server-vue-frontend" }
-]
-},
-{
-"text": "Frontend",
- "items": [{ "text": "*", "link": "/Frontend/dockerfile-documentation-latex-builder.code-workspace-makefile-readme.md-schema.json-scripts-server-vue-frontend" }
 ]
 }]

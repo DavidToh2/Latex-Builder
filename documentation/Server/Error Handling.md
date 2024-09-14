@@ -44,8 +44,8 @@ Server and Database errors are caused by unexpected and abnormal software behavi
 
 They are formatted as a `ResponseError()`:
 ```js
-    const response = new ResponseBody()
-    response.status = 1
+    const response = new ResponseError()
+    response.status = -1
     response.fn = // function of request
     response.error = {
         name: 'ServerError' | 'DatabaseError'

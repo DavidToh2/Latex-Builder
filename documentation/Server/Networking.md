@@ -1,12 +1,13 @@
 # Introduction
 
+This document describes how the backend, functioning as a server, processes network requests from the front-end, and issues network responses back to the front-end.
+
 - [Introduction](#introduction)
 - [Express](#express)
 	- [Response Format](#response-format)
 - [CORS](#cors)
-	- [Network Request Procedure](#network-request-procedure)
+	- [Handling a Network Request](#handling-a-network-request)
 	- [CORS does not protect against external scripts](#cors-does-not-protect-against-external-scripts)
-
 
 # Express
 
@@ -57,9 +58,9 @@ response: {
 }
 res.json(response)
 ```
-Responses should be formatted by the database functions, not the router functions.
+Responses should be formatted by the database functions, not the router functions. Details regarding response formatting can be found in he [Error Handling](./error-handling.md) documentation.
 
-Responses will be passed verbatim from the higher-level post functions directly to the Vue components for preprocessing. Vue components can access the response state like so:
+Once received by the front-end, responses will be passed verbatim from the higher-level post functions directly to the Vue components for preprocessing. Details can be found in the [Frontend Networking](../Frontend/networking.md) documentation. Vue components can access the response state like so:
 ```js
 if (responsejson.status == -1) {
 	// Error occured
@@ -108,7 +109,7 @@ In the front-end,
 1. The `Content-Type` must be set.
 2. Set an array of `Allowed` content-types for the response payload. For example, `'Accept': 'application/pdf, image/png, image/svg+xml'`
 
-## Network Request Procedure
+## Handling a Network Request
 
 We describe the procedure by which the front-end fetches a resource, or submits data, to the back-end.
 

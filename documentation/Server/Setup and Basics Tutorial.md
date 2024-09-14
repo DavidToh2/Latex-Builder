@@ -190,7 +190,7 @@ services:
 volumes:
     [source/name]: (uses default options)
 ```
-Our app will have two services - one for the server, and one for the database. Both services will need to be configured in the `docker-compose.yml`. More details are in the [Development Configuration](../development/setup-and-configuration.md) file.
+Our app will have two services - one for the server, and one for the database. Both services will need to be configured in the `docker-compose.yml`. More details are in the [Development Configuration](../Development/setup-and-configuration.md) file.
 
 # Part 3: Setting Up Mongoose
 
@@ -209,4 +209,4 @@ mongoose.connection.on('error', callback)
 mongoose.connection.once('open', app logic)
 ```
 
-For details of how the development database is set up, please refer to the [Development Configuration](../development/setup-and-configuration.md) document.
+For details of how the development database is set up, please refer to the [Development Configuration](../Development/setup-and-configuration.md) document.

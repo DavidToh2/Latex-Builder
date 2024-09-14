@@ -1,8 +1,12 @@
 # Introduction
 
-This document details the formats used in the front-end's networking.
+This document details how the front-end issues network requests to the backend, and handles network responses.
 
-## Request Format
+- [Introduction](#introduction)
+- [Sending a Request](#sending-a-request)
+- [Response Handling](#response-handling)
+
+# Sending a Request
 
 All requests are handled by the helper files `postAuth.ts`, `postFile.ts` and `postQn.ts`, which implement separate helper functions for every single possible use-case requiring server communication.
 - `postAuth.ts`: login, logout, signup and authentication
@@ -22,9 +26,9 @@ await fetch(url, {
 })
 ```
 
-## Response Handling
+# Response Handling
 
-Exact response format can be found in the [Server Networking](../server/network-requests.md) documentation.
+Responses are formatted by the backend. The formats can be found under the [Server Networking](../Server/networking.md) documentation.
 
 On receipt of a response, `post.ts` will pass the response data back to the helper functions, which then parse the response data back into `JSON` or `BLOB` (for files) format, before passing the data back to the components that requested said data.
 
@@ -33,6 +37,19 @@ Components will generally handle response data as such:
   - If status code is -1, then server or database error occured. Format the error message to include all error information, then display a popup.
   - If status code is 1, then user-caused error occured. Only display the error cause in the popup.
   - If status code is 0, carry on with regular functions.
+
+We implement two interfaces, `UserError` and `ServerError`, for this purpose:
+```js
+export interface ServerError {
+    name: string,
+    message: string,
+    cause: string,
+    status: string
+}
+```
+
+An example of a response-handling workflow follows. Note that this is done in a very verbatim fashion to allow for greater customisability across different views. Nevertheless, it is to be noted that most views share a very similar response-handling workflow, and so the underlying code could probably be abstracted for re-use more effectively in some way. This is a point for future improvement.
+
 ```js
 const responsejson = await questionSave(active, active.id)
 if (responsejson.status == -1) {

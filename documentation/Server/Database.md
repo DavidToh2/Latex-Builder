@@ -27,7 +27,7 @@ This file serves to document our database implementation, as well as how it inte
 
 **MongoDB Atlas** is MongoDB's cloud-hosted database service. We use its free tier for our production database.
 
-For more details on how the development database is set up, please refer to the [Development Configuration](../development/setup-and-configuration.md) document.
+For more details on how the development database is set up, please refer to the [Development Configuration](../Development/setup-and-configuration.md) document.
 
 The native Mongo Shell is known as `mongosh` and is the default way for interacting with Mongo databases. Documentation can be found [here](https://www.mongodb.com/docs/mongodb-shell/run-commands/). It provides us with a shell-like interface where we can issue commands to a database, as such:
 
@@ -284,7 +284,7 @@ We need to choose an *analyzer* for our index. The analyzer is responsible for c
 
 We now configure the index's **field mappings**. For every field we want to search on, we need to index it according to a specified data type:
 
-<img src="Images/database-field-mappings.png" width=75%>
+<img src="./Images/database-field-mappings.png" width=75%>
 
 - The `token` data type stores the entire value of the field as a single token. This is ideal for equality comparisons (for values of any types).
 - The `string` data type converts fields whose values are strings into a list of tokens to be stored. This is ideal for textual search.
@@ -303,6 +303,6 @@ Stored soruce fields are a way to keep only the minimum number of fields require
 
 Documentation can be found [here](https://www.mongodb.com/docs/atlas/atlas-search/performance/index-performance/#storing-source-fields).
 
-<img src="Images/database-stored-sources.png" width=75%>
+<img src="./Images/database-stored-sources.png" width=75%>
 
 Note that, for the purposes of our database, the only real use of these stored source fields is to speed up the `skip()` and `limit()` stages (for which we only really need the `_id` field). This is a potential future improvement and is **currently not implemented in our database**.

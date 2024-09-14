@@ -16,14 +16,14 @@ We use the **official Mongo Docker image** as our local database during developm
 - Execute `docker pull mongo:latest`
 - The image stores its database data internally in `/data/db`
 - We should thus create a volume `server_db-data` to persist the database data, so that even if we need to re-build the Mongo container (e.g. if an image update is required), all the data is preserved.
-  - This is done below using Docker-Compose. We could also do it manually though (refer to the [Setup and Basics Tutorial](../server/setup-and-basics-tutorial.md)).
+  - This is done below using Docker-Compose. We could also do it manually though (refer to the [Setup and Basics Tutorial](../Server/setup-and-basics-tutorial.md)).
 - This means we do not need to install MongoDB natively on our own machine. 
 
 # Docker-Compose
 
 We use Docker Compose to describe how our two containers (here known as services), housing our backend services, behave and interact with each other.
 
-Every service should have a `container_name` and an `image` (the former is optional but Docker-Compose will generate a default name for you otherwise). By convention we use the same name for all three; nonetheless, the distinction between the three concepts is important and is explained in the [Setup and Basics Tutorial](../server/setup-and-basics-tutorial.md).
+Every service should have a `container_name` and an `image` (the former is optional but Docker-Compose will generate a default name for you otherwise). By convention we use the same name for all three; nonetheless, the distinction between the three concepts is important and is explained in the [Setup and Basics Tutorial](../Server/setup-and-basics-tutorial.md).
 ```
 services:
   latexquestionbank:
