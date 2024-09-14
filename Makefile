@@ -3,7 +3,10 @@ latex-base:
 
 copy-docs:
 	( \
-	rm -r ./vue-frontend/docs/{development,production,server,vue-frontend}; \
+	rm -r ./vue-frontend/docs/Development && \
+	rm -r ./vue-frontend/docs/Production && \
+	rm -r ./vue-frontend/docs/Server && \
+	rm -r ./vue-frontend/docs/Frontend; \
 	rm ./documentation/docs-hierarchy.json; \
 	./scripts/generateDocHierarchy.sh $(PWD) && \
 	cp -a ./documentation/. ./vue-frontend/docs && \

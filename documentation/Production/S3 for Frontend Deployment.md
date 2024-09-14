@@ -4,6 +4,8 @@ This file describes the steps taken to deploy the web-app's frontend to producti
 
 The Vue frontend is compiled and minified in `./dist`, so that the site is now essentially static. These static files are then pushed to an **AWS S3 bucket**, which is proxied through **Cloudflare**.
 
+The documentation subsite is compiled and minified in `./docs/.vitepress/dist`.
+
 - [Introduction](#introduction)
 - [S3](#s3)
   - [Creating S3 Bucket](#creating-s3-bucket)
@@ -16,6 +18,8 @@ The Vue frontend is compiled and minified in `./dist`, so that the site is now e
 
 
 # S3
+
+The following procedure applies to both the main site, **https://towelet.app**, as well as the documentation subsite, **https://docs.towelet.app**.
 
 ## Creating S3 Bucket
 

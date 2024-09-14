@@ -13,10 +13,10 @@ This document is intended as a guide for people setting up Vue 3 for use as thei
 - [Project Configuration](#project-configuration)
   - [Vite](#vite)
   - [Typescript](#typescript)
-  - [Commands](#commands)
-    - [Compile and Hot-Reload for Development](#compile-and-hot-reload-for-development)
-    - [Type-Check, Compile and Minify for Production](#type-check-compile-and-minify-for-production)
-    - [Lint with ESLint](#lint-with-eslint)
+- [Commands](#commands)
+  - [Compile and Hot-Reload for Development](#compile-and-hot-reload-for-development)
+  - [Type-Check, Compile and Minify for Production](#type-check-compile-and-minify-for-production)
+  - [Lint with ESLint](#lint-with-eslint)
 
 ## What is Vue?
 
@@ -221,21 +221,25 @@ Under *compilerOptions*, we may also specify *path aliases*, relative to the `ba
 
 The *types* parameter above is more complicated and I don't really get it either. [Full explanation here](https://stackoverflow.com/questions/39826848/typescript-2-0-types-field-in-tsconfig-json)
 
-## Commands
+# Commands
 
-### Compile and Hot-Reload for Development
+Run all commands from `vue-frontend`.
+
+## Compile and Hot-Reload for Development
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+## Type-Check, Compile and Minify for Production
 
 ```sh
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## Lint with [ESLint](https://eslint.org/)
+
+It is not recommended to use the linter as the indentation setting doesn't seem to work. I prefer indentation using tabs, but the linter will insist on indenting everything using two spaces.
 
 ```sh
 npm run lint

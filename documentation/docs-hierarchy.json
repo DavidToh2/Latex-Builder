@@ -10,9 +10,9 @@
 "text": "Frontend",
  "items": [{ "text": "Authentication", "link": "/Frontend/authentication" }
 ,{ "text": "Documentation Subsite", "link": "/Frontend/documentation-subsite" }
+,{ "text": "Draggable Search Table", "link": "/Frontend/draggable-search-table" }
 ,{ "text": "Networking", "link": "/Frontend/networking" }
 ,{ "text": "Setup Tutorial", "link": "/Frontend/setup-tutorial" }
-,{ "text": "(TBA) Draggable Search Table", "link": "/Frontend/(tba)-draggable-search-table" }
 ]
 },
 {
@@ -32,7 +32,7 @@
 ,{ "text": "Dockerfile Build", "link": "/Server/dockerfile-build" }
 ,{ "text": "Error Handling", "link": "/Server/error-handling" }
 ,{ "text": "Latex", "link": "/Server/latex" }
-,{ "text": "Network Requests", "link": "/Server/network-requests" }
+,{ "text": "Networking", "link": "/Server/networking" }
 ,{ "text": "Setup and Basics Tutorial", "link": "/Server/setup-and-basics-tutorial" }
 ]
 }]
