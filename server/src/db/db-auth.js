@@ -137,7 +137,7 @@ async function findUserIDUsingUsername(username) {
             username: username
         }
 
-        const userArr = await Users.find(u).lean()
+        const userArr = await Users.find(u, 'id').lean()
 
         if (userArr.length > 1) {
             throw new DatabaseError(errorString, `findUser() found multiple users for username ${username}!`)
@@ -164,7 +164,7 @@ async function findUsernameUsingID(userID) {
             id: userID
         }
 
-        const userArr = await Users.find(u).lean()
+        const userArr = await Users.find(u, 'username').lean()
 
         if (userArr.length > 1) {
             throw new DatabaseError(errorString, `findUsernameUsingID() found multiple users!`)
