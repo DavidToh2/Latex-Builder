@@ -12,6 +12,8 @@ This document serves to describe how the documentation subsite is set up.
   - [Compile and Hot-Reload for Development](#compile-and-hot-reload-for-development)
   - [Type-Check, Compile and Minify for Production](#type-check-compile-and-minify-for-production)
 
+Note: other popular documentation static-site generators are: [Docusaurus](https://docusaurus.io/docs)
+
 # Vitepress
 
 Vitepress is a static site generator with a default theme purpose-built for documentation sites. Site pages are written in Markdown, and converted to HTML using `markdown-it`. **Routing is done by file hierarchy**. Its default theme also provides us with nice-looking stylings.

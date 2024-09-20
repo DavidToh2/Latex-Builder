@@ -11,7 +11,7 @@ do
         echo "file = $f"
         fname=$(basename "${f}" .md)
         f1=$(format $fname)
-        mv -v "$f" "$folder/$f1.md"
+        mv -v "$f" "$folder$f1.md"
     done
 done
 IFS="$OIFS"
